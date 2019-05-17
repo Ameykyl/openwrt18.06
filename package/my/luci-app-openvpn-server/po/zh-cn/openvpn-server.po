@@ -1,0 +1,131 @@
+msgid "OpenVPN Server"
+msgstr "OpenVPN 服务器"
+
+msgid "An easy config OpenVPN Server Web-UI"
+msgstr "易于使用的 OpenVPN 服务器 Web-UI"
+
+msgid "Base Setting"
+msgstr "基本设置"
+
+msgid "Enable"
+msgstr "启用"
+
+msgid "Disable"
+msgstr "禁用"
+
+msgid "Port"
+msgstr "端口"
+
+msgid "Address"
+msgstr "地址"
+
+msgid "DDNS address or IP of the WAN port"
+msgstr "WAN口的DDNS地址或者IP地址"
+
+msgid "Client Network"
+msgstr "客户端网段"
+
+msgid "VPN Client Network IP with subnet"
+msgstr "客户端分配的网段地址（默认为 10.8.0.0 255.255.255.0）"
+
+msgid "proto"
+msgstr "协议"
+
+msgid "Remote-cert-tls"
+msgstr "检查远程证书"
+
+msgid "Check remote certificate to prevent man-in-the-middle attacks.<br / >Recommended to enable."
+msgstr "检查远程证书防止中间人攻击.<br / >建议启用."
+
+msgid "Add an additional layer of HMAC authentication on top of the TLS control channel.Recommended to enable."
+msgstr "启用在TLS通道上的HMAC身份验证,建议启用."
+
+msgid "Max-clients"
+msgstr "最大连接数"
+
+msgid "Set maximum number of connections."
+msgstr "设置最大连接数."
+
+msgid "Auth-user-pass-verify"
+msgstr "用户名/密码认证"
+
+msgid "Enable username/password for authentication."
+msgstr "启用用户名/密码认证."
+
+msgid "Script-security level"
+msgstr "脚本安全等级"
+
+msgid "If username/password are used for authentication,please change to level 3."
+msgstr "如果使用用户名/密码认证，请改为等级3"
+
+msgid "1-Only call built-in executables such as ifconfig, ip, route, or netsh."
+msgstr "1-仅调用内置可执行文件，如ifconfig,ip,route或netsh."
+
+msgid "2-Allow calling of built-in executables and user-defined scripts."
+msgstr "2-允许调用内置可执行文件和用户定义的脚本."
+
+msgid "3-Allow passwords to be passed to scripts via environmental variables."
+msgstr "3-允许通过环境变量将密码传递给脚本."
+
+msgid "Duplicate-cn"
+msgstr "允许相同用户登录"
+
+msgid "Allow multiple clients with the same name or the same client certificate to connect to the server at the same time."
+msgstr "允许使用相同用户名或者同客户端证书的多个客户端同时连接."
+
+msgid "Username-as-common-name"
+msgstr "使用用户名作为公用名"
+
+msgid "For enable username/password verification,use the authenticated username as the common name, rather than the common name from the client cert."
+msgstr "在启用用户名/密码认证的情况下，使用经过身份验证的用户名作为公用名，而不是客户端证书中的公用名."
+
+msgid "Verify-Client-Cert None"
+msgstr "不启用证书认证"
+
+msgid "Don’t require client certificate, client will authenticate using username/password only.<br / >Checking remote certificate will fail after enabling."
+msgstr "不启用证书认证功能，客户端认证只使用用户名/密码.<br / >启用后检查远程证书功能将失效."
+
+msgid "Client Push Settings"
+msgstr "客户端推送配置"
+
+msgid "Set route 192.168.0.0 255.255.255.0 and dhcp-option DNS 192.168.0.1 base on your router"
+msgstr "根据路由的实际LAN IP 修改 route 192.168.0.0 255.255.255.0 和 dhcp-option DNS 192.168.0.1 这两行"
+
+msgid "OpenVPN Client config file"
+msgstr "OpenVPN 客户端配置文件"
+
+msgid "Download .ovpn file"
+msgstr "下载.ovpn文件"
+
+msgid "If you are using IOS client, please download this .ovpn file and send it via Telegram or Email to your IOS device.<br / >After modifying the configuration, you need to download the .ovpn file again.<br / >Re-download the .ovpn file after generating the certificate."
+msgstr "如果你使用的是iOS设备,你可以使用Telegram或者邮件发送到自己的设备上用 OpenVPN 客户端打开导入.<br / >修改配置以后需要重新下载.ovpn文件.<br / >生成证书以后需要重新下载.ovpn文件."
+
+msgid "Client configuration"
+msgstr "客户端配置"
+
+msgid "The code added to .ovpn file."
+msgstr "加入到.ovpn文件里的代码."
+
+msgid "Username and Password"
+msgstr "用户名和密码"
+
+msgid "One line is a set of username passwords,username password is separated by a space."
+msgstr "一行为一组用户名与密码，用户名密码中间用空格隔开"
+
+msgid "Generate certificate"
+msgstr "生成证书"
+
+msgid "<font color=\"red\">Generate certificate before running for the first time.<br / >After modifying the certificate option, you need to regenerate the certificate to take effect.<br / >The certificate may take a long time to generate.<br / >After the certificate is generated, the VPN service needs to be restarted to take effect.</font>"
+msgstr "<font color=\"red\">首次运行前需要生成证书.<br / >修改证书选项以后需要重新生成证书才会生效.<br / >生成证书可能会需要很长时间.<Br / >生成证书以后需要重启VPN服务才会生效.</font>"
+
+msgid "Certificate option"
+msgstr "证书选项"
+
+msgid "Edit certificate generation options,keep the default for normal users.<br / >Do not modify the set_var EASYRSA_PKI, otherwise the certificate will not be generated normally."
+msgstr "编辑证书选项，普通用户请保持默认.<br / >不要修改set_var EASYRSA_PKI,否则证书无法正常生成."
+
+msgid "Restart"
+msgstr "重启"
+
+msgid "Restart OpenVPN service."
+msgstr "重启OpenVPN服务."

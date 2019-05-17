@@ -1,0 +1,12 @@
+#!/bin/sh
+# Copyright (C) 2007 OpenWrt.org
+
+[ "$ACTION" = ifup -o "$INTERFACE" = wan ] && {
+ifconfig | grep pptp-vpn0
+if [ $? -ne 0 ]; then
+	sleep 15
+	ifdown vpn0
+	sleep 5
+	ifup vpn0
+fi
+}

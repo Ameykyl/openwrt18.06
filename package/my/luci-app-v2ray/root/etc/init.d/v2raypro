@@ -1,0 +1,562 @@
+#!/bin/sh /etc/rc.common
+
+START=99
+# local port is defined in $V2_CONF_GENERATE_LUA
+SS_REDIR_PORT=7070
+SS_REDIR_PIDFILE=/var/run/v2ray-go.pid
+PDNSD_LOCAL_PORT=7453
+SSRCONF=/etc/v2ray/config.json
+V2_CONF_GENERATE_LUA=/etc/v2ray/gen_config.lua
+CRON_FILE=/etc/crontabs/root
+CONFIG=v2ray
+V2RAY_EXEC_PATH=/usr/bin/v2ray/v2ray
+
+
+# -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+
+	# $covered_subnets, $local_addresses are not required
+covered_subnets=`uci get v2ray.@v2ray[0].covered_subnets 2>/dev/null`
+local_addresses=`uci get v2ray.@v2ray[0].local_addresses 2>/dev/null`
+	# Get LAN settings as default parameters
+	[ -f /lib/functions/network.sh ] && . /lib/functions/network.sh
+	[ -z "$covered_subnets" ] && network_get_subnet covered_subnets lan
+	[ -z "$local_addresses" ] && network_get_ipaddr local_addresses lan
+vt_np_ipset="china"  # Must be global variable
+
+__gfwlist_by_mode()
+{
+	case "$1" in
+		V) echo unblock-youku;;
+		*) echo china-banned;;
+	esac
+}
+
+
+
+# -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+
+start()
+{
+  local vt_enabled=`uci get v2ray.@v2ray[0].enabled 2>/dev/null`
+  local vt_safe_dns=`uci get v2ray.@v2ray[0].safe_dns 2>/dev/null`
+  local vt_safe_dns_port=`uci get v2ray.@v2ray[0].safe_dns_port 2>/dev/null`
+  local vt_safe_dns_tcp=`uci get v2ray.@v2ray[0].safe_dns_tcp 2>/dev/null`
+  local vt_proxy_mode=`uci get v2ray.@v2ray[0].proxy_mode`
+  local vt_server_addr=`uci get v2ray.@v2ray[0].address`
+  local cron_mode=`uci get v2ray.@v2ray[0].cron_mode 2>/dev/null`
+  local vt_gfwlist=`__gfwlist_by_mode $vt_proxy_mode`
+  local use_conf_file=`uci get v2ray.@v2ray[0].use_conf_file 2>/dev/null`
+  local conf_file_path=`uci get v2ray.@v2ray[0].conf_file_path 2>/dev/null`
+  local conf_file_type=`uci get v2ray.@v2ray[0].conf_file_type 2>/dev/null`
+  local safe_dns_tcp_udp=`uci get v2ray.@v2ray[0].safe_dns_tcp_udp 2>/dev/null`
+  local pdnsd_enable=`uci get v2ray.@v2ray[0].pdnsd_enable 2>/dev/null`
+
+	[ -f /etc/init.d/pdnsd ] && /etc/init.d/pdnsd disable 2>/dev/null
+
+	# -----------------------------------------------------------------
+	if [ "$vt_enabled" = 0 ]; then
+		echo "WARNING: V2Ray is disabled."
+		return 1
+	fi
+
+	[ -z "$vt_proxy_mode" ] && vt_proxy_mode=M
+	[ -z "$vt_method" ] && vt_method=table
+	[ -z "$vt_timeout" ] && vt_timeout=60
+	case "$vt_proxy_mode" in
+		M|S|G)
+			[ -z "$vt_safe_dns" ] && vt_safe_dns="8.8.8.8"
+			[ -z "$vt_safe_dns_tcp" ] && vt_safe_dns_tcp=1
+			;;
+	esac
+	[ -z "$vt_safe_dns_port" ] && vt_safe_dns_port=53
+
+	# -----------------------------------------------------------------
+	###### v2ray ######
+
+	if [ "$use_conf_file" = 0 ]; then
+	   	/usr/bin/lua $V2_CONF_GENERATE_LUA $CONFIG $SSRCONF
+	    $V2RAY_EXEC_PATH -config=$SSRCONF &
+	else
+	   $V2RAY_EXEC_PATH -config=$conf_file_path -format=$conf_file_type &
+    fi
+
+	sleep 3
+	if pidof v2ray>/dev/null; then
+	   echo "V2Ray started"
+	 else
+	   return 1
+    fi
+
+	# IPv4 firewall rules
+	add_rule
+
+	# -----------------------------------------------------------------
+	mkdir -p /var/dnsmasq.d
+	###### Anti-pollution configuration ######
+	if [ -n "$vt_safe_dns" ]; then
+		if [ "$vt_safe_dns_tcp" = 1 ]; then
+			case "$pdnsd_enable" in
+				Pdnsd)
+					start_pdnsd "$vt_safe_dns"
+					;;
+				dnsforwarder)
+					start_dnsforwarder "$vt_safe_dns"
+					;;
+			esac
+			awk -vs="127.0.0.1#$PDNSD_LOCAL_PORT" '!/^$/&&!/^#/{printf("server=/%s/%s\n",$0,s)}' \
+				/etc/gfwlist/$vt_gfwlist > /var/dnsmasq.d/01-pollution.conf
+		else
+			awk -vs="$vt_safe_dns#$vt_safe_dns_port" '!/^$/&&!/^#/{printf("server=/%s/%s\n",$0,s)}' \
+				/etc/gfwlist/$vt_gfwlist > /var/dnsmasq.d/01-pollution.conf
+		fi
+	else
+		echo "WARNING: Not using secure DNS, DNS resolution might be polluted if you are in China."
+	fi
+
+	###### dnsmasq-to-ipset configuration ######
+	case "$vt_proxy_mode" in
+		M|V)
+			awk '!/^$/&&!/^#/{printf("ipset=/%s/'"$vt_gfwlist"'\n",$0)}' \
+				/etc/gfwlist/$vt_gfwlist > /var/dnsmasq.d/02-ipset.conf
+			;;
+	esac
+
+	# -----------------------------------------------------------------
+	###### Restart main 'dnsmasq' service if needed ######
+	if ls /var/dnsmasq.d/* >/dev/null 2>&1; then
+		mkdir -p /var/dnsmasq.d
+		grep "conf-dir=/var/dnsmasq.d" /etc/dnsmasq.conf ||echo 'conf-dir=/var/dnsmasq.d' >> /etc/dnsmasq.conf
+#		cat > /var/dnsmasq.d/dnsmasq-go.conf <<EOF
+#conf-dir=/var/dnsmasq.d
+#EOF
+		/etc/init.d/dnsmasq restart
+	fi
+	add_cron
+}
+
+stop()
+{
+
+	# -----------------------------------------------------------------
+	rm -rf /var/dnsmasq.d
+	/etc/init.d/dnsmasq restart
+
+	stop_pdnsd
+	stop_dnsforwarder
+
+	# --STOP IPv4 firewall---------------------------------------------------------------
+	del_rule
+
+	# -----------------------------------------------------------------
+	if [ -f $SS_REDIR_PIDFILE ]; then
+		kill -9 `cat $SS_REDIR_PIDFILE`
+		rm -f $SS_REDIR_PIDFILE
+	fi
+	killall -9 v2ray 2>/dev/null
+	del_cron
+	uci set v2ray.v2ray.more=0
+	uci commit v2ray
+}
+
+restart()
+{
+	KEEP_GFWLIST=Y
+	stop
+	start
+}
+
+reload()
+{
+  local vt_enabled=`uci get v2ray.@v2ray[0].enabled 2>/dev/null`
+  local vt_server_addr=`uci get v2ray.@v2ray[0].address`
+  local vt_safe_dns=`uci get v2ray.@v2ray[0].safe_dns 2>/dev/null`
+  local vt_safe_dns_port=`uci get v2ray.@v2ray[0].safe_dns_port 2>/dev/null`
+  local vt_safe_dns_tcp=`uci get v2ray.@v2ray[0].safe_dns_tcp 2>/dev/null`
+  local vt_proxy_mode=`uci get v2ray.@v2ray[0].proxy_mode`
+  local vt_gfwlist=`__gfwlist_by_mode $vt_proxy_mode`
+  local pdnsd_enable=`uci get v2ray.@v2ray[0].pdnsd_enable 2>/dev/null`
+	KEEP_GFWLIST=Y
+	del_rule
+	add_rule
+	if [ "$vt_safe_dns_tcp" = 1 ]; then
+		case "$pdnsd_enable" in
+		Pdnsd)
+			stop_pdnsd
+			start_pdnsd
+			;;
+		dnsforwarder)
+		    stop_dnsforwarder
+			start_dnsforwarder
+			;;
+		esac
+	fi
+}
+
+# $1: upstream DNS server
+start_pdnsd() {
+	local vt_redir=`uci get v2ray.@v2ray[0].redir 2>/dev/null`
+	local safe_dns="$1"
+	local tcp_dns_list="208.67.222.222,208.67.220.220,1.1.1.1,1.0.0.1,8.8.8.8,8.8.4.4"
+	[ -n "$safe_dns" ] && tcp_dns_list="$safe_dns,$tcp_dns_list"
+
+
+	#killall -9 pdnsd 2>/dev/null && sleep 1
+	kill -9 $(cat /var/run/pdnsd.pid) >/dev/null 2>&1 
+	
+	mkdir -p /var/etc /var/pdnsd
+	if ! test -f "/var/pdnsd/pdnsd.cache"; then
+		echo -ne "pd13\000\000\000\000" >/var/pdnsd/pdnsd.cache
+		chown -R nobody.nogroup /var/pdnsd
+	fi
+	
+	cat > /var/etc/pdnsd.conf <<EOF
+global {
+	perm_cache=1024;
+	cache_dir="/var/pdnsd";
+	pid_file = /var/run/pdnsd.pid;
+	run_as="nobody";
+	server_ip = 127.0.0.1;
+	server_port = $PDNSD_LOCAL_PORT;
+	status_ctl = on;
+	query_method = tcp_only;
+	neg_domain_pol = off;
+	par_queries = 400;
+	min_ttl=1h;
+	max_ttl=1w;
+	timeout=10;
+	neg_domain_pol=on;
+	proc_limit=40;
+	procq_limit=60;
+}
+server {
+	label= "ssr-usrdns";
+	ip = $safe_dns;
+	port = 53;
+	timeout=6;
+	uptest=none;
+	interval=10m;
+	purge_cache=off;
+	reject = 74.125.127.102,
+        74.125.155.102,
+        74.125.39.102,
+        74.125.39.113,
+        209.85.229.138,
+        128.121.126.139,
+        159.106.121.75,
+        169.132.13.103,
+        192.67.198.6,
+        202.106.1.2,
+        202.181.7.85,
+        203.161.230.171,
+        203.98.7.65,
+        207.12.88.98,
+        208.56.31.43,
+        209.145.54.50,
+        209.220.30.174,
+        209.36.73.33,
+        211.94.66.147,
+        213.169.251.35,
+        216.221.188.182,
+        216.234.179.13,
+        243.185.187.39,
+        37.61.54.158,
+        4.36.66.178,
+        46.82.174.68,
+        59.24.3.173,
+        64.33.88.161,
+        64.33.99.47,
+        64.66.163.251,
+        65.104.202.252,
+        65.160.219.113,
+        66.45.252.237,
+        69.55.52.253,
+        72.14.205.104,
+        72.14.205.99,
+        78.16.49.15,
+        8.7.198.45,
+        93.46.8.89,
+        37.61.54.158,
+        243.185.187.39,
+        190.93.247.4,
+        190.93.246.4,
+        190.93.245.4,
+        190.93.244.4,
+        65.49.2.178,
+        189.163.17.5,
+        23.89.5.60,
+        49.2.123.56,
+        54.76.135.1,
+        77.4.7.92,
+        118.5.49.6,
+        159.24.3.173,
+        188.5.4.96,
+        197.4.4.12,
+        220.250.64.24,
+        243.185.187.30,
+        249.129.46.48,
+        253.157.14.165;
+    reject_policy = fail;
+}
+server {
+	label= "ssr-pdnsd";
+	ip = $tcp_dns_list;
+	port = 5353;
+	timeout=6;
+	uptest=none;
+	interval=10m;
+	purge_cache=off;
+}
+EOF
+
+	/usr/sbin/pdnsd -c /var/etc/pdnsd.conf -d
+
+	# Access TCP DNS server through v2ray tunnel
+	if iptables -t nat -N pdnsd_output; then
+		iptables -t nat -A pdnsd_output -m set --match-set $vt_np_ipset dst -j RETURN
+		iptables -t nat -A pdnsd_output -p tcp -j REDIRECT --to $V2RAY_REDIR_PORT
+	fi
+	iptables -t nat -I OUTPUT -p tcp --dport 53 -j pdnsd_output
+	if [ "$vt_redir" = 1 ]; then
+		iptables -t nat -A pdnsd_output -p udp --dport 53 -j REDIRECT --to-ports $PDNSD_LOCAL_PORT
+		iptables -t nat -I PREROUTING -j pdnsd_output
+	fi
+}
+
+stop_pdnsd()
+{
+	if iptables -t nat -F pdnsd_output 2>/dev/null; then
+		while iptables -t nat -D OUTPUT -p tcp --dport 53 -j pdnsd_output 2>/dev/null; do :; done
+		iptables -t nat -X pdnsd_output
+	fi
+	kill $(cat /var/run/pdnsd.pid) >/dev/null 2>&1 || killall -9 pdnsd >/dev/null 2>&1 
+	rm -rf /var/pdnsd
+	rm -f /var/etc/pdnsd.conf
+}
+
+# $1: upstream DNS server
+start_dnsforwarder()
+{
+	local vt_redir=`uci get v2ray.@v2ray[0].redir 2>/dev/null`
+	local safe_dns="$1"
+	local tcp_dns_list="1.1.1.1,1.0.0.1,8.8.8.8,8.8.4.4"
+	[ -n "$safe_dns" ] && tcp_dns_list="$safe_dns,$tcp_dns_list"
+
+
+	#killall -9 pdnsd 2>/dev/null && sleep 1
+	kill -9 $(cat /var/run/pdnsd.pid) >/dev/null 2>&1 
+	
+	[ ! -f /usr/sbin/dnsparsing ] && ln /usr/bin/dnsforwarder /usr/sbin/dnsparsing
+	DNSCACHE_CONF=/var/run/dnsparsing/dnsparsing.conf
+	PID_PATH=/var/run/dnsparsing
+	PID_FILE=dns.pid
+	mkdir -p $PID_PATH
+	pid=`ps | awk '$5 ~ /\[dnsparsing\]/ {print $1}'`
+
+	cat > /var/run/dnsparsing/dnsparsing.conf <<EOF
+LogOn false
+LogFileThresholdLength 102400
+LogFileFolder /var/run/dnsparsing
+UDPLocal 0.0.0.0:$PDNSD_LOCAL_PORT
+TCPGroup $safe_dns:53 * no
+GroupFile
+BlockIP 243.185.187.39,46.82.174.68,37.61.54.158,93.46.8.89,59.24.3.173,203.98.7.65,8.7.198.45,78.16.49.15,159.106.121.75,69.63.187.12,31.13.76.8,31.13.64.49
+IPSubstituting
+BlockNegativeResponse false
+Hosts
+HostsUpdateInterval 18000
+HostsDownloadPath
+HostsScript
+HostsRetryInterval 30
+AppendHosts
+BlockIpv6WhenIpv4Exists false
+UseCache true
+CacheSize 1048576
+MemoryCache true
+CacheFile
+IgnoreTTL false
+OverrideTTL -1
+MultipleTTL 1
+ReloadCache false
+OverwriteCache false
+DisabledType
+DisabledDomain
+DisabledList
+DomainStatistic false
+DomainStatisticTempletFile
+StatisticUpdateInterval 29
+EOF
+	
+	dnsparsing -f $DNSCACHE_CONF -d
+	echo dnsparsing running pid is $pid
+	logger -t alex the pid of dnsparsing is $PID_PATH/$PID_FILE $pid
+	echo $pid > $PID_PATH/$PID_FILE
+
+	# Access TCP DNS server through v2ray tunnel
+	if iptables -t nat -N pdnsd_output; then
+		iptables -t nat -A pdnsd_output -m set --match-set $vt_np_ipset dst -j RETURN
+		iptables -t nat -A pdnsd_output -p tcp -j REDIRECT --to $V2RAY_REDIR_PORT
+	fi
+	iptables -t nat -I OUTPUT -p tcp --dport 53 -j pdnsd_output
+	if [ "$vt_redir" = 1 ]; then
+		iptables -t nat -A pdnsd_output -p udp --dport 53 -j REDIRECT --to-ports $PDNSD_LOCAL_PORT
+		iptables -t nat -I PREROUTING -j pdnsd_output
+	fi
+}
+
+
+stop_dnsforwarder()
+{
+	if iptables -t nat -F pdnsd_output 2>/dev/null; then
+		while iptables -t nat -D OUTPUT -p tcp --dport 53 -j pdnsd_output 2>/dev/null; do :; done
+		iptables -t nat -X pdnsd_output
+	fi
+	kill $(pidof dnsparsing) >/dev/null 2>&1 || killall -9 dnsparsing >/dev/null 2>&1
+	rm -rf /var/run/dnsparsing
+}
+
+add_cron()
+{
+  sed -i '/up-gfwlist.sh/d' $CRON_FILE
+	sed -i '/v2ray_watchdog.log/d' $CRON_FILE
+	if [ $cron_mode -eq 1 ]; then
+		echo '0 4 * * * /etc/v2ray/v2ray_update.sh > /tmp/gfwupdate.log 2>&1' >> $CRON_FILE
+		echo '0 5 * * * /etc/v2ray/up-gfwlist.sh > /tmp/gfwupdate.log 2>&1' >> $CRON_FILE
+	fi
+	echo '0 */1 * * * /etc/v2ray/v2ray-watchdog >> /tmp/v2ray_watchdog.log 2>&1' >> $CRON_FILE
+	echo '0 1 * * 0 echo "" > /tmp/v2ray_watchdog.log' >> $CRON_FILE
+	crontab $CRON_FILE
+}
+
+del_cron()
+{
+	sed -i '/v2ray_update.sh/d' $CRON_FILE
+	sed -i '/up-gfwlist.sh/d' $CRON_FILE
+	sed -i '/v2ray_watchdog.log/d' $CRON_FILE
+	/etc/init.d/cron restart
+}
+
+
+
+uci_get_by_name() {
+	local ret=$(uci get $CONFIG.$1.$2 2>/dev/null)
+	echo ${ret:=$3}
+}
+
+uci_get_by_type() {
+	local index=0
+	if [ -n $4 ]; then
+		index=$4
+	fi
+	local ret=$(uci get $CONFIG.@$1[$index].$2 2>/dev/null)
+	echo ${ret:=$3}
+}
+
+is_ipv6_address()
+{
+		echo "$1" | grep -q ":"
+}
+
+add_rule()
+{
+	iptables -t nat -N v2ray_pre
+	iptables -t nat -F v2ray_pre
+	iptables -t nat -A v2ray_pre -m set --match-set local dst -j RETURN || {
+		iptables -t nat -A v2ray_pre -d 0.0.0.0/8 -j RETURN
+		iptables -t nat -A v2ray_pre -d 10.0.0.0/8 -j RETURN
+		iptables -t nat -A v2ray_pre -d 127.0.0.0/8 -j RETURN
+		iptables -t nat -A v2ray_pre -d 169.254.0.0/16 -j RETURN
+		iptables -t nat -A v2ray_pre -d 172.16.0.0/12 -j RETURN
+		iptables -t nat -A v2ray_pre -d 192.168.0.0/16 -j RETURN
+		iptables -t nat -A v2ray_pre -d 224.0.0.0/4 -j RETURN
+		iptables -t nat -A v2ray_pre -d 240.0.0.0/4 -j RETURN
+	}
+
+	iptables -t nat -A v2ray_pre -d $vt_server_addr -j RETURN
+
+	iptables -N gameboost -t mangle
+	ipset -! create gameuser hash:ip maxelem 65536 2>/dev/null
+	/usr/bin/ip rule add fwmark 0x100/0xfff table 100
+	/usr/bin/ip route add local 0.0.0.0/0 dev lo table 100
+	iptables -t mangle -A gameboost -p udp -m set --match-set local dst -j RETURN
+	iptables -t mangle -A gameboost -p udp -m set --match-set china dst -j RETURN
+	iptables -t mangle -A gameboost -p udp --dport 53 -j RETURN
+	iptables -t mangle -A gameboost -p udp -j TPROXY --on-port 7070 --tproxy-mark 0x100/0xfff
+	iptables -t mangle -A PREROUTING -m set --match-set gameuser src -j gameboost
+
+	for i in $(seq 0 100)
+	do
+		local ip=$(uci_get_by_type acl_rule ipaddr '' $i)
+		local mode=$(uci_get_by_type acl_rule filter_mode '' $i)
+		case "$mode" in
+		disable)
+			iptables -t nat -A v2ray_pre -s $ip -j RETURN
+			;;
+		global)
+			iptables -t nat -A v2ray_pre -s $ip -p tcp -j REDIRECT --to $SS_REDIR_PORT
+			iptables -t nat -A v2ray_pre -s $ip -j RETURN
+			;;
+		game)
+			iptables -t nat -A v2ray_pre -p tcp -s $ip -m set ! --match-set china dst -j REDIRECT --to $SS_REDIR_PORT
+			ipset -! add gameuser $ip
+			;;
+		esac
+	done
+
+	case "$vt_proxy_mode" in
+		G) : ;;
+		S)
+			iptables -t nat -A v2ray_pre -m set --match-set $vt_np_ipset dst -j RETURN
+			iptables -t nat -I OUTPUT -p tcp -m multiport --dports 80,443 -m set ! --match-set $vt_np_ipset dst -j REDIRECT --to $SS_REDIR_PORT
+			# Add line below to prevent traffic of v2ray from redirecting to itself.
+			iptables -t nat -I OUTPUT -d $vt_server_addr -j RETURN
+
+			;;
+		M)
+			ipset -! create $vt_gfwlist hash:ip maxelem 65536 2>/dev/null
+      awk '!/^$/&&!/^#/{printf("add vt_gfwlist %s'" "'\n",$0)}' /etc/v2ray/addinip.txt > /tmp/addinip.ipset
+      sed -i "s/vt_gfwlist/$vt_gfwlist/g" /tmp/addinip.ipset
+      ipset -! restore < /tmp/addinip.ipset
+			iptables -t nat -A v2ray_pre -m set ! --match-set $vt_gfwlist dst -j RETURN
+			iptables -t nat -A v2ray_pre -m set --match-set $vt_np_ipset dst -j RETURN
+			iptables -t nat -I OUTPUT -p tcp -m multiport --dports 80,443 -m set --match-set $vt_gfwlist dst -j REDIRECT --to $SS_REDIR_PORT
+			;;
+		V)
+			iptables -t nat -A v2ray_pre -m set ! --match-set $vt_np_ipset dst -j RETURN
+			iptables -t nat -I OUTPUT -p tcp -m multiport --dports 80,443 -m set --match-set $vt_np_ipset dst -j REDIRECT --to $SS_REDIR_PORT
+			# Add line below to prevent traffic of v2ray from redirecting to itself.
+			iptables -t nat -I OUTPUT -d $vt_server_addr -j RETURN
+			;;
+	esac
+	local subnet
+	for subnet in $covered_subnets; do
+		iptables -t nat -A v2ray_pre -s $subnet -p tcp -j REDIRECT --to $SS_REDIR_PORT
+	done
+	iptables -t nat -I PREROUTING -p tcp -j v2ray_pre
+}
+
+del_rule()
+{
+	if iptables -t nat -F v2ray_pre 2>/dev/null; then
+		while iptables -t nat -D PREROUTING -p tcp -j v2ray_pre 2>/dev/null; do :; done
+		iptables -t nat -X v2ray_pre 2>/dev/null
+	fi
+
+	iptables -t nat -D OUTPUT -p tcp -m multiport --dports 80,443 -m set --match-set china-banned dst -j REDIRECT --to $SS_REDIR_PORT 2>/dev/null
+	iptables -t nat -D OUTPUT -p tcp -m multiport --dports 80,443 -m set ! --match-set $vt_np_ipset dst -j REDIRECT --to $SS_REDIR_PORT 2>/dev/null
+	# Add line below to delete the rule preventing traffic of v2ray from redirecting to itself.
+	iptables -t nat -D OUTPUT -d $vt_server_addr -j RETURN 2>/dev/null
+
+	
+	/usr/bin/ip rule del fwmark 0x100/0xfff table 100
+	/usr/bin/ip route del local 0.0.0.0/0 dev lo table 100
+	if iptables -t mangle -F gameboost 2>/dev/null; then
+		while iptables -t mangle -D PREROUTING -m set --match-set gameuser src -j gameboost 2>/dev/null; do :; done
+		iptables -t mangle -X gameboost 2>/dev/null
+	fi
+
+	ipset destroy gameuser 2>/dev/null
+
+
+	# -----------------------------------------------------------------
+	[ "$KEEP_GFWLIST" = Y ] || ipset destroy "$vt_gfwlist" 2>/dev/null
+}

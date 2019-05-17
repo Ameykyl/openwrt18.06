@@ -1,0 +1,9 @@
+#!/bin/sh
+# Copyright (C) 2007 OpenWrt.org
+
+[ "$ACTION" = ifup -o "$INTERFACE" = wan ] && {
+icount=`ps -w  | grep zerotier-one |grep -v grep| wc -l`
+if [ $icount -eq 1 ]; then
+	/etc/init.d/zerotier restart
+fi
+}
