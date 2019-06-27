@@ -1,155 +1,152 @@
 msgid ""
 msgstr "Content-Type: text/plain; charset=UTF-8\n"
 
-msgid "MentoHUST"
-msgstr "MentoHUST"
+msgid "MentoHUST Settings"
+msgstr "MentoHUST 设置"
 
-msgid "A Ruijie and Cernet supplicant on Linux and MacOS"
-msgstr "Linux/MacOS 平台的锐捷认证客户端"
+msgid "MentoHUST LOG"
+msgstr "MentoHUST 日志"
 
-msgid "Start option"
-msgstr "启动选项"
+msgid "Log file:/tmp/mentohust.log"
+msgstr "日志文件：/tmp/mentohust.log"
 
-msgid "Configure mentohust's start option"
-msgstr "配置mentohust的启动选项"
+msgid "Configure MentoHUST 802.11x."
+msgstr "配置MentoHUST 802.11x验证。"
 
-msgid "MentoHUST_enable"
-msgstr "启用MentoHUST"
+msgid "Normal Settings"
+msgstr "常规设置"
 
-msgid "enable or disable mentohust"
-msgstr "启用或禁用mentohust"
+msgid "The username given to you by your network administrator"
+msgstr "您的用户名(或管理员分配的用户名)"
 
-msgid "Router Proxy"
-msgstr "路由代理伪装"
+msgid "The password you set or given to you by your network administrator"
+msgstr "您的密码(或管理员分配的密码)"
 
-msgid "max conntrack limits"
-msgstr "最大连接数限制"
+msgid "Physical interface of WAN"
+msgstr "WAN口的物理接口"
 
-msgid "0 means no limit, default to 280"
-msgstr "0表示没有限制，默认限制280"
-
-msgid "router proxy to fake single client"
-msgstr "隐藏代理的多个设备避免因为代理检测断网"
-
-msgid "Config mentohust"
-msgstr "配置mentohust"
-
-msgid "The options below are all of mentohust's arguments."
-msgstr "下面是mentohust的配置参数"
-
-msgid "Username"
-msgstr "用户名"
-
-msgid "Password"
-msgstr "密码"
-
-msgid "net card name"
-msgstr "网卡"
-
-msgid "ServiceName"
-msgstr "服务名"
-
-msgid "default to 'internet'"
-msgstr "默认是internet"
-
-msgid "IP"
-msgstr "IP"
-
-msgid "default to localhost's IP"
-msgstr "默认本机IP"
-
-msgid "netmask"
-msgstr "子网掩码"
-
-msgid "default to localhost's netmask"
-msgstr "默认本机子网掩码"
-
-msgid "gateway"
-msgstr "网关地址"
-
-msgid "default to 0.0.0.0"
-msgstr "默认 0.0.0.0"
-
-msgid "DNS"
-msgstr "DNS"
-
-msgid "Ping host"
+msgid "PingHost"
 msgstr "Ping主机"
 
-msgid "default to 0.0.0.0,i.e. disable this function"
-msgstr "默认 0.0.0.0 表示禁用此功能"
+msgid "Ping host for drop detection, 0.0.0.0 to turn off this feature"
+msgstr "Ping主机，用于掉线检测，0.0.0.0表示关闭该功能"
 
-msgid "authenticate timeout(s)"
-msgstr "认证超时（秒）"
+msgid "IP Address"
+msgstr "IP地址"
 
-msgid "default to 8s"
-msgstr "默认8秒"
+msgid "Your IPv4 Address. (DHCP users can set to 0.0.0.0)"
+msgstr "你的IPV4地址，DHCP用户可设为0.0.0.0"
 
-msgid "heartbeat timeout(s)"
-msgstr "心跳间隔（秒）"
+msgid "NetMask"
+msgstr "子网掩码"
 
-msgid "default to 30s"
-msgstr "默认30秒"
+msgid "NetMask, it doesn't matter"
+msgstr "掩码，无关紧要"
 
-msgid "wait on failure timeout(s)"
-msgstr "失败等待时间（秒）"
+msgid "Gateway, if specified, will monitor gateway ARP information"
+msgstr "网关，如果指定了就会监视网关ARP信息"
 
-msgid "default to 15s"
-msgstr "默认15秒"
+msgid "DNS server"
+msgstr "DNS服务器"
 
-msgid "max failure times"
-msgstr "重连次数"
+msgid "DNS server, it doesn't matter"
+msgstr "DNS服务器，无关紧要"
 
-msgid "0 means no limit,default to 8"
-msgstr "0表示没有限制，默认8"
+msgid "Timeout"
+msgstr "验证超时"
 
-msgid "mulcast address"
-msgstr "组播地址"
+msgid "Each timeout of the package (seconds)"
+msgstr "每次发包超时时间（秒）"
 
-msgid "default to 0"
-msgstr "默认0"
+msgid "EchoInterval"
+msgstr "Echo包间隔"
 
-msgid "0(standard)"
-msgstr "0(标准)"
+msgid "Interval for sending Echo packets (seconds)"
+msgstr "发送Echo包的间隔（秒）"
 
-msgid "1(ruijjie)"
-msgstr "1(锐捷)"
+msgid "RestartWait"
+msgstr "验证失败等待时间"
 
-msgid "2(saier)"
-msgstr "2(赛尔)"
+msgid "Failed Wait (seconds) Wait for seconds after authentication failed or restart authentication after server request"
+msgstr "失败等待（秒）认证失败后等待多少秒或者服务器请求后重启认证"
 
-msgid "DHCP type"
-msgstr "DHCP类型"
+msgid "StartMode"
+msgstr "组播地址类型"
 
-msgid "default to 0"
-msgstr "默认0"
+msgid "Multicast address type when searching for servers"
+msgstr "寻找服务器时的组播地址类型(某些交换机可能会丢弃标准包)"
 
-msgid "0(not in used)"
-msgstr "0(不使用)"
+msgid "Standard"
+msgstr "标准"
 
-msgid "1(secondary authenticate)"
-msgstr "1(二次认证)"
+msgid "Ruijie"
+msgstr "锐捷"
 
-msgid "2(post authenticate)"
-msgstr "2(认证后)"
+msgid "Uses MentoHUST for Xaar certification"
+msgstr "将MentoHUST用于赛尔认证"
 
-msgid "3(pre authenticate)"
-msgstr "3(认证前)"
+msgid "DhcpMode"
+msgstr "DHCP设置"
 
-msgid "client version"
-msgstr "客户端版本"
+msgid "DHCP method"
+msgstr "DHCP方式"
 
-msgid "default to 0.00,compatible with xrgsu"
-msgstr "默认0.00，兼容xrgsu"
+msgid "None"
+msgstr "无"
 
-msgid "customized data file"
-msgstr "自定义数据文件"
+msgid "secondary authentication"
+msgstr "二次认证"
 
-msgid "not in used by default"
-msgstr "默认不使用"
+msgid "after certification"
+msgstr "认证后"
+
+msgid "before certification"
+msgstr "认证前"
+
+msgid "ShowNotify"
+msgstr "通知级别"
+
+msgid "Whether to display notifications 0 (no) 1 to 20 (yes)"
+msgstr "是否显示通知： 0(否) 1~20(是)"
+
+msgid "Client Version"
+msgstr "客户端版本号"
+
+msgid "Client version number. If client verification is not enabled but the version number is required, it can be specified here. The format is 3.30."
+msgstr "客户端版本号，如果未开启客户端校验但对版本号有要求，可以在此指定，形如3.30"
+
+msgid "DataFile"
+msgstr "数据文件"
+
+msgid "Authentication data file, if you need to verify the client, you need to set correctly"
+msgstr "认证数据文件，如果需要校验客户端，就需要正确设置"
+
+msgid "DhcpScript"
+msgstr "DHCP的脚本"
 
 msgid "DHCP script"
-msgstr "DHCP脚本"
+msgstr "进行DHCP的脚本"
 
-msgid "use dhclient by default"
-msgstr "默认使用dhclient"
+msgid "RUNNING"
+msgstr "运行中"
+
+msgid "NOT RUNNING"
+msgstr "未运行"
+
+msgid "ONLINE"
+msgstr "能访问互联网"
+
+msgid "NOT ONLINE"
+msgstr "不能访问互联网"
+
+msgid "Settings"
+msgstr "设置"
+
+msgid "Network Status"
+msgstr "网络状态"
+
+msgid "Pinghost not set"
+msgstr "没有设置Ping主机"
+
+msgid "Clear log"
+msgstr "清除日志"

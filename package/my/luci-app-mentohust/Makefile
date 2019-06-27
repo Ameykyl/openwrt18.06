@@ -1,34 +1,27 @@
-#
-# Copyright (C) 2016-2017 Jian Chang <aa65535@live.com>
-#
-# This is free software, licensed under the GNU General Public License v3.
-# See /LICENSE for more information.
-#
-
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=luci-app-mentohust
-PKG_VERSION:=4.0.0
-PKG_RELEASE:=1
-
-PKG_LICENSE:=GPLv3
-PKG_LICENSE_FILES:=LICENSE
-PKG_MAINTAINER:=Chen Minqiang <ptpt52@gmail.com>
+PKG_VERSION=1.1.
+PKG_RELEASE:=0
 
 PKG_BUILD_DIR:=$(BUILD_DIR)/$(PKG_NAME)
 
 include $(INCLUDE_DIR)/package.mk
 
 define Package/luci-app-mentohust
-	CATEGORY:=Ptpt52
-	SUBMENU:=Mentohust
-	TITLE:=LuCI Support for mentohust
+	SECTION:=luci
+	CATEGORY:=LuCI
+	SUBMENU:=3. Applications
+	TITLE:=MentoHUST 802.1X Client for LuCI
 	PKGARCH:=all
-	DEPENDS:=+mentohust
 endef
 
 define Package/luci-app-mentohust/description
-	LuCI Support for mentohust.
+	This package contains LuCI configuration pages for 8021xclient.
+endef
+
+define Package/luci-app-mentohust/conffiles
+/etc/config/mentohust
 endef
 
 define Build/Prepare
@@ -42,23 +35,18 @@ endef
 define Build/Compile
 endef
 
-define Package/luci-app-mentohust/postinst
-#!/bin/sh
-if [ -z "$${IPKG_INSTROOT}" ]; then
-	rm -rf /tmp/luci-indexcache /tmp/luci-modulecache
-fi
-exit 0
-endef
-
 define Package/luci-app-mentohust/install
+	$(INSTALL_DIR) $(1)/etc/config
+	$(INSTALL_DIR) $(1)/etc/init.d
+	$(INSTALL_DIR) $(1)/usr/lib/lua/luci/model/cbi/mentohust
+	$(INSTALL_DIR) $(1)/usr/lib/lua/luci/controller
 	$(INSTALL_DIR) $(1)/usr/lib/lua/luci/i18n
 	$(INSTALL_DATA) $(PKG_BUILD_DIR)/mentohust.*.lmo $(1)/usr/lib/lua/luci/i18n/
-	$(INSTALL_DIR) $(1)/usr/lib/lua/luci/controller
-	$(INSTALL_DATA) ./files/luci/controller/*.lua $(1)/usr/lib/lua/luci/controller/
-	$(INSTALL_DIR) $(1)/usr/lib/lua/luci/model/cbi/mentohust
-	$(INSTALL_DATA) ./files/luci/model/cbi/mentohust/*.lua $(1)/usr/lib/lua/luci/model/cbi/mentohust/
-	$(INSTALL_DIR) $(1)/usr/lib/lua/luci/view/mentohust
-	$(INSTALL_DATA) ./files/luci/view/mentohust/*.htm $(1)/usr/lib/lua/luci/view/mentohust/
+	$(INSTALL_CONF) ./files/root/etc/config/mentohust $(1)/etc/config/mentohust
+	$(INSTALL_BIN) ./files/root/etc/init.d/mentohust $(1)/etc/init.d/mentohust
+	$(INSTALL_DATA) ./files/luci/model/cbi/mentohust/general.lua $(1)/usr/lib/lua/luci/model/cbi/mentohust/general.lua
+	$(INSTALL_DATA) ./files/luci/model/cbi/mentohust/log.lua $(1)/usr/lib/lua/luci/model/cbi/mentohust/log.lua
+	$(INSTALL_DATA) ./files/luci/controller/mentohust.lua $(1)/usr/lib/lua/luci/controller/mentohust.lua
 endef
 
 $(eval $(call BuildPackage,luci-app-mentohust))

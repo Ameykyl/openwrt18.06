@@ -142,7 +142,7 @@ fw_rule() {
 	$IPT -A SS_SPEC_WAN_FW -d 224.0.0.0/4 -j RETURN
 	$IPT -A SS_SPEC_WAN_FW -d 240.0.0.0/4 -j RETURN
 	if [ $bt -eq 1 ] ;then
-		$IPT -A SS_SPEC_WAN_FW -p tcp --dports $bt_port -j RETURN
+		$IPT -A SS_SPEC_WAN_FW -p tcp --dport $bt_port -j RETURN
 	fi
 	$IPT -A SS_SPEC_WAN_FW -p tcp \
 		-j REDIRECT --to-ports $local_port 2>/dev/null || {
@@ -206,7 +206,7 @@ tp_rule() {
 	$ipt -A SS_SPEC_TPROXY -p udp -d 224.0.0.0/4 -j RETURN
 	$ipt -A SS_SPEC_TPROXY -p udp -d 240.0.0.0/4 -j RETURN
 	if [ $bt -eq 1 ] ;then
-		$IPT -A SS_SPEC_TPROXY -p udp --dports $bt_port -j RETURN
+		$IPT -A SS_SPEC_TPROXY -p udp --dport $bt_port -j RETURN
 	fi
 	$ipt -A SS_SPEC_TPROXY -p udp -d $SERVER -j RETURN
   

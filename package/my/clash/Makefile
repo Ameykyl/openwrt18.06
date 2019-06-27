@@ -8,6 +8,7 @@ include $(TOPDIR)/rules.mk
 
 PKG_NAME:=clash
 PKG_VERSION:=0.14.0
+PKG_RELEASE:=1
 PKG_BUILD_DIR:=$(BUILD_DIR)/$(PKG_NAME)-$(PKG_VERSION)
 
 include $(INCLUDE_DIR)/package.mk
@@ -54,13 +55,13 @@ define Build/Configure
 endef
 
 define Build/Compile
-	#chmod +x $(PKG_BUILD_DIR)/clash-v$(PKG_VERSION)-$(PKG_ARCH_CLASH) && upx --ultra-brute $(PKG_BUILD_DIR)/clash-v$(PKG_VERSION)-$(PKG_ARCH_CLASH)
+	#chmod +x $(PKG_BUILD_DIR)/clash-$(PKG_ARCH_CLASH) && upx --ultra-brute $(PKG_BUILD_DIR)/clash-$(PKG_ARCH_CLASH)
 	#echo "$(PKG_VERSION)" > $(PKG_BUILD_DIR)/clash_version
 endef
 
 define Package/$(PKG_NAME)/install
-	$(INSTALL_DIR) $(1)/etc/clash
-	$(INSTALL_BIN) $(PKG_BUILD_DIR)/clash-$(PKG_ARCH_CLASH) $(1)/etc/clash/clash
+	$(INSTALL_DIR) $(1)/usr/bin
+	$(INSTALL_BIN) $(PKG_BUILD_DIR)/clash-$(PKG_ARCH_CLASH) $(1)/usr/bin/clash
 	#$(INSTALL_DIR) $(1)/usr/share/clash
 	#$(INSTALL_DATA) $(PKG_BUILD_DIR)/clash_version $(1)/usr/share/clash/clash_version
 endef

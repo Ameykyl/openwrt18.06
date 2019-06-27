@@ -1,8 +1,8 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=luci-app-ssr-plus
-PKG_VERSION:=1
-PKG_RELEASE:=140
+PKG_VERSION:=1.13
+PKG_RELEASE:=2
 
 PKG_CONFIG_DEPENDS:= CONFIG_PACKAGE_$(PKG_NAME)_INCLUDE_Shadowsocks \
 	CONFIG_PACKAGE_$(PKG_NAME)_INCLUDE_V2ray \
@@ -13,7 +13,13 @@ PKG_CONFIG_DEPENDS:= CONFIG_PACKAGE_$(PKG_NAME)_INCLUDE_Shadowsocks \
 	CONFIG_PACKAGE_$(PKG_NAME)_INCLUDE_Shadowsocks_Socks \
 	CONFIG_PACKAGE_$(PKG_NAME)_INCLUDE_dnscrypt_proxy \
 	CONFIG_PACKAGE_$(PKG_NAME)_INCLUDE_dnsforwarder \
-	CONFIG_PACKAGE_$(PKG_NAME)_INCLUDE_haproxy
+	CONFIG_PACKAGE_$(PKG_NAME)_INCLUDE_haproxy \
+	CONFIG_PACKAGE_$(PKG_NAME)_INCLUDE_privoxy \
+	CONFIG_PACKAGE_$(PKG_NAME)_INCLUDE_simple-obfs\
+	CONFIG_PACKAGE_$(PKG_NAME)_INCLUDE_simple-obfs-server\
+	CONFIG_PACKAGE_$(PKG_NAME)_INCLUDE_GoQuiet-client\
+	CONFIG_PACKAGE_$(PKG_NAME)_INCLUDE_GoQuiet-server\
+	CONFIG_PACKAGE_$(PKG_NAME)_INCLUDE_v2ray-plugin
 
 include $(INCLUDE_DIR)/package.mk
 
@@ -57,6 +63,30 @@ config PACKAGE_$(PKG_NAME)_INCLUDE_dnsforwarder
 config PACKAGE_$(PKG_NAME)_INCLUDE_haproxy
 	bool "haproxy"
 	default n
+
+config PACKAGE_$(PKG_NAME)_INCLUDE_privoxy
+	bool "privoxy http local"
+	default n
+
+config PACKAGE_$(PKG_NAME)_INCLUDE_simple-obfs
+	bool "simple-obfsl"
+	default n
+	
+config PACKAGE_$(PKG_NAME)_INCLUDE_simple-obfs-server
+	bool "simple-obfs-server"
+	default n
+	
+config PACKAGE_$(PKG_NAME)_INCLUDE_GoQuiet-client
+	bool "GoQuiet-client"
+	default n
+	
+config PACKAGE_$(PKG_NAME)_INCLUDE_GoQuiet-server
+	bool "GoQuiet-server"
+	default n
+
+config PACKAGE_$(PKG_NAME)_INCLUDE_v2ray-plugin
+	bool "v2ray-plugin"
+	default n
 endef
 
 define Package/luci-app-ssr-plus
@@ -70,12 +100,18 @@ define Package/luci-app-ssr-plus
             +PACKAGE_$(PKG_NAME)_INCLUDE_V2ray:v2ray \
             +PACKAGE_$(PKG_NAME)_INCLUDE_Kcptun:kcptun \
             +PACKAGE_$(PKG_NAME)_INCLUDE_ShadowsocksR_Server:shadowsocksr-libev-server \
-			+PACKAGE_$(PKG_NAME)_INCLUDE_Shadowsocks_Server:shadowsocks-libev-ss-server \
+            +PACKAGE_$(PKG_NAME)_INCLUDE_Shadowsocks_Server:shadowsocks-libev-ss-server \
             +PACKAGE_$(PKG_NAME)_INCLUDE_ShadowsocksR_Socks:shadowsocksr-libev-ssr-local \
-			+PACKAGE_$(PKG_NAME)_INCLUDE_Shadowsocks_Socks:shadowsocks-libev-ss-local \
-			+PACKAGE_$(PKG_NAME)_INCLUDE_dnscrypt_proxy:dnscrypt-proxy-full \
-			+PACKAGE_$(PKG_NAME)_INCLUDE_dnsforwarder:dnsforwarder \
-			+PACKAGE_$(PKG_NAME)_INCLUDE_haproxy:haproxy
+            +PACKAGE_$(PKG_NAME)_INCLUDE_Shadowsocks_Socks:shadowsocks-libev-ss-local \
+            +PACKAGE_$(PKG_NAME)_INCLUDE_dnscrypt_proxy:dnscrypt-proxy-full \
+            +PACKAGE_$(PKG_NAME)_INCLUDE_dnsforwarder:dnsforwarder \
+            +PACKAGE_$(PKG_NAME)_INCLUDE_haproxy:haproxy \
+            +PACKAGE_$(PKG_NAME)_INCLUDE_privoxy:privoxy \
+            +PACKAGE_$(PKG_NAME)_INCLUDE_simple-obfs:simple-obfs \
+            +PACKAGE_$(PKG_NAME)_INCLUDE_simple-obfs-server:simple-obfs-server \
+            +PACKAGE_$(PKG_NAME)_INCLUDE_GoQuiet-client:gq-client \
+			+PACKAGE_$(PKG_NAME)_INCLUDE_GoQuiet-server:gq-server \
+            +PACKAGE_$(PKG_NAME)_INCLUDE_v2ray-plugin:v2ray-plugin
 endef
 
 define Build/Prepare

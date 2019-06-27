@@ -9,7 +9,7 @@ include $(TOPDIR)/rules.mk
 
 PKG_NAME:=luci-app-qosv4
 PKG_VERSION:=1.1f
-PKG_RELEASE:=1
+PKG_RELEASE:=3
 
 include $(INCLUDE_DIR)/package.mk
 

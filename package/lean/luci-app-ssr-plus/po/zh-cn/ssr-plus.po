@@ -565,3 +565,33 @@ msgstr "未指定上传文件"
 
 msgid "Enable V2ray Update"
 msgstr "启用V2ray自动升级"
+
+msgid "weight"
+msgstr "比重"
+
+msgid "HTTP Proxy"
+msgstr "HTTP代理"
+
+msgid "Enable HTTP Proxy"
+msgstr "启用HTTP代理"
+
+msgid "HTTP Port"
+msgstr "HTTP代理端口"
+
+msgid "Domain White List"
+msgstr "域名白名单"
+
+msgid "Domain name (keyword only:youdao.com)"
+msgstr "域名（关键字如:youdao.com）"
+
+msgid "Enabling IPv6 server"
+msgstr "启用ipv6服务"
+
+msgid "haProxy settings"
+msgstr "haProxy 设置"
+
+msgid "Enabling the Management Console"
+msgstr "启用管理控制台"
+
+msgid "Ping Latency"
+msgstr "Ping 延迟"

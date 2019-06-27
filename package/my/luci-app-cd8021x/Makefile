@@ -19,6 +19,7 @@ define Package/luci-app-cd8021x
 	TITLE:=a wired IEEE 802.1x client for Luci
 	PKGARCH:=all
 	DEPENDS:=+wpad
+	URL:=https://github.com/txthinking/brook/releases
 endef
 
 define Package/luci-app-cd8021x/description

@@ -8,7 +8,7 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=eqos
-PKG_RELEASE:=1
+PKG_RELEASE:=2
 LUCI_DIR:=/usr/lib/lua/luci
 
 PKG_MAINTAINER:=Jianhui Zhao <jianhuizhao329@gmail.com>

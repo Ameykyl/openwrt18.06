@@ -11,37 +11,38 @@ function index()
 		return
 	end
 
-	entry({"admin", "network", "qos_gargoyle"},
+	entry({"admin","QOS"}, firstchild(), "QOS", 85).dependent = false
+	entry({"admin", "QOS", "qos_gargoyle"},
 		firstchild(), _("Gargoyle QoS"), 60)
 
-	entry({"admin", "network", "qos_gargoyle", "global"},
+	entry({"admin", "QOS", "qos_gargoyle", "global"},
 		cbi("qos_gargoyle/global"), _("Global Settings"), 10)
 
-	entry({"admin", "network", "qos_gargoyle", "upload"},
+	entry({"admin", "QOS", "qos_gargoyle", "upload"},
 		cbi("qos_gargoyle/upload"), _("Upload Settings"), 20)
 
-	entry({"admin", "network", "qos_gargoyle", "upload", "class"},
+	entry({"admin", "QOS", "qos_gargoyle", "upload", "class"},
 		cbi("qos_gargoyle/upload_class")).leaf = true
 
-	entry({"admin", "network", "qos_gargoyle", "upload", "rule"},
+	entry({"admin", "QOS", "qos_gargoyle", "upload", "rule"},
 		cbi("qos_gargoyle/upload_rule")).leaf = true
 
-	entry({"admin", "network", "qos_gargoyle", "download"},
+	entry({"admin", "QOS", "qos_gargoyle", "download"},
 		cbi("qos_gargoyle/download"), _("Download Settings"), 30)
 
-	entry({"admin", "network", "qos_gargoyle", "download", "class"},
+	entry({"admin", "QOS", "qos_gargoyle", "download", "class"},
 		cbi("qos_gargoyle/download_class")).leaf = true
 
-	entry({"admin", "network", "qos_gargoyle", "download", "rule"},
+	entry({"admin", "QOS", "qos_gargoyle", "download", "rule"},
 		cbi("qos_gargoyle/download_rule")).leaf = true
 
-	entry({"admin", "network", "qos_gargoyle", "troubleshooting"},
+	entry({"admin", "QOS", "qos_gargoyle", "troubleshooting"},
 		template("qos_gargoyle/troubleshooting"), _("Troubleshooting"), 40)
 
-	entry({"admin", "network", "qos_gargoyle", "troubleshooting", "data"},
+	entry({"admin", "QOS", "qos_gargoyle", "troubleshooting", "data"},
 		call("action_troubleshooting_data"))
 
-	entry({"admin", "network", "qos_gargoyle", "load_data"},
+	entry({"admin", "QOS", "qos_gargoyle", "load_data"},
 		call("action_load_data")).leaf = true
 end
 

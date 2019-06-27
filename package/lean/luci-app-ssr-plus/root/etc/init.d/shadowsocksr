@@ -31,6 +31,7 @@ ssserver_enable=0
 ssrserver_enable=0
 v2rayserver_enable=0
 haproxy_enable=0
+privoxy_enable=0
 switch_server=$1
 MAXFD=32768
 CRON_FILE=/etc/crontabs/root
@@ -102,7 +103,7 @@ gen_config_file() {
 	local port=$(uci_get_by_name $1 server_port)
 
 	if [ $HAPROXY_MODE = "1" ]; then
-		hostip="127.0.0.1"
+		hostip="0.0.0.0"
 		port="4433"
 	fi
 	
@@ -110,7 +111,9 @@ gen_config_file() {
 	iptables -A SS_WAN_DROP -p tcp --dport $local_port -j DROP
 
 	local stype=$(uci_get_by_name $1 type)
+	local plugin=$(uci_get_by_name $1 plugin)
 	if [ "$stype" == "ss" ] ;then
+		if [ "$plugin" == "none" ] ;then
 	cat <<-EOF >$config_file
 		{
 		    "server": "$hostip",
@@ -124,6 +127,23 @@ gen_config_file() {
 		    "fast_open": $fastopen
 		}
 EOF
+		else
+	cat <<-EOF >$config_file
+		{
+		    "server": "$hostip",
+		    "server_port": $port,
+		    "local_address": "0.0.0.0",
+		    "local_port": $local_port,
+		    "password": "$(uci_get_by_name $1 password)",
+		    "timeout": $(uci_get_by_name $1 timeout 60),
+		    "method": "$(uci_get_by_name $1 encrypt_method_ss)",
+		    "plugin": "$(uci_get_by_name $1 plugin)",
+		    "plugin_opts": "$(uci_get_by_name $1 plugin_opts)",
+		    "reuse_port": true,
+		    "fast_open": $fastopen
+		}
+EOF
+		fi
 	elif [ "$stype" == "ssr" ] ;then
 	cat <<-EOF >$config_file
 		{
@@ -149,7 +169,8 @@ EOF
 		else
 			global_server=$(uci_get_by_type global global_server)
 			if [ "$global_server" = "__haproxy__" ]; then
-				lua /usr/share/shadowsocksr/genv2config_haproxy.lua $GLOBAL_SERVER tcp $local_port > /var/etc/v2-ssr-retcp.json
+				local haproxy_server=$(uci -X show shadowsocksr | grep servers | awk -F'[.=]' '{print $2}' | sed -n 2p)
+				lua /usr/share/shadowsocksr/genv2config_haproxy.lua $haproxy_server tcp $local_port > /var/etc/v2-ssr-retcp.json
 			else
 				lua /usr/share/shadowsocksr/genv2config.lua $GLOBAL_SERVER tcp $(uci_get_by_name $1 local_port) > /var/etc/v2-ssr-retcp.json
 			fi
@@ -167,7 +188,7 @@ get_arg_out() {
 
 start_rules() {
 	local server=$(uci_get_by_name $GLOBAL_SERVER server)
-	[ $HAPROXY_MODE = "1" ] && server="127.0.0.1"
+	[ $HAPROXY_MODE = "1" ] && server="0.0.0.0"
 	#resolve name
 	if echo $server|grep -E "^[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}$">/dev/null; then         
 		server=${server}
@@ -253,8 +274,8 @@ start_pdnsd() {
 
 	kill $(pidof pdnsd) >/dev/null 2>&1 || killall -9 pdnsd >/dev/null 2>&1
 	kill $(pidof dnsparsing) >/dev/null 2>&1 || killall -9 dnsparsing >/dev/null 2>&1
+	/etc/init.d/dnscrypt-proxy disable	
 	/etc/init.d/dnscrypt-proxy stop
-	/etc/init.d/dnscrypt-proxy disable
 
 	[ -d /var/etc ] || mkdir -p /var/etc
 
@@ -322,8 +343,8 @@ start_dnsforwarder()
 
 	kill $(pidof pdnsd) >/dev/null 2>&1 || killall -9 pdnsd >/dev/null 2>&1
 	kill $(pidof dnsparsing) >/dev/null 2>&1 || killall -9 dnsparsing >/dev/null 2>&1
-	/etc/init.d/dnscrypt-proxy stop
 	/etc/init.d/dnscrypt-proxy disable
+	/etc/init.d/dnscrypt-proxy stop
 	rm -rf /var/run/dnsparsing
 	
 	[ ! -f /usr/sbin/dnsparsing ] && ln /usr/bin/dnsforwarder /usr/sbin/dnsparsing
@@ -375,11 +396,11 @@ EOF
 }
 
 dnscrypt_config_file() {
-
+	local dnsstr="$(uci_get_by_type global tunnel_forward 8.8.4.4:53)"
 	kill $(pidof pdnsd) >/dev/null 2>&1 || killall -9 pdnsd >/dev/null 2>&1
 	kill $(pidof dnsparsing) >/dev/null 2>&1 || killall -9 dnsparsing >/dev/null 2>&1
-	/etc/init.d/dnscrypt-proxy stop
 	/etc/init.d/dnscrypt-proxy disable
+	/etc/init.d/dnscrypt-proxy stop
 
 	cat > /etc/dnscrypt-proxy/dnscrypt-proxy.toml <<EOF
 ipv4_servers = true
@@ -413,7 +434,7 @@ cache_min_ttl = 60000
 cache_max_ttl = 864000
 cache_neg_ttl = 60
 
-fallback_resolver = '9.9.9.9:53'
+fallback_resolver = '$dnsstr'
 
 [query_log]
 format = "ltsv"
@@ -438,8 +459,49 @@ EOF
 
 }
 
-start_haproxy() {
+privoxy_config_file() {
+	local socks5_proxy=$(uci_get_by_type socks5_proxy local_port 1080)
+	local http_proxy=$(uci_get_by_type socks5_proxy http_port 1081)
 	lan_ip=$(uci get network.lan.ipaddr)
+
+	/etc/init.d/privoxy stop
+	/etc/init.d/privoxy disable
+
+	cat > /etc/config/privoxy <<EOF
+config	privoxy	'privoxy'
+	option	confdir		'/etc/privoxy'
+	option	logdir		'/var/log'
+	option	logfile		'privoxy.log'
+	list	filterfile	'default.filter'
+#	list	filterfile	'user.filter'
+	list	actionsfile	'match-all.action'
+	list	actionsfile	'default.action'
+#	list	actionsfile	'user.action'
+	list	listen_address	'0.0.0.0:$http_proxy'
+	option	toggle		'1'
+	option	enable_remote_toggle	'1'
+	option	enable_remote_http_toggle	'0'
+	option	enable_edit_actions	'1'
+	option	enforce_blocks		'0'
+	option	buffer_limit		'4096'
+	option	forwarded_connect_retries	'0'
+	option	accept_intercepted_requests	'0'
+	option	allow_cgi_request_crunching	'0'
+	option	split_large_forms	'0'
+	option	keep_alive_timeout	'300'
+	option	socket_timeout		'300'
+	list	permit_access		'$lan_ip/24'
+	option	debug_1		'0'
+	option	debug_512	'1'
+	option	debug_1024	'0'
+	option	debug_4096	'1'
+	option	debug_8192	'1'
+	list forward_socks5 '/ 0.0.0.0:$socks5_proxy .'
+EOF
+
+}
+
+start_haproxy() {
 	cat >/var/etc/haproxy.cfg <<EOF
 global
 	log 127.0.0.1 local2
@@ -455,21 +517,31 @@ defaults
 	timeout client 30000ms
 	timeout server 30000ms
 
-listen stats
-	bind $lan_ip:1111
-	mode http
-	maxconn 10
-	stats refresh 30s
-	stats uri /stats
-
 frontend ss-in
-	bind 127.0.0.1:4433
+	bind 0.0.0.0:4433
 	default_backend ss-out
 
 backend ss-out
 	mode tcp
 	balance roundrobin
 EOF
+
+	adminstatus=$(uci_get_by_type global_haproxy admin_enable)
+	if [ "$adminstatus" = "1" ];then
+		adminport=$(uci_get_by_type global_haproxy admin_port)
+		adminuser=$(uci_get_by_type global_haproxy admin_user)
+		adminpassword=$(uci_get_by_type global_haproxy admin_password)
+		cat >/var/etc/haproxy.cfg <<EOF
+listen status
+	bind 0.0.0.0:$adminport
+	mode http                   
+	stats refresh 30s
+	stats uri  /  
+	stats auth $adminuser:$adminpassword
+	#stats hide-version
+	stats admin if TRUE
+EOF
+	fi
 
 	iptables -t nat -N HAPROXY
 
@@ -577,7 +649,6 @@ start_redir() {
 
 	if [ "$(uci_get_by_type global pdnsd_enable)" -ne "0" ] ;then
 	local dnsstr="$(uci_get_by_type global tunnel_forward 8.8.4.4:53)"
-	local aaaa="$(uci_get_by_type global filter_aaaa 0)"
     local dnsserver=`echo "$dnsstr"|awk -F ':'  '{print $1}'`
     local dnsport=`echo "$dnsstr"|awk -F ':'  '{print $2}'`
 		if [ "$run_mode" = "gfw" ]; then
@@ -596,15 +667,7 @@ start_redir() {
 			dnsforwarder_enable_flag=1
 		elif [ "$(uci_get_by_type global pdnsd_enable)" = "5" ] ;then
 			dnscrypt_config_file
-			/etc/init.d/dnscrypt-proxy enable
-			/etc/init.d/dnscrypt-proxy start
-		fi
-		
-		if [ $aaaa -eq 1 ];  then
-			sed -i '/filter-aaaa/d' /etc/dnsmasq.conf
-			echo "filter-aaaa" >> /etc/dnsmasq.conf
-		else
-			sed -i '/filter-aaaa/d' /etc/dnsmasq.conf	
+			/etc/init.d/dnscrypt-proxy enable && /etc/init.d/dnscrypt-proxy start
 		fi
 
 	fi
@@ -632,10 +695,18 @@ gen_service_file() {
 	fi
 	
 	local sertype=$(uci_get_by_name $1 type)
+	local plugin=$(uci_get_by_name $1 plugin)
+	if [ $(uci_get_by_name $1 ipv4_ipv6) = "1" ] ;then
+		ipv4_ipv6="::";
+	else
+		ipv4_ipv6="0.0.0.0";
+	fi
+	
 	if [ "$sertype" == "ss" ] ;then
+		if [ "$plugin" == "none" ] ;then
 	cat <<-EOF >$2
 		{
-		    "server": "0.0.0.0",
+		    "server": "$ipv4_ipv6",
 		    "server_port": $(uci_get_by_name $1 server_port),
 		    "password": "$(uci_get_by_name $1 password)",
 		    "timeout": $(uci_get_by_name $1 timeout 60),
@@ -643,10 +714,24 @@ gen_service_file() {
 		    "fast_open": $fastopen
 		}
 EOF
+		else
+	cat <<-EOF >$2
+		{
+		    "server": "$ipv4_ipv6",
+		    "server_port": $(uci_get_by_name $1 server_port),
+		    "password": "$(uci_get_by_name $1 password)",
+		    "timeout": $(uci_get_by_name $1 timeout 60),
+		    "method": "$(uci_get_by_name $1 encrypt_method)",
+		    "plugin": "$(uci_get_by_name $1 plugin)",
+		    "plugin_opts": "$(uci_get_by_name $1 plugin_opts)",
+		    "fast_open": $fastopen
+		}
+EOF
+		fi	
 	elif [ "$sertype" == "ssr" ] ;then
 	cat <<-EOF >$2
 		{
-		    "server": "0.0.0.0",
+		    "server": "$ipv4_ipv6",
 		    "server_port": $(uci_get_by_name $1 server_port),
 		    "password": "$(uci_get_by_name $1 password)",
 		    "timeout": $(uci_get_by_name $1 timeout 60),
@@ -736,6 +821,7 @@ start_server() {
 
 start_local() {
 	local local_server=$(uci_get_by_type socks5_proxy server)
+	local http_enable=$(uci_get_by_type socks5_proxy http_enable)
 	local stype=$(uci_get_by_name $local_server type)
 	[ "$local_server" = "nil" ] && return 1
 	mkdir -p /var/run /var/etc
@@ -757,6 +843,12 @@ start_local() {
 		sed -i 's/\\//g' /var/etc/v2-ssr-local.json
 		/usr/bin/v2ray/v2ray -config /var/etc/v2-ssr-local.json >/dev/null 2>&1 &
 		local_enable=3
+	fi
+
+	if [ "$http_enable" -eq 1 ] ;then
+		privoxy_config_file
+		/etc/init.d/privoxy enable && /etc/init.d/privoxy start
+		privoxy_enable=1
 	fi
 
 }
@@ -795,6 +887,16 @@ start() {
 		mkdir -p /tmp/dnsmasq.d
 
 		if ! [ "$run_mode" = "oversea" ]; then
+	for domain_names in $(uci -X show shadowsocksr | grep domain_white_list | awk -F'[.=]' '{print $2}'); do
+		local DOMAIN_NANES=$(uci_get_by_name $domain_names domain_names)
+
+		sed -i "/$DOMAIN_NANES/d" /etc/dnsmasq.ssr/custom_forward.conf
+		sed -i "/$DOMAIN_NANES/d" /etc/dnsmasq.ssr/gfw_base.conf
+		sed -i "/$DOMAIN_NANES/d" /etc/dnsmasq.ssr/gfw_list.conf
+	done
+
+	sleep 2
+
 		cat > /tmp/dnsmasq.d/dnsmasq-ssr.conf <<EOF
 conf-dir=/var/dnsmasq.ssr
 EOF
@@ -817,11 +919,11 @@ EOF
 	start_local
 	
 	if [ $(uci_get_by_type global monitor_enable) = 1 ] ;then
-		let total_count=server_count+redir_tcp+redir_udp+tunnel_enable+kcp_enable_flag+local_enable+pdnsd_enable_flag+dnsforwarder_enable_flag+switch_enable+ssserver_enable+ssrserver_enable+v2rayserver_enable+haproxy_enable
+		let total_count=server_count+redir_tcp+redir_udp+tunnel_enable+kcp_enable_flag+local_enable+pdnsd_enable_flag+dnsforwarder_enable_flag+switch_enable+ssserver_enable+ssrserver_enable+v2rayserver_enable+haproxy_enable+privoxy_enable
 
 		if [ $total_count -gt 0 ] ;then
 			#param:server(count) redir_tcp(0:no,1:yes)  redir_udp tunnel kcp local gfw
-			service_start /usr/bin/ssr-monitor $server_count $redir_tcp $redir_udp $tunnel_enable $kcp_enable_flag $local_enable $pdnsd_enable_flag $dnsforwarder_enable_flag $switch_enable $ssserver_enable $ssrserver_enable $v2rayserver_enable $haproxy_enable
+			service_start /usr/bin/ssr-monitor $server_count $redir_tcp $redir_udp $tunnel_enable $kcp_enable_flag $local_enable $pdnsd_enable_flag $dnsforwarder_enable_flag $switch_enable $ssserver_enable $ssrserver_enable $v2rayserver_enable $haproxy_enable $privoxy_enable
 		fi
 	fi
 	
@@ -864,6 +966,12 @@ stop() {
 	killall -q -9 ssr-local
 	killall -q -9 ss-local
 	killall -q -9 haproxy
+	killall -q -9 privoxy
+	killall -q -9 v2ray-plugin
+	killall -q -9 gq-client
+	killall -q -9 gq-server
+	killall -q -9 obfs-local
+	killall -q -9 obfs-server
 
 	if [ -f /var/run/pdnsd.pid ] ;then
 		kill $(cat /var/run/pdnsd.pid) >/dev/null 2>&1
@@ -874,7 +982,7 @@ stop() {
 
 	kill $(pidof dnsparsing) >/dev/null 2>&1 || killall -9 dnsparsing >/dev/null 2>&1
 	rm -rf /var/run/dnsparsing
-	sed -i '/filter-aaaa/d' /etc/dnsmasq.conf
+
 	if [ -f "/tmp/dnsmasq.d/dnsmasq-ssr.conf" ]; then
 		rm -f /tmp/dnsmasq.d/dnsmasq-ssr.conf
 
@@ -887,9 +995,11 @@ stop() {
 		fi
 		/etc/init.d/dnsmasq restart >/dev/null 2>&1
 	fi
-	
+	/etc/init.d/dnscrypt-proxy disable	
 	/etc/init.d/dnscrypt-proxy stop
-	/etc/init.d/dnscrypt-proxy disable
+	/etc/init.d/privoxy disable
+	/etc/init.d/privoxy stop
+
 
 	del_cron
 }

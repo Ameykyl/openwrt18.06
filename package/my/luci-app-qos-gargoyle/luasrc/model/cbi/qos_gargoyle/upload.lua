@@ -27,7 +27,7 @@ class_s = m:section(TypedSection, "upload_class", translate("Service Classes"),
 class_s.anonymous = true
 class_s.addremove = true
 class_s.template  = "cbi/tblsection"
-class_s.extedit   = dsp.build_url("admin/network/qos_gargoyle/upload/class/%s")
+class_s.extedit   = dsp.build_url("admin/QOS/qos_gargoyle/upload/class/%s")
 class_s.create    = function(...)
 	local sid = TypedSection.create(...)
 	if sid then
@@ -76,7 +76,7 @@ rule_s.addremove = true
 rule_s.sortable  = true
 rule_s.anonymous = true
 rule_s.template  = "cbi/tblsection"
-rule_s.extedit   = dsp.build_url("admin/network/qos_gargoyle/upload/rule/%s")
+rule_s.extedit   = dsp.build_url("admin/QOS/qos_gargoyle/upload/rule/%s")
 rule_s.create    = function(...)
 	local sid = TypedSection.create(...)
 	if sid then

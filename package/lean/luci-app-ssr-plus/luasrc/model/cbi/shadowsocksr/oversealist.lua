@@ -1,5 +1,5 @@
 local fs = require "nixio.fs"
-local conffile = "/etc/dnsmasq.oversea/oversea_list.conf"
+local conffile = "/etc/dnsmasq.oversea/base_list.conf"
 
 f = SimpleForm("custom", translate("Oversea Custom List"))
 
@@ -14,7 +14,7 @@ function f.handle(self, state, data)
 	if state == FORM_VALID then
 		if data.conf then
 			fs.writefile(conffile, data.conf:gsub("\r\n", "\n"))
-			luci.sys.call("/etc/init.d/dnsmasq restart")
+			luci.sys.call("/etc/init.d/shadowsocksr restart")
 		end
 	end
 	return true

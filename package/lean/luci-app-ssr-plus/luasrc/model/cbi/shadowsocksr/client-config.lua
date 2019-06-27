@@ -89,7 +89,7 @@ local protocol = {
 	"auth_chain_f",
 }
 
-obfs = {
+local obfs = {
 	"plain",
 	"http_simple",
 	"http_post",
@@ -202,6 +202,11 @@ o.rmempty = false
 -- o.default = 60
 -- o.rmempty = false
 
+o = s:option(Value, "weight", translate("Weight"))
+o.datatype = "uinteger"
+o.default = 10
+o.rmempty = false
+
 o = s:option(Value, "password", translate("Password"))
 o.password = true
 o.rmempty = true
@@ -217,6 +222,28 @@ o = s:option(ListValue, "encrypt_method_ss", translate("Encrypt Method"))
 for _, v in ipairs(encrypt_methods_ss) do o:value(v) end
 o.rmempty = true
 o:depends("type", "ss")
+
+o = s:option(ListValue, "plugin", translate("plugin"))
+o:value("none", "None")
+if nixio.fs.access("/usr/bin/v2ray-plugin") then
+o:value("/usr/bin/v2ray-plugin", "v2ray-plugin")
+end
+if nixio.fs.access("/usr/bin/obfs-local") then
+o:value("/usr/bin/obfs-local", "obfs-local")
+end
+if nixio.fs.access("/usr/bin/gq-client") then
+o:value("/usr/bin/gq-client", "GoQuiet")
+end
+o.rmempty = false
+o.default = "none"
+o:depends("type", "ss")
+
+o = s:option(Value, "plugin_opts", translate("Plugin Opts"))
+o.rmempty = true
+o:depends("plugin", "/usr/bin/v2ray-plugin")
+o:depends("plugin", "/usr/bin/obfs-local")
+o:depends("plugin", "/usr/bin/gq-client")
+
 
 o = s:option(ListValue, "protocol", translate("Protocol"))
 for _, v in ipairs(protocol) do o:value(v) end

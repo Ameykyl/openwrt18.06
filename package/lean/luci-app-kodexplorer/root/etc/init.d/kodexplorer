@@ -1,5 +1,5 @@
 #!/bin/sh /etc/rc.common
-# Copyright (C) 2018 Lienol <admin@lienol.cn>
+# Copyright (C) 2018-2019 Lienol
 
 START=99
 
@@ -34,6 +34,7 @@ http {
     keepalive_timeout  65;
     server {
         listen       $port;
+        listen [::]:$port ipv6only=on;
         server_name  localhost;
         location / {
             root $project_directory;

@@ -55,7 +55,7 @@ table.cbi-section-table td.cbi-section-table-cell {
 		var dataTable = [];
 		var updateInProgress = false;
 
-		XHR.poll(3, '<%=dsp.build_url("admin", "network", "qos_gargoyle", "load_data", leaf)%>',
+		XHR.poll(3, '<%=dsp.build_url("admin", "QOS", "qos_gargoyle", "load_data", leaf)%>',
 			null, function(res) {
 				if (res.readyState == 4 && tbs) {
 					var timestamp = new Date().getTime();

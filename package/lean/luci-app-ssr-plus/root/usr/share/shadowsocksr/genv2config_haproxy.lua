@@ -30,7 +30,7 @@ local v2ray = {
         settings = {
             vnext = {
                 {
-                    address = '127.0.0.1',
+                    address = "0.0.0.0",
                     port = '4433',
                     users = {
                         {

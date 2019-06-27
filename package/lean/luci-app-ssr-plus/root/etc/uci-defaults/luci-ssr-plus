@@ -15,6 +15,9 @@ EOF
 
 /etc/init.d/dnscrypt-proxy stop
 /etc/init.d/dnscrypt-proxy disable
+/etc/init.d/privoxy stop
+/etc/init.d/privoxy disable
+killall -q -9 v2ray-plugin
 
 /usr/share/shadowsocksr/gfw2ipset.sh
 rm -f /tmp/luci-indexcache

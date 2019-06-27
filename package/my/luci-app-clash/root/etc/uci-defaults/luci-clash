@@ -6,6 +6,8 @@ uci -q batch <<-EOF >/dev/null
 	set ucitrack.@clash[-1].init=clash
 	commit ucitrack
 EOF
-chmod 777 /etc/init.d/clash
+
+[ ! -f /etc/clash/clash ] && ln /usr/bin/clash /etc/clash/clash
+
 rm -f /tmp/luci-indexcache
 exit 0

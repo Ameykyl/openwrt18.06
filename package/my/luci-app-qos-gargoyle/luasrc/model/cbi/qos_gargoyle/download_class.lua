@@ -6,7 +6,7 @@ local sid = arg[1]
 local qos_gargoyle = "qos_gargoyle"
 
 m = Map(qos_gargoyle, translate("Edit Download Service Class"))
-m.redirect = luci.dispatcher.build_url("admin/network/qos_gargoyle/download")
+m.redirect = luci.dispatcher.build_url("admin/QOS/qos_gargoyle/download")
 
 if m.uci:get(qos_gargoyle, sid) ~= "download_class" then
 	luci.http.redirect(m.redirect)

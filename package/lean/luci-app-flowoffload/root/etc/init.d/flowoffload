@@ -235,7 +235,7 @@ start_service(){
 		elif [ $dnscache_enable = "2" ] || [ $dnscache_enable = "3" ];  then
 			start_dnsforwarder
 		elif [ $dnscache_enable = "3" ];  then
-			AdGuardHome -c /etc/AdGuardHome/AdGuardHome.yaml -w /etc/AdGuardHome >/dev/null 2>&1 &
+			AdGuardHome -c /etc/AdGuardHome/AdGuardHome.yaml -w /etc/AdGuardHome -h 0.0.0.0 -p 3000 >/dev/null 2>&1 &
 		fi
 		change_dns
 		nohup /usr/share/dnscache/dnscache-while.sh > /var/log/dnscache.file 2>&1 &
@@ -244,11 +244,12 @@ start_service(){
 		revert_dns
 	fi
 
-	if [ $bbr -eq 1 ];  then
-		sysctl -w net.ipv4.tcp_congestion_control=bbr
-	else
+	if [ "$bbr" = "default" ]; then
 		sysctl -w net.ipv4.tcp_congestion_control=cubic
+	else
+		sysctl -w net.ipv4.tcp_congestion_control=$bbr
 	fi
+
 	uci set firewall.@defaults[0].flow_offloading=$(uci get flowoffload.@flow[0].flow_offloading)
 	uci set firewall.@defaults[0].flow_offloading_hw=$(uci get flowoffload.@flow[0].flow_offloading_hw)
 	uci commit firewall

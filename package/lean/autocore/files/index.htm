@@ -687,7 +687,7 @@
 		<tr><td width="33%"><%:Hostname%></td><td><%=luci.sys.hostname() or "?"%></td></tr>
 		<tr><td width="33%"><%:Model%></td><td><%=pcdata(boardinfo.model or boardinfo.system or "?")%></td></tr>
 		<tr><td width="33%"><%:CPU Info%></td><td><%=luci.sys.exec("grep 'MHz' /proc/cpuinfo | cut -c11- |sed -n '1p'")%> MHz</td></tr>
-        <tr><td width="33%"><%:CPU Temperature%></td><td><%=luci.sys.exec("sensors | grep 'Core 0' | cut -c10-")%></td></tr>
+        <tr><td width="33%"><%:CPU Temperature%></td><td><%=luci.sys.exec("sensors | grep 'Core' | cut -c10-24")%></td></tr>
 		<tr><td width="33%"><%:Firmware Version%></td><td>
 			<%=pcdata(ver.distname)%> <%=pcdata(ver.distversion)%> /
 			<%=pcdata(ver.luciname)%> (<%=pcdata(ver.luciversion)%>)
@@ -697,9 +697,11 @@
 		<tr><td width="33%"><%:Uptime%></td><td id="uptime">-</td></tr>
 		<tr><td width="33%"><%:Load Average%></td><td id="loadavg">-</td></tr>
 		<tr><td width="33%"><%:CPU usage (%)%></td><td id="cpuusage">-</td></tr>
-		<tr><td width="33%"><%:Update%></td>
+		<tr><td width="33%"><%:help%></td>
 			<td id="cpr">
-				<input type="button" class="cbi-button cbi-button-apply" value="<%:Firmware-Update%>" onclick="window.open('https://www.right.com.cn/forum/thread-304009-1-1.html')" />
+				<input type="button" class="cbi-button cbi-button-apply" value="<%:Firmware-Update%>" onclick="window.open('https://github.com/ntlf9t/openwrt_update/releases')" />
+				<input type="button" class="cbi-button cbi-button-apply" value="<%:Problem feedback%>" onclick="window.open('https://github.com/ntlf9t/openwrt_update/issues')" />
+				<input type="button" class="cbi-button cbi-button-apply" value="<%:TG_investigation%>" onclick="window.open('https://t.me/joinchat/MHkJCxH8gUdV4UFBrxw_Ow')" />
 				</td>
 			</tr>
 	</table>

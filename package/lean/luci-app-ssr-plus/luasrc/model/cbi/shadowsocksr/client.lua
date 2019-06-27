@@ -95,18 +95,13 @@ o:depends("pdnsd_enable", "2")
 o:depends("pdnsd_enable", "3")
 o:depends("pdnsd_enable", "4")
 
-aaaa = s:option(Flag, "filter_aaaa", translate("Filter AAAA"))
-aaaa.default = 0
-aaaa.rmempty = false
-aaaa.description = translate("Dnsmasq rejects IPv6 parsing and optimizes domestic complex dual-stack network")
-
 o = s:option(Flag, "bt", translate("Kill BT"))
 o.default = 0
 o.rmempty = false
 o.description = translate("Prohibit downloading tool ports through proxy")
 
 o = s:option(Value, "bt_port", translate("BT Port"))
-o.default = "51413,8437,12551"
+o.default = "1236:65535"
 o.rmempty = true
 o:depends("bt", "1")
 

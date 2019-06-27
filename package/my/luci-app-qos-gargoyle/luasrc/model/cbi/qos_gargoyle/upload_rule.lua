@@ -18,7 +18,7 @@ uci:foreach(qos_gargoyle, "upload_class", function(s)
 end)
 
 m = Map(qos_gargoyle, translate("Edit Upload Classification Rule"))
-m.redirect = luci.dispatcher.build_url("admin/network/qos_gargoyle/upload")
+m.redirect = luci.dispatcher.build_url("admin/QOS/qos_gargoyle/upload")
 
 if m.uci:get(qos_gargoyle, sid) ~= "upload_rule" then
 	luci.http.redirect(m.redirect)

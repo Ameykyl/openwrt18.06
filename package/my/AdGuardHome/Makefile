@@ -7,7 +7,7 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=AdGuardHome
-PKG_VERSION:=v0.95-hotfix
+PKG_VERSION:=v0.96-hotfix
 PKG_BUILD_DIR:=$(BUILD_DIR)/$(PKG_NAME)-$(PKG_VERSION)
 
 include $(INCLUDE_DIR)/package.mk
@@ -44,8 +44,8 @@ ifeq ($(ARCH),aarch64)
 endif
 
 define Build/Prepare
-	[ ! -f $(PKG_BUILD_DIR)/AdGuardHome_$(PKG_VERSION)_$(PKG_ARCH_AdGuardHome).tar.gz ] && wget  https://github.com/AdguardTeam/AdGuardHome/releases/download/$(PKG_VERSION)/AdGuardHome_$(PKG_VERSION)_$(PKG_ARCH_AdGuardHome).tar.gz -O $(PKG_BUILD_DIR)/AdGuardHome_$(PKG_VERSION)_$(PKG_ARCH_AdGuardHome).tar.gz
-	tar -xzvf $(PKG_BUILD_DIR)/AdGuardHome_$(PKG_VERSION)_$(PKG_ARCH_AdGuardHome).tar.gz -C $(PKG_BUILD_DIR)
+	[ ! -f $(PKG_BUILD_DIR)/AdGuardHome_$(PKG_ARCH_AdGuardHome).tar.gz ] && wget  https://github.com/AdguardTeam/AdGuardHome/releases/download/$(PKG_VERSION)/AdGuardHome_$(PKG_ARCH_AdGuardHome).tar.gz -O $(PKG_BUILD_DIR)/AdGuardHome_$(PKG_ARCH_AdGuardHome).tar.gz
+	tar -xzvf $(PKG_BUILD_DIR)/AdGuardHome_$(PKG_ARCH_AdGuardHome).tar.gz -C $(PKG_BUILD_DIR)
 endef
 
 define Build/Configure

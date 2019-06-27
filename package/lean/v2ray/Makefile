@@ -7,7 +7,7 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=v2ray
-PKG_VERSION:=4.18.0
+PKG_VERSION:=4.19.1
 PKG_BUILD_DIR:=$(BUILD_DIR)/$(PKG_NAME)-$(PKG_VERSION)
 
 include $(INCLUDE_DIR)/package.mk
@@ -103,9 +103,9 @@ define Build/Configure
 endef
 
 define Build/Compile
-		chmod +x $(PKG_BUILD_DIR)/$(V2RAY_BIN) && upx --ultra-brute $(PKG_BUILD_DIR)/$(V2RAY_BIN)
-		chmod +x $(PKG_BUILD_DIR)/$(V2CTL_BIN) && upx --ultra-brute $(PKG_BUILD_DIR)/$(V2CTL_BIN)
-		echo "$(PKG_VERSION)" > $(PKG_BUILD_DIR)/v2ray_version
+	#chmod +x $(PKG_BUILD_DIR)/$(V2RAY_BIN) && upx -k --best --lzma $(PKG_BUILD_DIR)/$(V2RAY_BIN)
+	#chmod +x $(PKG_BUILD_DIR)/$(V2CTL_BIN) && upx -k --best --lzma $(PKG_BUILD_DIR)/$(V2CTL_BIN)
+	echo "$(PKG_VERSION)" > $(PKG_BUILD_DIR)/v2ray_version
 endef
 
 define Package/$(PKG_NAME)/install

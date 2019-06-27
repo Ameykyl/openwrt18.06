@@ -146,6 +146,10 @@ if luci.http.formvalue("upload") then
 	end	
 end
 
+o = s:option(Flag, "ipv4_ipv6", translate("Enabling IPv6 server"))
+o.default = 0
+o.rmempty = false
+
 o = s:option(Value, "server_port", translate("Server Port"))
 o.datatype = "port"
 o.default = 8388
@@ -167,6 +171,27 @@ for _, v in ipairs(encrypt_methods) do o:value(v) end
 o.rmempty = true
 o:depends("type", "ssr")
 o:depends("type", "ss")
+
+o = s:option(ListValue, "plugin", translate("plugin"))
+o:value("none", "None")
+if nixio.fs.access("/usr/bin/v2ray-plugin") then
+o:value("/usr/bin/v2ray-plugin", "v2ray-plugin")
+end
+if nixio.fs.access("/usr/bin/obfs-server") then
+o:value("/usr/bin/obfs-server", "obfs-server")
+end
+if nixio.fs.access("/usr/bin/gq-server") then
+o:value("/usr/bin/gq-server", "GoQuiet")
+end
+o.rmempty = false
+o.default = "none"
+o:depends("type", "ss")
+
+o = s:option(Value, "plugin_opts", translate("Plugin Opts"))
+o.rmempty = true
+o:depends("plugin", "/usr/bin/v2ray-plugin")
+o:depends("plugin", "/usr/bin/obfs-server")
+o:depends("plugin", "/usr/bin/gq-server")
 
 o = s:option(ListValue, "protocol", translate("Protocol"))
 for _, v in ipairs(protocol) do o:value(v) end

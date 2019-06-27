@@ -6,38 +6,37 @@ local DISP = require "luci.dispatcher"
 local UTIL = require "luci.util"
 
 
-m = Map("clash", translate("Clash Client"))
-m:section(SimpleSection).template  = "clash/status"
+m = Map("clash")
 s = m:section(TypedSection, "clash")
 s.anonymous = true
 
 
 o = s:option( Flag, "enable")
-o.title = translate("Enable Clash")
+o.title = translate("Enable")
 o.default = 0
 o.rmempty = false
-o.description = translate("After clash start running, wait a moment for servers to resolve,enjoy")
-
+o.description = translate("After clash start running, wait a moment for servers to resolve")
 
 o = s:option(Value, "proxy_port")
-o.title = translate("* Clash Redir Port")
+o.title = translate("Redir Port")
 o.default = 7892
 o.datatype = "port"
 o.rmempty = false
-o.description = translate("Clash config redir-port")
+o.description = translate("Redir Port")
 
-o = s:option(Value, "cn_port")
+o = s:option(Value, "dash_port")
 o.title = translate("Dashboard Port")
 o.default = 9090
 o.datatype = "port"
 o.rmempty = false
-o.description = translate("Dashboard hostname is Your router local address. eg, 192.168.1.1")
+o.description = translate("Dashboard Port")
 
-o = s:option(Value, "dashboard_password")
+o = s:option(Value, "dash_pass")
 o.title = translate("Dashboard Secret")
 o.default = 123456
 o.rmempty = false
 o.description = translate("Dashboard Secret")
+
 
 o = s:option(Flag, "auto_update", translate("Auto Update"))
 o.rmempty = false
@@ -50,6 +49,7 @@ o:value(t, t..":00")
 end
 o.default=0
 o.rmempty = false
+o.description = translate("Daily Server subscription update time")
 
 o = s:option(Value, "subscribe_url")
 o.title = translate("Subcription Url")
@@ -63,7 +63,7 @@ o.inputstyle = "reload"
 o.write = function()
   os.execute("mv /etc/clash/config.yml /etc/clash/config.bak")
   SYS.call("bash /usr/share/clash/clash.sh >>/tmp/clash.log 2>&1 &")
-  HTTP.redirect(DISP.build_url("admin", "services", "clash"))
+  HTTP.redirect(DISP.build_url("admin", "services", "clash", "client"))
 end
 
 
@@ -71,9 +71,6 @@ local apply = luci.http.formvalue("cbi.apply")
 if apply then
 	os.execute("/etc/init.d/clash restart >/dev/null 2>&1 &")
 end
-
-
-
 
 
 return m

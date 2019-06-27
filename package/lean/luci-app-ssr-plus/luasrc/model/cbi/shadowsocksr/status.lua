@@ -23,6 +23,7 @@ local pdnsd_run=0
 local dnsforwarder_run=0
 local dnscrypt_proxy_run=0
 local haproxy_run=0
+local privoxy_run=0
 
 if nixio.fs.access("/etc/dnsmasq.ssr/gfw_list.conf") then
 gfwmode=1		
@@ -88,6 +89,10 @@ end
 
 if luci.sys.call("ps -w | grep v2-ssr-local | grep -v grep >/dev/null") == 0 then
 v2sock5_run=1
+end
+
+if luci.sys.call("pidof privoxy >/dev/null") == 0 then
+privoxy_run=1
 end
 
 if luci.sys.call("pidof kcptun-client >/dev/null") == 0 then
@@ -202,6 +207,16 @@ if nixio.fs.access("/usr/bin/v2ray/v2ray") then
 s=m:field(DummyValue,"ssock5_run",translate("V2SOCKS5 Proxy")) 
 s.rawhtml  = true
 if v2sock5_run == 1 then
+s.value =font_blue .. bold_on .. translate("Running") .. bold_off .. font_off
+else
+s.value = translate("Not Running")
+end
+end
+
+if nixio.fs.access("/usr/sbin/privoxy") then
+s=m:field(DummyValue,"privoxy_run",translate("HTTP Proxy")) 
+s.rawhtml  = true
+if privoxy_run == 1 then
 s.value =font_blue .. bold_on .. translate("Running") .. bold_off .. font_off
 else
 s.value = translate("Not Running")

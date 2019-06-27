@@ -27,11 +27,18 @@ sed -i 's/\"services\"/\"nas\"/g' /usr/lib/lua/luci/controller/usb_printer.lua
 sed -i 's/\"services\"/\"nas\"/g' /usr/lib/lua/luci/controller/xunlei.lua
 sed -i 's/\"services\"/\"nas\"/g' /usr/lib/lua/luci/controller/nfs.lua
 sed -i 's/\"services\"/\"nas\"/g' /usr/lib/lua/luci/controller/cifs.lua
-sed -i 's/\"services\"/\"network\"/g' /usr/lib/lua/luci/controller/nft-qos.lua
-sed -i 's/\"network\"/\"services\"/g' /usr/lib/lua/luci/controller/dnspod.lua
-
 sed -i 's/services/nas/g'  /usr/lib/lua/luci/view/minidlna_status.htm
 
+sed -i 's/\"network\"/\"services\"/g' /usr/lib/lua/luci/controller/dnspod.lua
+
+sed -i 's/\"services\"/\"QOS\"/g' /usr/lib/lua/luci/controller/qosv4.lua
+sed -i 's/\"network\"/\"QOS\"/g' /usr/lib/lua/luci/controller/eqos.lua
+sed -i 's/\"network\"/\"QOS\"/g' /usr/lib/lua/luci/controller/qos.lua
+sed -i 's/\"network\"/\"QOS\"/g' /usr/lib/lua/luci/controller/sqm.lua
+sed -i 's/\"services\"/\"QOS\"/g' /usr/lib/lua/luci/controller/nft-qos.lua
+sed -i 's/\"network\"/\"QOS\"/g' /usr/lib/lua/luci/controller/qos.lua
+
+sed -i 's/\"services\"/\"vpn\"/g' /usr/lib/lua/luci/controller/softethervpn5.lua
 
 uci set minidlna.config.enabled=0
 uci commit minidlna
@@ -40,7 +47,7 @@ uci commit minidlna
 
 ln -sf /sbin/ip /usr/bin/ip
 
-sed -i 's/downloads.openwrt.org/openwrt.proxy.ustclug.org/g' /etc/opkg/distfeeds.conf
+#sed -i 's/downloads.openwrt.org/openwrt.proxy.ustclug.org/g' /etc/opkg/distfeeds.conf
 sed -i 's/root::0:0:99999:7:::/root:$1$V4UetPzk$CYXluq4wUazHjmCDBCqXF.:0:0:99999:7:::/g' /etc/shadow
 
 sed -i "s/# //g" /etc/opkg/distfeeds.conf
@@ -60,7 +67,7 @@ sed -i '/set wireless.radio${devidx}.disabled/d' /lib/wifi/mac80211.sh
 wifi up
 
 sed -i '/DISTRIB_REVISION/d' /etc/openwrt_release
-echo "DISTRIB_REVISION='R9.x.x By Lean Mod3.1.19 By dz'" >> /etc/openwrt_release
+echo "DISTRIB_REVISION='R9.x.x By Lean Mod3.1.40 By dz'" >> /etc/openwrt_release
 sed -i '/DISTRIB_DESCRIPTION/d' /etc/openwrt_release
 echo "DISTRIB_DESCRIPTION='OpenWrt '" >> /etc/openwrt_release
 
@@ -87,6 +94,14 @@ sed -i 's/cbi.submit\"] = true/cbi.submit\"] = \"1\"/g' /usr/lib/lua/luci/dispat
 /etc/init.d/dnscrypt-proxy disable
 /etc/init.d/igmpproxy stop
 /etc/init.d/igmpproxy disable
+/etc/init.d/redsocks2 stop
+/etc/init.d/redsocks2 disable
+/etc/init.d/banip stop
+/etc/init.d/banip disable
+/etc/init.d/udpxy enable
+/etc/init.d/udpxy stop
+/etc/init.d/wsdd2 stop
+/etc/init.d/v2ray_server stop
 /etc/init.d/samba4 stop
 /etc/init.d/samba stop
 
