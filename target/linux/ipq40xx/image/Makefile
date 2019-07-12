@@ -289,6 +289,31 @@ define Device/qcom_ap-dk04.1-c1
 endef
 TARGET_DEVICES += qcom_ap-dk04.1-c1
 
+define Device/qcom_ipq4019-ap-dk07.1-c1
+	$(call Device/FitImage)
+	$(call Device/UbiFit)
+	DEVICE_DTS := qcom-ipq4019-ap.dk07.1-c1
+	KERNEL_INSTALL := 1
+	KERNEL_SIZE := 4096k
+	BLOCKSIZE := 128k
+	PAGESIZE := 2048
+	DEVICE_TITLE := QCA AP-DK07.1-C1
+endef
+TARGET_DEVICES += qcom_ipq4019-ap-dk07.1-c1
+
+define Device/cm-gateway-4019-v12
+	$(call Device/FitImage)
+	$(call Device/UbiFit)
+	DEVICE_DTS := qcom-ipq4019-cm-gateway
+	KERNEL_INSTALL := 1
+	KERNEL_SIZE := 4096k
+	BLOCKSIZE := 128k
+	PAGESIZE := 2048
+	DEVICE_TITLE := CM GATEWAY-4019-V12
+	DEVICE_PACKAGES := ath10k-firmware-qca9984 kmod-ath10k ath10k-firmware-qca4019
+endef
+TARGET_DEVICES += cm-gateway-4019-v12
+
 define Device/zyxel_nbg6617
 	$(call Device/FitImageLzma)
 	DEVICE_DTS := qcom-ipq4018-nbg6617

@@ -1,0 +1,2 @@
+config core main
+	option lang auto

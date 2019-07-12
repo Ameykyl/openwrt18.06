@@ -7,7 +7,7 @@ uci -q batch <<-EOF >/dev/null
 	commit ucitrack
 EOF
 
-[ ! -f /etc/openclash/clash ] && ln /usr/bin/clash /etc/openclash/clash
+[ ! -f /etc/openclash/clash ] && ln -s /usr/bin/clash /etc/openclash/clash
 
 rm -f /tmp/luci-indexcache
 exit 0

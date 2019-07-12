@@ -53,42 +53,42 @@ yml_change(){
 		dash_port=$(uci get clash.config.dash_port 2>/dev/null)
 if [ $mode -eq 1 ];  then	
 		
-		sed -i "/Proxy:/i\#clash-openwrt" /etc/clash/config.yml
-        	sed -i "/#clash-openwrt/a\#=============" /etc/clash/config.yml
-		sed -i '1,/#clash-openwrt/d' /etc/clash/config.yml		
-		mv /etc/clash/config.yml /etc/clash/dns.yml
-		cat /usr/share/clash/dns.yml /etc/clash/dns.yml > /etc/clash/config.yml 
-		rm -rf /etc/clash/dns.yml
-		sed -i "1i\port: 7890" /etc/clash/config.yml
-		sed -i "2i\socks-port: 7891" /etc/clash/config.yml
-		sed -i "3i\redir-port: ${proxy_port}" /etc/clash/config.yml
-		sed -i "4i\allow-lan: true" /etc/clash/config.yml
-		sed -i "5i\mode: Rule" /etc/clash/config.yml
-		sed -i "6i\log-level: info" /etc/clash/config.yml
-		sed -i "7i\external-controller: 0.0.0.0:${dash_port}" /etc/clash/config.yml
-		sed -i "8i\secret: '${da_password}'" /etc/clash/config.yml
-		sed -i "9i\external-ui: "/usr/share/clash/dashboard"" /etc/clash/config.yml
-		sed -i "10i\ " /etc/clash/config.yml
-		sed -i "11i\ " /etc/clash/config.yml
-		sed -i '/#=============/ d' /etc/clash/config.yml
+		sed -i "/Proxy:/i\#clash-openwrt" /etc/clash/config.yaml
+        	sed -i "/#clash-openwrt/a\#=============" /etc/clash/config.yaml
+		sed -i '1,/#clash-openwrt/d' /etc/clash/config.yaml		
+		mv /etc/clash/config.yaml /etc/clash/dns.yaml
+		cat /usr/share/clash/dns.yaml /etc/clash/dns.yaml > /etc/clash/config.yaml 
+		rm -rf /etc/clash/dns.yaml
+		sed -i "1i\port: 7890" /etc/clash/config.yaml
+		sed -i "2i\socks-port: 7891" /etc/clash/config.yaml
+		sed -i "3i\redir-port: ${proxy_port}" /etc/clash/config.yaml
+		sed -i "4i\allow-lan: true" /etc/clash/config.yaml
+		sed -i "5i\mode: Rule" /etc/clash/config.yaml
+		sed -i "6i\log-level: info" /etc/clash/config.yaml
+		sed -i "7i\external-controller: 0.0.0.0:${dash_port}" /etc/clash/config.yaml
+		sed -i "8i\secret: '${da_password}'" /etc/clash/config.yaml
+		sed -i "9i\external-ui: "/usr/share/clash/dashboard"" /etc/clash/config.yaml
+		sed -i "10i\ " /etc/clash/config.yaml
+		sed -i "11i\ " /etc/clash/config.yaml
+		sed -i '/#=============/ d' /etc/clash/config.yaml
 		
 else
-
-		sed -i "/dns:/i\#clash-openwrt" /etc/clash/config.yml
-        	sed -i "/#clash-openwrt/a\#=============" /etc/clash/config.yml
-		sed -i '1,/#clash-openwrt/d' /etc/clash/config.yml
-		sed -i "1i\port: 7890" /etc/clash/config.yml
-		sed -i "2i\socks-port: 7891" /etc/clash/config.yml
-		sed -i "3i\redir-port: ${proxy_port}" /etc/clash/config.yml
-		sed -i "4i\allow-lan: true" /etc/clash/config.yml
-		sed -i "5i\mode: Rule" /etc/clash/config.yml
-		sed -i "6i\log-level: info" /etc/clash/config.yml
-		sed -i "7i\external-controller: 0.0.0.0:${dash_port}" /etc/clash/config.yml
-		sed -i "8i\secret: '${da_password}'" /etc/clash/config.yml
-		sed -i "9i\external-ui: "/usr/share/clash/dashboard"" /etc/clash/config.yml
-		sed -i "10i\ " /etc/clash/config.yml
-		sed -i "11i\ " /etc/clash/config.yml
-		sed -i '/#=============/ d' /etc/clash/config.yml
+		
+		sed -i "/dns:/i\#clash-openwrt" /etc/clash/config.yaml
+        	sed -i "/#clash-openwrt/a\#=============" /etc/clash/config.yaml
+		sed -i '1,/#clash-openwrt/d' /etc/clash/config.yaml
+		sed -i "1i\port: 7890" /etc/clash/config.yaml
+		sed -i "2i\socks-port: 7891" /etc/clash/config.yaml
+		sed -i "3i\redir-port: ${proxy_port}" /etc/clash/config.yaml
+		sed -i "4i\allow-lan: true" /etc/clash/config.yaml
+		sed -i "5i\mode: Rule" /etc/clash/config.yaml
+		sed -i "6i\log-level: info" /etc/clash/config.yaml
+		sed -i "7i\external-controller: 0.0.0.0:${dash_port}" /etc/clash/config.yaml
+		sed -i "8i\secret: '${da_password}'" /etc/clash/config.yaml
+		sed -i "9i\external-ui: "/usr/share/clash/dashboard"" /etc/clash/config.yaml
+		sed -i "10i\ " /etc/clash/config.yaml
+		sed -i "11i\ " /etc/clash/config.yaml
+		sed -i '/#=============/ d' /etc/clash/config.yaml
 
 fi
 #=========================================================================================================================== 
@@ -99,12 +99,12 @@ fi
 
 yml_dns_change(){
 #=========================================================================================================================== 
-	dns_port=`grep listen: /etc/clash/config.yml |awk -F ':' '{print $3}' |tr -cd "[0-9]"`
+	dns_port=`grep listen: /etc/clash/config.yaml |awk -F ':' '{print $3}' |tr -cd "[0-9]"`
 	dnsforwader=$(uci get clash.config.dnsforwader 2>/dev/null)
 	
 	if [ $dns_port -eq 53 ]; then
-	          sed -i '/listen:/ d' /etc/clash/config.yml
-	          sed -i "/nameserver:/i\  listen: 0.0.0.0:5353" /etc/clash/config.yml
+	          sed -i '/listen:/ d' /etc/clash/config.yaml
+	          sed -i "/nameserver:/i\  listen: 0.0.0.0:5353" /etc/clash/config.yaml
 	fi	
 
 	if [ $dnsforwader -eq 1 ]; then	
@@ -148,8 +148,8 @@ reject_access() {
 #===========================================================================================================================
 lan_ac=$(uci get clash.config.lan_ips)
 	ipset -! -R <<-EOF
-		create clash_lan hash:net
-		$(for ip in $lan_ac; do echo "add clash_lan $ip"; done)
+	create clash_lan hash:net
+	$(for ip in $lan_ac; do echo "add clash_lan $ip"; done)
 EOF
 #===========================================================================================================================
 }
@@ -160,7 +160,7 @@ rules(){
 		lan_ip=$(uci get network.lan.ipaddr 2>/dev/null)
 		lanac=$(uci get clash.config.rejectlan 2>/dev/null)
 		lan=$(uci get clash.config.proxylan 2>/dev/null)
-		dns_port=`grep listen: /etc/clash/config.yml |awk -F ':' '{print $3}' |tr -cd "[0-9]"`
+		dns_port=`grep listen: /etc/clash/config.yaml |awk -F ':' '{print $3}' |tr -cd "[0-9]"`
 		iptables -t nat -N clash   
 		iptables -t nat -N clash_dns            
 		iptables -t nat -A clash -d 0.0.0.0/8 -j RETURN
@@ -203,7 +203,10 @@ start_service(){
 #=========================================================================================================================== 
 
 enable=$(uci get clash.config.enable 2>/dev/null)
-size=`ls -l /etc/clash/config.yml|awk '{print $5}'`
+if [ -f /etc/clash/config.yml ];then
+	mv /etc/clash/config.yml /etc/clash/config.yaml
+fi
+size=`ls -l /etc/clash/config.yaml|awk '{print $5}'`
 lan=$(uci get clash.config.proxylan 2>/dev/null)
 lanac=$(uci get clash.config.rejectlan 2>/dev/null)
 
@@ -239,11 +242,11 @@ if [ $size -ne 0 ]; then
 	
 	if pidof clash >/dev/null; then
 		add_cron
-		nohup /usr/share/clash/clash-watchdog.sh > /var/log/clash-watchdog.file 2>&1 &
+		nohup /usr/share/clash/clash-watchdog.sh >/dev/null 2>&1
 	
 	fi
 else
-	echo "===============================$(date "+%Y-%m-%d %H:%M:%S")  problem with config.yml,  config.yml is either empty or not found =====================================" >> /tmp/clash.log
+	echo "===============================$(date "+%Y-%m-%d %H:%M:%S")  problem with config.yaml,  config.yaml is either empty or not found =====================================" >> /tmp/clash.log
 
 
 fi
@@ -275,7 +278,7 @@ stop_service(){
 		kill -9 `pidof clash|sed "s/$//g"` 2>/dev/null
 
 	   	revert_dns
-	
+
   	  	/etc/init.d/dnsmasq restart >/dev/null 2>&1
     
   	  	rm -rf /www/clash 2> /dev/null

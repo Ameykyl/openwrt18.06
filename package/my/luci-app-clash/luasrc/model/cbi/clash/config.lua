@@ -16,7 +16,7 @@ sul =ful:section(SimpleSection, "", translate(""))
 o = sul:option(FileUpload, "")
 o.title = translate("Upload Clash Configuration")
 o.template = "clash/clash_upload"
-o.description = translate("NB: Rename your config file to config.yml before upload. file will save to /etc/clash")
+o.description = translate("NB: Rename your config file to config.yaml before upload. file will save to /etc/clash")
 um = sul:option(DummyValue, "", nil)
 um.template = "clash/clash_dvalue"
 
@@ -61,10 +61,10 @@ s.anonymous = true
 s.addremove=false
 
 
-local conf = "/etc/clash/config.yml"
+local conf = "/etc/clash/config.yaml"
 sev = s:option(TextValue, "conf")
 sev.readonly=true
-update_time = SYS.exec("ls -l --full-time /etc/clash/config.yml|awk '{print $6,$7;}'")
+update_time = SYS.exec("ls -l --full-time /etc/clash/config.yaml|awk '{print $6,$7;}'")
 sev.description = update_time
 --sev.description = translate("Changes to config file must be made from source")
 sev.rows = 20

@@ -35,14 +35,14 @@ local cfgs = mtkwifi.load_profile(dev.profile)
     &nbsp;&nbsp;&nbsp; Please waiting while the page is loading......
 </div>
 
-<form method="post" name="cbi" action="<%=luci.dispatcher.build_url("admin", "mtk", "wifi", "dev_cfg", devname)%>" enctype="multipart/form-data" onreset="return cbi_validate_reset(this)" onsubmit="return cbi_validate_form(this, 'Some fields are invalid, cannot save values!')" autocomplete="false">
+<form method="post" name="cbi" action="<%=luci.dispatcher.build_url("admin", "network", "wifi", "dev_cfg", devname)%>" enctype="multipart/form-data" onreset="return cbi_validate_reset(this)" onsubmit="return cbi_validate_form(this, 'Some fields are invalid, cannot save values!')" autocomplete="false">
     <fieldset class="cbi-section">
         <legend> Device Configurations - <%=devname%> 
 <%
 local diff = mtkwifi.diff_profile(dev.profile)
 if next(diff) ~= nil then
 %>
-    <span style="color:red;">(<a href="javascript:location.href='<%=luci.dispatcher.build_url("admin", "mtk", "wifi", "reload", dev.devname)%>'">reload</a> to apply changes)</span>
+    <span style="color:red;">(<a href="javascript:location.href='<%=luci.dispatcher.build_url("admin", "network", "wifi", "reload", dev.devname)%>'">reload</a> to apply changes)</span>
 <% 
     end
 %>
@@ -374,7 +374,7 @@ if next(diff) ~= nil then
 
     </fieldset>
     <div class="cbi-page-actions">
-        <input class="cbi-button cbi-button-apply" value="Reload" type="button" onclick='wifi_reload("<%=luci.dispatcher.build_url("admin", "mtk", "wifi", "reload", devname)%>");' />
+        <input class="cbi-button cbi-button-apply" value="Reload" type="button" onclick='wifi_reload("<%=luci.dispatcher.build_url("admin", "network", "wifi", "reload", devname)%>");' />
         <input class="cbi-button cbi-button-apply" value="Save" type="submit" />
         <input class="cbi-button cbi-button-apply" name="__apply" value="Save & Apply" type="submit" />
         <input class="cbi-button cbi-button-reset" value="Reset" type="reset" />
@@ -382,7 +382,7 @@ if next(diff) ~= nil then
 </form>
 
 
-<form method="post" name="cbi2" action="<%=luci.dispatcher.build_url("admin", "mtk", "wifi", "dev_cfg_raw", devname)%>" enctype="multipart/form-data" onreset="return cbi_validate_reset(this)" onsubmit="return cbi_validate_form(this, 'Some fields are invalid, cannot save values!')" autocomplete="off">
+<form method="post" name="cbi2" action="<%=luci.dispatcher.build_url("admin", "network", "wifi", "dev_cfg_raw", devname)%>" enctype="multipart/form-data" onreset="return cbi_validate_reset(this)" onsubmit="return cbi_validate_form(this, 'Some fields are invalid, cannot save values!')" autocomplete="off">
     <fieldset class="cbi-section">
         <legend> Raw Configurations ( Edit WiFi profile directly )</legend>
         <p> <span style="color: red"><b>WARNING</b></span> : DO NOT MESS WITH IT IF YOU DON'T UNDERSTAND IT!</p>
@@ -394,9 +394,9 @@ if next(diff) ~= nil then
         %></textarea>
     </fieldset>
     <div class="cbi-page-actions">
-        <input class="cbi-button cbi-button-reset" value="Reset" onclick="location.href='<%=luci.dispatcher.build_url("admin", "mtk", "wifi", "dev_cfg_view", devname)%>'" type="button" />
+        <input class="cbi-button cbi-button-reset" value="Reset" onclick="location.href='<%=luci.dispatcher.build_url("admin", "network", "wifi", "dev_cfg_view", devname)%>'" type="button" />
         <input class="cbi-button cbi-button-apply" id="save" value="Save" type="submit" onclick="if (confirm('You are going to overwrite the profile directly, are you sure?')) return true; else return false;" />
-        <input class="cbi-button cbi-button-apply" id="reset" value="Restore Profile to Factory Setting" type="button" onclick="if (confirm('You are going to reset the profile of <%=devname%> to factory default, are you sure?')) location.href='<%=luci.dispatcher.build_url("admin", "mtk", "wifi", "dev_cfg_reset", devname)%>'" />
+        <input class="cbi-button cbi-button-apply" id="reset" value="Restore Profile to Factory Setting" type="button" onclick="if (confirm('You are going to reset the profile of <%=devname%> to factory default, are you sure?')) location.href='<%=luci.dispatcher.build_url("admin", "network", "wifi", "dev_cfg_reset", devname)%>'" />
     </div>
 </form>
 
@@ -472,7 +472,7 @@ if next(diff) ~= nil then
     }
 
     function getCountryRegionList(mode) {
-        XHR.get('<%=luci.dispatcher.build_url("admin", "mtk", "wifi", "get_country_region_list")%>', 'mode='+mode,
+        XHR.get('<%=luci.dispatcher.build_url("admin", "network", "wifi", "get_country_region_list")%>', 'mode='+mode,
             function(x)
             {
                 //console.log(x);
@@ -497,7 +497,7 @@ if next(diff) ~= nil then
     }
 
     function getChannelList(mode, country_region) {
-        XHR.get('<%=luci.dispatcher.build_url("admin", "mtk", "wifi", "get_channel_list")%>', 'mode='+mode+'&country_region='+country_region,
+        XHR.get('<%=luci.dispatcher.build_url("admin", "network", "wifi", "get_channel_list")%>', 'mode='+mode+'&country_region='+country_region,
             function(x)
             {
                 console.log(x);
@@ -616,7 +616,7 @@ if next(diff) ~= nil then
         mode = mode.value*1;
 
         var cr = GetCountryRegion(mode);
-        XHR.get('<%=luci.dispatcher.build_url("admin", "mtk", "wifi", "get_5G_2nd_80Mhz_channel_list")%>', 'ch_cur='+ch+'&country_region='+cr,
+        XHR.get('<%=luci.dispatcher.build_url("admin", "network", "wifi", "get_5G_2nd_80Mhz_channel_list")%>', 'ch_cur='+ch+'&country_region='+cr,
             function(x)
             {
                 //console.log(x);
@@ -658,7 +658,7 @@ if next(diff) ~= nil then
         mode = mode.value*1;
 
         var cr = GetCountryRegion(mode);
-        XHR.get('<%=luci.dispatcher.build_url("admin", "mtk", "wifi", "get_HT_ext_channel_list")%>', 'ch_cur='+ch+'&country_region='+cr,
+        XHR.get('<%=luci.dispatcher.build_url("admin", "network", "wifi", "get_HT_ext_channel_list")%>', 'ch_cur='+ch+'&country_region='+cr,
             function(x)
             {
                 console.log(x);

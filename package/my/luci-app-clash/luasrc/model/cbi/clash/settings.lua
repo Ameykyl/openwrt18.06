@@ -77,17 +77,16 @@ md.rmempty = false
 md.description = translate("Enabling Custom DNS will Overwrite your config.yml dns section")
 
 
-local dns = "/usr/share/clash/dns.yml"
+local dns = "/usr/share/clash/dns.yaml"
 o = s:option(TextValue, "dns",translate("Modify yml DNS"))
 o.template = "clash/tvalue"
-o.rows = 21
+o.rows = 24
 o.wrap = "off"
 o.cfgvalue = function(self, section)
 	return NXFS.readfile(dns) or ""
 end
 o.write = function(self, section, value)
 	NXFS.writefile(dns, value:gsub("\r\n", "\n"))
-	--SYS.call("/etc/init.d/adbyby restart")
 end
 o.description = translate("Please modify the file here.")
 o:depends("mode", 1)

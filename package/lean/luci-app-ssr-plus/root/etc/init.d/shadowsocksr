@@ -26,6 +26,7 @@ kcp_enable_flag=0
 kcp_flag=0
 pdnsd_enable_flag=0
 dnsforwarder_enable_flag=0
+chinadns_enable_flag=0
 switch_enable=0
 ssserver_enable=0
 ssrserver_enable=0
@@ -253,6 +254,7 @@ start_rules() {
 		-w "$(uci_get_by_type access_control wan_fw_ips)" \
 		-p "$(uci_get_by_type access_control lan_fp_ips)" \
 		-G "$(uci_get_by_type access_control lan_gm_ips)" \
+		-k "$(uci_get_by_type access_control wan_fk_ips)" \
 		$(get_arg_out) $gfwmode $ARG_UDP
 			
 	return $?
@@ -261,6 +263,7 @@ start_rules() {
 start_pdnsd() {
 	local usr_dns="$1"
 	local usr_port="$2"
+	local dns_port="5335"
   
 	local tcp_dns_list="208.67.222.222,208.67.220.220"
 	[ -z "$usr_dns" ] && usr_dns="8.8.8.8"
@@ -270,6 +273,19 @@ start_pdnsd() {
 		tcp_only="tcp_only"
 	elif [ "$(uci_get_by_type global pdnsd_enable)" = "2" ] ;then
 		tcp_only="udp_only"
+	fi
+
+	if [ "$(uci_get_by_type global pdnsd_enable)" = "6" ] ;then
+		if [ "$(uci_get_by_type global chinadns_enable)" = "0" ] ;then
+			dns_port="5335"
+		else
+			dns_port="5337"
+		fi
+		if [ "$(uci_get_by_type global chinadns_enable)" = "1" ] ;then
+			tcp_only="tcp_only"
+		elif [ "$(uci_get_by_type global chinadns_enable)" = "2" ] ;then
+			tcp_only="udp_only"
+		fi
 	fi
 
 	kill $(pidof pdnsd) >/dev/null 2>&1 || killall -9 pdnsd >/dev/null 2>&1
@@ -292,7 +308,7 @@ global {
 	pid_file = /var/run/pdnsd.pid;
 	run_as="nobody";
 	server_ip = 127.0.0.1;
-	server_port = 5335;
+	server_port = $dns_port;
 	status_ctl = on;
 	query_method = $tcp_only;
 	min_ttl=1h;
@@ -330,6 +346,7 @@ start_dnsforwarder()
 {
 	local usr_dns="$1"
 	local usr_port="$2"
+	local dns_port="5335"
 
 	local tcp_dns_list="1.0.0.1,208.67.220.220"
 	[ -z "$usr_dns" ] && usr_dns="8.8.8.8"
@@ -339,6 +356,18 @@ start_dnsforwarder()
 		dnsgroup="TCPGroup"
 	elif [ "$(uci_get_by_type global pdnsd_enable)" = "4" ] ;then
 		dnsgroup="UDPGroup"
+	fi
+	if [ "$(uci_get_by_type global pdnsd_enable)" = "6" ] ;then
+		if [ "$(uci_get_by_type global chinadns_enable)" = "0" ] ;then
+			dns_port="5335"
+		else
+			dns_port="5337"
+		fi
+		if [ "$(uci_get_by_type global chinadns_enable)" = "3" ] ;then
+			dnsgroup="TCPGroup"
+		elif [ "$(uci_get_by_type global chinadns_enable)" = "4" ] ;then
+			dnsgroup="UDPGroup"
+		fi
 	fi
 
 	kill $(pidof pdnsd) >/dev/null 2>&1 || killall -9 pdnsd >/dev/null 2>&1
@@ -358,7 +387,7 @@ start_dnsforwarder()
 LogOn false
 LogFileThresholdLength 102400
 LogFileFolder /var/run/dnsparsing
-UDPLocal 127.0.0.1:5335
+UDPLocal 127.0.0.1:$dns_port
 $dnsgroup $usr_dns:$usr_port * no
 GroupFile
 BlockIP 243.185.187.39,46.82.174.68,37.61.54.158,93.46.8.89,59.24.3.173,203.98.7.65,8.7.198.45,78.16.49.15,159.106.121.75,69.63.187.12,31.13.76.8,31.13.64.49
@@ -397,6 +426,14 @@ EOF
 
 dnscrypt_config_file() {
 	local dnsstr="$(uci_get_by_type global tunnel_forward 8.8.4.4:53)"
+	local dns_port="5335"
+	if [ "$(uci_get_by_type global pdnsd_enable)" = "6" ] ;then
+		if [ "$(uci_get_by_type global chinadns_enable)" = "0" ] ;then
+			dns_port="5335"
+		else
+			dns_port="5337"
+		fi
+	fi
 	kill $(pidof pdnsd) >/dev/null 2>&1 || killall -9 pdnsd >/dev/null 2>&1
 	kill $(pidof dnsparsing) >/dev/null 2>&1 || killall -9 dnsparsing >/dev/null 2>&1
 	/etc/init.d/dnscrypt-proxy disable
@@ -416,7 +453,7 @@ force_tcp = true
 server_names = ["cloudflare", "d0wn-us-ns1"]
 #ipv6dns
 #server_names = ["cloudflare-ipv6", "d0wn-tz-ns1-ipv6"]
-listen_addresses = ['127.0.0.1:5335', '[::1]:5335']
+listen_addresses = ['127.0.0.1:$dns_port', '[::1]:$dns_port']
 max_clients = 300
 dnscrypt_servers = true
 doh_servers = true
@@ -651,12 +688,16 @@ start_redir() {
 	local dnsstr="$(uci_get_by_type global tunnel_forward 8.8.4.4:53)"
     local dnsserver=`echo "$dnsstr"|awk -F ':'  '{print $1}'`
     local dnsport=`echo "$dnsstr"|awk -F ':'  '{print $2}'`
-		if [ "$run_mode" = "gfw" ]; then
-			ipset add gfwlist $dnsserver 2>/dev/null
-		elif [ "$run_mode" = "oversea" ]; then
-			ipset add oversea $dnsserver 2>/dev/null
+		if [ "$dnsserver" = "0.0.0.0" ]; then
+			echo "$(date "+%Y-%m-%d %H:%M:%S") dns="$dnsserver"" >> /tmp/ssrplus.log
 		else
-			ipset add ss_spec_wan_ac $dnsserver nomatch 2>/dev/null  
+			if [ "$run_mode" = "gfw" ]; then
+				ipset add gfwlist $dnsserver 2>/dev/null
+			elif [ "$run_mode" = "oversea" ]; then
+				ipset add oversea $dnsserver 2>/dev/null
+			else
+				ipset add ss_spec_wan_ac $dnsserver nomatch 2>/dev/null  
+			fi
 		fi
 
 		if [ "$(uci_get_by_type global pdnsd_enable)" = "1" ] || [ "$(uci_get_by_type global pdnsd_enable)" = "2" ] ;then
@@ -668,6 +709,24 @@ start_redir() {
 		elif [ "$(uci_get_by_type global pdnsd_enable)" = "5" ] ;then
 			dnscrypt_config_file
 			/etc/init.d/dnscrypt-proxy enable && /etc/init.d/dnscrypt-proxy start
+		elif [ "$(uci_get_by_type global pdnsd_enable)" = "6" ] ;then
+			if [ "$(uci_get_by_type global chinadns_enable)" = "1" ] || [ "$(uci_get_by_type global chinadns_enable)" = "2" ] ;then
+				start_pdnsd $dnsserver $dnsport
+				pdnsd_enable_flag=1
+				dnsstrs="0.0.0.0:5337"
+			elif [ "$(uci_get_by_type global chinadns_enable)" = "3" ] || [ "$(uci_get_by_type global chinadns_enable)" = "4" ] ;then
+				start_dnsforwarder $dnsserver $dnsport
+				dnsforwarder_enable_flag=1
+				dnsstrs="0.0.0.0:5337"
+			elif [ "$(uci_get_by_type global chinadns_enable)" = "5" ] ;then
+				dnscrypt_config_file
+				/etc/init.d/dnscrypt-proxy enable && /etc/init.d/dnscrypt-proxy start
+				dnsstrs="0.0.0.0:5337"
+			else
+				dnsstrs="$(uci_get_by_type global tunnel_forward 8.8.4.4:53)"
+			fi
+			nohup /usr/bin/chinadns -p 5335 -c /etc/china_ssr.txt -m -d -s $dnsstrs >/dev/null 2>&1 &
+			chinadns_enable_flag=1
 		fi
 
 	fi
@@ -898,17 +957,19 @@ start() {
 	sleep 2
 
 		cat > /tmp/dnsmasq.d/dnsmasq-ssr.conf <<EOF
-conf-dir=/var/dnsmasq.ssr
+conf-dir=/var/etc/dnsmasq.ssr
 EOF
-
-			cp -a /etc/dnsmasq.ssr /var
+			mkdir -p /var/etc/dnsmasq.ssr
+			ln -s /etc/dnsmasq.ssr/* /var/etc/dnsmasq.ssr/
 
 		else
 		cat > /tmp/dnsmasq.d/dnsmasq-ssr.conf <<EOF
-conf-dir=/var/dnsmasq.oversea
+conf-dir=/var/etc/dnsmasq.oversea
 EOF
 
-			cp -a /etc/dnsmasq.oversea /var
+			mkdir -p /var/etc/dnsmasq.oversea
+			ln -s /etc/dnsmasq.oversea/* /var/etc/dnsmasq.oversea/
+			ln -s /etc/dnsmasq.ssr/appoint_list.conf /var/etc/dnsmasq.oversea/appoint_list.conf
 
 		fi
 
@@ -919,11 +980,11 @@ EOF
 	start_local
 	
 	if [ $(uci_get_by_type global monitor_enable) = 1 ] ;then
-		let total_count=server_count+redir_tcp+redir_udp+tunnel_enable+kcp_enable_flag+local_enable+pdnsd_enable_flag+dnsforwarder_enable_flag+switch_enable+ssserver_enable+ssrserver_enable+v2rayserver_enable+haproxy_enable+privoxy_enable
+		let total_count=server_count+redir_tcp+redir_udp+tunnel_enable+kcp_enable_flag+local_enable+pdnsd_enable_flag+dnsforwarder_enable_flag+switch_enable+ssserver_enable+ssrserver_enable+v2rayserver_enable+haproxy_enable+privoxy_enable+chinadns_enable_flag
 
 		if [ $total_count -gt 0 ] ;then
 			#param:server(count) redir_tcp(0:no,1:yes)  redir_udp tunnel kcp local gfw
-			service_start /usr/bin/ssr-monitor $server_count $redir_tcp $redir_udp $tunnel_enable $kcp_enable_flag $local_enable $pdnsd_enable_flag $dnsforwarder_enable_flag $switch_enable $ssserver_enable $ssrserver_enable $v2rayserver_enable $haproxy_enable $privoxy_enable
+			service_start /usr/bin/ssr-monitor $server_count $redir_tcp $redir_udp $tunnel_enable $kcp_enable_flag $local_enable $pdnsd_enable_flag $dnsforwarder_enable_flag $switch_enable $ssserver_enable $ssrserver_enable $v2rayserver_enable $haproxy_enable $privoxy_enable $chinadns_enable_flag
 		fi
 	fi
 	
@@ -972,6 +1033,7 @@ stop() {
 	killall -q -9 gq-server
 	killall -q -9 obfs-local
 	killall -q -9 obfs-server
+	killall -q -9 chinadns
 
 	if [ -f /var/run/pdnsd.pid ] ;then
 		kill $(cat /var/run/pdnsd.pid) >/dev/null 2>&1
@@ -987,11 +1049,11 @@ stop() {
 		rm -f /tmp/dnsmasq.d/dnsmasq-ssr.conf
 
 		if [ -d  "/var/dnsmasq.ssr" ]; then
-			rm -rf /var/dnsmasq.ssr
+			rm -rf /var/etc/dnsmasq.ssr
 		fi
 
 		if [ -d  "/var/dnsmasq.oversea" ]; then
-			rm -rf /var/dnsmasq.oversea
+			rm -rf /var/etc/dnsmasq.oversea
 		fi
 		/etc/init.d/dnsmasq restart >/dev/null 2>&1
 	fi

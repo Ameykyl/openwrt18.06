@@ -42,7 +42,7 @@ local debug = 0
     &nbsp;&nbsp;&nbsp; Please waiting while the page is loading......
 </div>
 
-<form method="post" name="cbi" action="<%=luci.dispatcher.build_url("admin", "mtk", "wifi", "apcli_cfg", devname, vifname)%>" enctype="multipart/form-data" onreset="return cbi_validate_reset(this)" onsubmit="return cbi_validate_form(this, 'Some fields are invalid, cannot save values!')" autocomplete="off">
+<form method="post" name="cbi" action="<%=luci.dispatcher.build_url("admin", "network", "wifi", "apcli_cfg", devname, vifname)%>" enctype="multipart/form-data" onreset="return cbi_validate_reset(this)" onsubmit="return cbi_validate_form(this, 'Some fields are invalid, cannot save values!')" autocomplete="off">
 
     <fieldset class="cbi-section" id="vif-cfg-apcli">
         <legend> <a name="apcli_scan_section">Wireless Repeater - <%=devname.."@"..vifname%> </a></legend>
@@ -162,7 +162,7 @@ local debug = 0
     </fieldset>
 
     <div class="cbi-page-actions" id="apcli_form_buttons">
-        <input class="cbi-button cbi-button-apply" value="Reload" type="button" onclick='wifi_reload("<%=luci.dispatcher.build_url("admin", "mtk", "wifi", "reload", devname)%>");' />
+        <input class="cbi-button cbi-button-apply" value="Reload" type="button" onclick='wifi_reload("<%=luci.dispatcher.build_url("admin", "network", "wifi", "reload", devname)%>");' />
         <input class="cbi-button cbi-button-apply" value="Save" type="submit" />
         <input class="cbi-button cbi-button-reset" value="Reset" type="reset" />
     </div>
@@ -251,7 +251,7 @@ local debug = 0
 
         document.getElementById("loading").style.display="";
 
-        XHR.get('<%=luci.dispatcher.build_url("admin", "mtk", "wifi", "apcli_scan")%>/' + vifname, null,
+        XHR.get('<%=luci.dispatcher.build_url("admin", "network", "wifi", "apcli_scan")%>/' + vifname, null,
             function(x)
             {
                 console.log(x)

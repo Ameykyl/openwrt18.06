@@ -1,0 +1,79 @@
+--- a/arch/arm/boot/dts/qcom-ipq4019-ap.dk07.1-c1.dts
++++ b/arch/arm/boot/dts/qcom-ipq4019-ap.dk07.1-c1.dts
+@@ -5,7 +5,7 @@
+ 
+ / {
+ 	model = "Qualcomm Technologies, Inc. IPQ4019/AP-DK07.1-C1";
+-	compatible = "qcom,ipq4019-ap-dk07.1-c1";
++	compatible = "qcom,ap-dk07.1-c1", "qcom,ipq4019";
+ 
+ 	soc {
+ 		pci@40000000 {
+--- a/arch/arm/boot/dts/qcom-ipq4019-ap.dk07.1.dtsi
++++ b/arch/arm/boot/dts/qcom-ipq4019-ap.dk07.1.dtsi
+@@ -13,15 +13,6 @@
+ 		reg = <0x80000000 0x20000000>; /* 512MB */
+ 	};
+ 
+-	aliases {
+-		serial0 = &blsp1_uart1;
+-		serial1 = &blsp1_uart2;
+-	};
+-
+-	chosen {
+-		stdout-path = "serial0:115200n8";
+-	};
+-
+ 	soc {
+ 		pinctrl@1000000 {
+ 			serial_0_pins: serial0-pinmux {
+@@ -67,9 +71,49 @@
+ 		};
+ 
+ 		qpic-nand@79b0000 {
++			compatible = "qcom,ipq4019-nand", "qcom,msm-nand";
+ 			pinctrl-0 = <&nand_pins>;
+ 			pinctrl-names = "default";
+ 			status = "ok";
++
++			nand@0 {
++				compatible = "qcom,nandcs";
++				reg = <0>;
++				#address-cells = <1>;
++				#size-cells = <1>;
++
++				nand-ecc-strength = <4>;
++				nand-ecc-step-size = <512>;
++				nand-bus-width = <8>;
++			};
++		};
++
++		mdio@90000 {
++			status = "okay";
++		};
++
++		ess-switch@c000000 {
++				status = "okay";
++				switch_mac_mode = <0x0>; /* mac mode for RGMII RMII */
++				switch_initvlas = <
++					0x0007c 0x54 /* PORT0_STATUS */
++				>;
++			};
++
++		ess-psgmii@98000 {
++			status = "okay";
++		};
++
++		edma@c080000 {
++			status = "okay";
++		};
++
++		wifi@a000000 {
++			status = "okay";
++		};
++
++		wifi@a800000 {
++			status = "okay";
+ 		};
+ 	};
+ };

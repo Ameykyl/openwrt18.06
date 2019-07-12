@@ -8,7 +8,7 @@ include $(TOPDIR)/rules.mk
 LUCI_TITLE:=LuCI Support for smartinfo
 LUCI_DEPENDS:=+smartmontools
 PKG_VERSION:=0.10.0
-PKG_RELEASE:=2
+PKG_RELEASE:=4
 
 include $(TOPDIR)/feeds/luci/luci.mk
 

@@ -11,7 +11,7 @@ config MTK_WIFI_DRIVER
 	depends on PACKAGE_kmod-mt_wifi
 	select MTK_WIFI_MT_MAC
 	select MTK_MT_MAC
-	select MTK_FIRST_IF_MT7615E
+	#select MTK_FIRST_IF_MT7615E
 	#select MTK_CHIP_MT7622
 	#select MTK_CHIP_MT7626
 	#select MTK_SECOND_IF_MT7615E
@@ -22,6 +22,8 @@ if MTK_WIFI_DRIVER
 
 choice
 	prompt "Choose First WiFi Interface"
+	config MTK_FIRST_IF_NONE
+	bool "None"
 
 	config MTK_FIRST_IF_MT7615E
 	bool "MT7615E"
@@ -40,9 +42,6 @@ choice
 	select MTK_WIFI_MT_MAC
 	select MTK_MT_MAC
 	select MTK_CHIP_MT7626
-	
-	config MTK_FIRST_IF_NONE
-	bool "None"
 endchoice
 
 choice
@@ -106,7 +105,6 @@ config  MTK_RT_THIRD_IF_RF_OFFSET
 config MTK_MT_WIFI
 	tristate "MT WIFI Driver"
 	select MTK_WIFI_BASIC_FUNC if MTK_MT_WIFI
-	default y
 
 config MTK_MT_WIFI_PATH
 	string
@@ -477,7 +475,7 @@ config MTK_UAPSD
 config MTK_TCP_RACK_SUPPORT
 	bool "TCP Reduced ACK  support"
 	depends on MTK_WIFI_DRIVER
-	default n
+	default y
 
 #### PA_LNA_Type choice
 

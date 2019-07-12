@@ -61,7 +61,7 @@ o.title = translate("Update Subcription")
 o.inputtitle = translate("Update Configuration")
 o.inputstyle = "reload"
 o.write = function()
-  os.execute("mv /etc/clash/config.yml /etc/clash/config.bak")
+  os.execute("mv /etc/clash/config.yaml /etc/clash/config.bak")
   SYS.call("bash /usr/share/clash/clash.sh >>/tmp/clash.log 2>&1 &")
   HTTP.redirect(DISP.build_url("admin", "services", "clash", "client"))
 end

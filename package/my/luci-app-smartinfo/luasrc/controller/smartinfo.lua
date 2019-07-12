@@ -22,14 +22,14 @@ function index()
 		return
 	end
 	
-	local page = entry({"admin","services","smartinfo"},cbi("smartinfo"),_("S.M.A.R.T Info"))
+	local page = entry({"admin","system","smartinfo"},cbi("smartinfo"),_("S.M.A.R.T Info"),20)
 	page.i18n="smartinfo"
 	page.dependent=true
-	entry({"admin","services","smartinfo","smartdetail"},call("smart_detail")).leaf = true
+	entry({"admin","system","smartinfo","smartdetail"},call("smart_detail")).leaf = true
 
-	entry({"admin","services","smartinfo","status"}, call("smart_status")).leaf = true
-	entry({"admin","services","smartinfo","run"},call("run_smart")).leaf=true
-	entry({"admin","services","smartinfo","smartattr"},call("smart_attr")).leaf=true
+	entry({"admin","system","smartinfo","status"}, call("smart_status")).leaf = true
+	entry({"admin","system","smartinfo","run"},call("run_smart")).leaf=true
+	entry({"admin","system","smartinfo","smartattr"},call("smart_attr")).leaf=true
 
 end
 

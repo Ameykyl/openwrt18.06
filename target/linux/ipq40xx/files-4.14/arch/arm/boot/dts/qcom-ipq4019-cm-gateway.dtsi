@@ -1,0 +1,106 @@
+// SPDX-License-Identifier: GPL-2.0
+// Copyright (c) 2018, The Linux Foundation. All rights reserved.
+
+#include "qcom-ipq4019.dtsi"
+#include <dt-bindings/input/input.h>
+#include <dt-bindings/gpio/gpio.h>
+
+/ {
+	model = "CM GATEWAY-4019-V12";
+
+	memory {
+		device_type = "memory";
+		reg = <0x80000000 0x20000000>; /* 512MB */
+	};
+
+	soc {
+		pinctrl@1000000 {
+			serial_0_pins: serial0-pinmux {
+				pins = "gpio16", "gpio17";
+				function = "blsp_uart0";
+				bias-disable;
+			};
+
+			i2c_0_pins: i2c-0-pinmux {
+				pins = "gpio20", "gpio21";
+				function = "blsp_i2c0";
+				bias-disable;
+			};
+
+			nand_pins: nand-pins {
+				pins = "gpio53", "gpio55", "gpio56",
+				       "gpio57", "gpio58", "gpio59",
+				       "gpio60", "gpio62", "gpio63",
+				       "gpio64", "gpio65", "gpio66",
+				       "gpio67", "gpio68", "gpio69";
+				function = "qpic";
+                        };
+		};
+
+		serial@78af000 {
+			pinctrl-0 = <&serial_0_pins>;
+			pinctrl-names = "default";
+			status = "ok";
+		};
+
+		dma@7884000 {
+			status = "ok";
+		};
+
+		i2c@78b7000 { /* BLSP1 QUP2 */
+			pinctrl-0 = <&i2c_0_pins>;
+			pinctrl-names = "default";
+			status = "ok";
+		};
+
+		dma@7984000 {
+			status = "ok";
+		};
+
+		qpic-nand@79b0000 {
+			compatible = "qcom,ipq4019-nand", "qcom,msm-nand";
+			pinctrl-0 = <&nand_pins>;
+			pinctrl-names = "default";
+			status = "ok";
+
+			nand@0 {
+				compatible = "qcom,nandcs";
+				reg = <0>;
+				#address-cells = <1>;
+				#size-cells = <1>;
+
+				nand-ecc-strength = <4>;
+				nand-ecc-step-size = <512>;
+				nand-bus-width = <8>;
+			};
+		};
+
+		mdio@90000 {
+			status = "okay";
+		};
+
+		ess-switch@c000000 {
+				status = "okay";
+				switch_mac_mode = <0x0>; /* mac mode for RGMII RMII */
+				switch_initvlas = <
+					0x0007c 0x54 /* PORT0_STATUS */
+				>;
+			};
+
+		ess-psgmii@98000 {
+			status = "okay";
+		};
+
+		edma@c080000 {
+			status = "okay";
+		};
+
+		wifi@a000000 {
+			status = "okay";
+		};
+
+		wifi@a800000 {
+			status = "okay";
+		};
+	};
+};

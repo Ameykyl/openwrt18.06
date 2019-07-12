@@ -60,7 +60,7 @@ local WscValue = mtkwifi.token_get(cfgs["WscConfMode"], vifidx, "0") or "0"
     &nbsp;&nbsp;&nbsp; Please waiting while the page is loading......
 </div>
 
-<form method="post" name="cbi" action="<%=luci.dispatcher.build_url("admin", "mtk", "wifi", "vif_cfg", devname, vifname)%>" enctype="multipart/form-data" onsubmit="return validate_security(<%=vifidx%>,<%=cfgs["HT_DisallowTKIP"]%>)" autocomplete="off">
+<form method="post" name="cbi" action="<%=luci.dispatcher.build_url("admin", "network", "wifi", "vif_cfg", devname, vifname)%>" enctype="multipart/form-data" onsubmit="return validate_security(<%=vifidx%>,<%=cfgs["HT_DisallowTKIP"]%>)" autocomplete="off">
 <% if not dev or not vif then%>
   <fieldset class="cbi-section">
     <legend>Interface Not Exist - <%=vifname and devname.."@"..vifname or devname%>
@@ -73,7 +73,7 @@ local WscValue = mtkwifi.token_get(cfgs["WscConfMode"], vifidx, "0") or "0"
 local diff = mtkwifi.diff_profile(dev.profile)
 if next(diff) ~= nil then
 %>
-<span style="color:red;">(<a href="javascript:location.href='<%=luci.dispatcher.build_url("admin", "mtk", "wifi", "reload", dev.devname)%>'">reload</a> to apply changes)</span>
+<span style="color:red;">(<a href="javascript:location.href='<%=luci.dispatcher.build_url("admin", "network", "wifi", "reload", dev.devname)%>'">reload</a> to apply changes)</span>
 <% 
 end
 %>
@@ -389,7 +389,7 @@ AA:BB:CC:DD:EE:FF
   </fieldset>
 
     <div class="cbi-page-actions">
-        <input class="cbi-button cbi-button-apply" value="Reload" type="button" onclick='wifi_reload("<%=luci.dispatcher.build_url("admin", "mtk", "wifi", "reload", devname)%>");' />
+        <input class="cbi-button cbi-button-apply" value="Reload" type="button" onclick='wifi_reload("<%=luci.dispatcher.build_url("admin", "network", "wifi", "reload", devname)%>");' />
       <input class="cbi-button cbi-button-apply" value="Save" type="submit" />
       <input class="cbi-button cbi-button-apply" name="__apply" value="Save & Apply" type="submit" />
       <input class="cbi-button cbi-button-reset" value="Reset" type="reset" />

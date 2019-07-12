@@ -152,7 +152,11 @@ case "$FIRMWARE" in
 	compex,wpj428 |\
 	engenius,eap1300 |\
 	openmesh,a42 |\
-	openmesh,a62)
+	openmesh,a62 |\
+	qcom,ipq4019-ap-dk07.1-c1)
+		ath10kcal_extract "0:ART" 4096 12064
+		;;
+	cm,gateway-4019-v12)
 		ath10kcal_extract "0:ART" 4096 12064
 		;;
 	zyxel,nbg6617 |\
@@ -193,7 +197,11 @@ case "$FIRMWARE" in
 	compex,wpj428 |\
 	engenius,eap1300 |\
 	openmesh,a42 |\
-	openmesh,a62)
+	openmesh,a62 |\
+	qcom,ipq4019-ap-dk07.1-c1)
+		ath10kcal_extract "0:ART" 20480 12064
+		;;
+	cm,gateway-4019-v12)
 		ath10kcal_extract "0:ART" 20480 12064
 		;;
 	zyxel,nbg6617 |\

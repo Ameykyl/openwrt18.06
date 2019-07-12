@@ -1,7 +1,7 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=luci-app-ssr-plus
-PKG_VERSION:=1.13
+PKG_VERSION:=1.15
 PKG_RELEASE:=2
 
 PKG_CONFIG_DEPENDS:= CONFIG_PACKAGE_$(PKG_NAME)_INCLUDE_Shadowsocks \
@@ -13,6 +13,7 @@ PKG_CONFIG_DEPENDS:= CONFIG_PACKAGE_$(PKG_NAME)_INCLUDE_Shadowsocks \
 	CONFIG_PACKAGE_$(PKG_NAME)_INCLUDE_Shadowsocks_Socks \
 	CONFIG_PACKAGE_$(PKG_NAME)_INCLUDE_dnscrypt_proxy \
 	CONFIG_PACKAGE_$(PKG_NAME)_INCLUDE_dnsforwarder \
+	CONFIG_PACKAGE_$(PKG_NAME)_INCLUDE_ChinaDNS \
 	CONFIG_PACKAGE_$(PKG_NAME)_INCLUDE_haproxy \
 	CONFIG_PACKAGE_$(PKG_NAME)_INCLUDE_privoxy \
 	CONFIG_PACKAGE_$(PKG_NAME)_INCLUDE_simple-obfs\
@@ -60,6 +61,10 @@ config PACKAGE_$(PKG_NAME)_INCLUDE_dnsforwarder
 	bool "dnsforwarder"
 	default n
 
+config PACKAGE_$(PKG_NAME)_INCLUDE_ChinaDNS
+	bool "chiandns"
+	default n
+
 config PACKAGE_$(PKG_NAME)_INCLUDE_haproxy
 	bool "haproxy"
 	default n
@@ -105,6 +110,7 @@ define Package/luci-app-ssr-plus
             +PACKAGE_$(PKG_NAME)_INCLUDE_Shadowsocks_Socks:shadowsocks-libev-ss-local \
             +PACKAGE_$(PKG_NAME)_INCLUDE_dnscrypt_proxy:dnscrypt-proxy-full \
             +PACKAGE_$(PKG_NAME)_INCLUDE_dnsforwarder:dnsforwarder \
+            +PACKAGE_$(PKG_NAME)_INCLUDE_ChinaDNS:ChinaDNS \
             +PACKAGE_$(PKG_NAME)_INCLUDE_haproxy:haproxy \
             +PACKAGE_$(PKG_NAME)_INCLUDE_privoxy:privoxy \
             +PACKAGE_$(PKG_NAME)_INCLUDE_simple-obfs:simple-obfs \

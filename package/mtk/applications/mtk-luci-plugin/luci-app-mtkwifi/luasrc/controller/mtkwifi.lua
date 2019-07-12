@@ -32,39 +32,32 @@ end
 
 
 function index()
-    local page
 
-    page = node("admin", "mtk")
-    page.target = firstchild()
-    page.title  = _("MTK")
-    page.order  = 80
-    page.index  = true
-
-    entry({"admin", "mtk", "wifi"}, template("admin_mtk/mtk_wifi_overview"), _("WiFi configuration"), 1)
-    entry({"admin", "mtk", "wifi", "dev_cfg_view"}, template("admin_mtk/mtk_wifi_dev_cfg")).leaf = true
-    entry({"admin", "mtk", "wifi", "dev_cfg"}, call("dev_cfg")).leaf = true
-    entry({"admin", "mtk", "wifi", "dev_cfg_reset"}, call("dev_cfg_reset")).leaf = true
-    entry({"admin", "mtk", "wifi", "dev_cfg_raw"}, call("dev_cfg_raw")).leaf = true
-    entry({"admin", "mtk", "wifi", "vif_cfg_view"}, template("admin_mtk/mtk_wifi_vif_cfg")).leaf = true
-    entry({"admin", "mtk", "wifi", "vif_cfg"}, call("vif_cfg")).leaf = true
-    entry({"admin", "mtk", "wifi", "vif_add_view"}, template("admin_mtk/mtk_wifi_vif_cfg")).leaf = true
-    entry({"admin", "mtk", "wifi", "vif_add"}, call("vif_cfg")).leaf = true
-    entry({"admin", "mtk", "wifi", "vif_del"}, call("vif_del")).leaf = true
-    entry({"admin", "mtk", "wifi", "vif_disable"}, call("vif_disable")).leaf = true
-    entry({"admin", "mtk", "wifi", "vif_enable"}, call("vif_enable")).leaf = true
-    entry({"admin", "mtk", "wifi", "get_station_list"}, call("get_station_list"))
-    entry({"admin", "mtk", "wifi", "get_country_region_list"}, call("get_country_region_list")).leaf = true
-    entry({"admin", "mtk", "wifi", "get_channel_list"}, call("get_channel_list"))
-    entry({"admin", "mtk", "wifi", "get_HT_ext_channel_list"}, call("get_HT_ext_channel_list"))
-    entry({"admin", "mtk", "wifi", "get_5G_2nd_80Mhz_channel_list"}, call("get_5G_2nd_80Mhz_channel_list"))
-    entry({"admin", "mtk", "wifi", "reset"}, call("reset_wifi")).leaf = true
-    entry({"admin", "mtk", "wifi", "reload"}, call("reload_wifi")).leaf = true
-    entry({"admin", "mtk", "wifi", "get_raw_profile"}, call("get_raw_profile"))
-    entry({"admin", "mtk", "wifi", "apcli_cfg_view"}, template("admin_mtk/mtk_wifi_apcli")).leaf = true
-    entry({"admin", "mtk", "wifi", "apcli_cfg"}, call("apcli_cfg")).leaf = true
-    entry({"admin", "mtk", "wifi", "apcli_disconnect"}, call("apcli_disconnect")).leaf = true
-    entry({"admin", "mtk", "wifi", "apcli_connect"}, call("apcli_connect")).leaf = true
-    entry({"admin", "mtk", "wifi", "apcli_scan"}, call("apcli_scan")).leaf = true;
+    entry({"admin", "network", "wifi"}, template("admin_mtk/mtk_wifi_overview"), _("WiFi"), 2)
+    entry({"admin", "network", "wifi", "dev_cfg_view"}, template("admin_mtk/mtk_wifi_dev_cfg")).leaf = true
+    entry({"admin", "network", "wifi", "dev_cfg"}, call("dev_cfg")).leaf = true
+    entry({"admin", "network", "wifi", "dev_cfg_reset"}, call("dev_cfg_reset")).leaf = true
+    entry({"admin", "network", "wifi", "dev_cfg_raw"}, call("dev_cfg_raw")).leaf = true
+    entry({"admin", "network", "wifi", "vif_cfg_view"}, template("admin_mtk/mtk_wifi_vif_cfg")).leaf = true
+    entry({"admin", "network", "wifi", "vif_cfg"}, call("vif_cfg")).leaf = true
+    entry({"admin", "network", "wifi", "vif_add_view"}, template("admin_mtk/mtk_wifi_vif_cfg")).leaf = true
+    entry({"admin", "network", "wifi", "vif_add"}, call("vif_cfg")).leaf = true
+    entry({"admin", "network", "wifi", "vif_del"}, call("vif_del")).leaf = true
+    entry({"admin", "network", "wifi", "vif_disable"}, call("vif_disable")).leaf = true
+    entry({"admin", "network", "wifi", "vif_enable"}, call("vif_enable")).leaf = true
+    entry({"admin", "network", "wifi", "get_station_list"}, call("get_station_list"))
+    entry({"admin", "network", "wifi", "get_country_region_list"}, call("get_country_region_list")).leaf = true
+    entry({"admin", "network", "wifi", "get_channel_list"}, call("get_channel_list"))
+    entry({"admin", "network", "wifi", "get_HT_ext_channel_list"}, call("get_HT_ext_channel_list"))
+    entry({"admin", "network", "wifi", "get_5G_2nd_80Mhz_channel_list"}, call("get_5G_2nd_80Mhz_channel_list"))
+    entry({"admin", "network", "wifi", "reset"}, call("reset_wifi")).leaf = true
+    entry({"admin", "network", "wifi", "reload"}, call("reload_wifi")).leaf = true
+    entry({"admin", "network", "wifi", "get_raw_profile"}, call("get_raw_profile"))
+    entry({"admin", "network", "wifi", "apcli_cfg_view"}, template("admin_mtk/mtk_wifi_apcli")).leaf = true
+    entry({"admin", "network", "wifi", "apcli_cfg"}, call("apcli_cfg")).leaf = true
+    entry({"admin", "network", "wifi", "apcli_disconnect"}, call("apcli_disconnect")).leaf = true
+    entry({"admin", "network", "wifi", "apcli_connect"}, call("apcli_connect")).leaf = true
+    entry({"admin", "network", "wifi", "apcli_scan"}, call("apcli_scan")).leaf = true;
 end
 
 function dev_cfg(devname)
@@ -199,7 +192,7 @@ function dev_cfg(devname)
         __mtkwifi_reload(devname)
     end
 
-    luci.http.redirect(luci.dispatcher.build_url("admin", "mtk", "wifi", "dev_cfg_view",devname))
+    luci.http.redirect(luci.dispatcher.build_url("admin", "network", "wifi", "dev_cfg_view",devname))
 end
 
 function dev_cfg_raw(devname)
@@ -212,7 +205,7 @@ function dev_cfg_raw(devname)
     local cfgs = mtkwifi.load_profile(nil, raw)
     mtkwifi.save_profile(cfgs, profiles[devname])
 
-    luci.http.redirect(luci.dispatcher.build_url("admin", "mtk", "wifi", "dev_cfg_view", devname))
+    luci.http.redirect(luci.dispatcher.build_url("admin", "network", "wifi", "dev_cfg_view", devname))
 end
 
 function dev_cfg_reset(devname)
@@ -227,7 +220,7 @@ function dev_cfg_reset(devname)
     else
         mtkwifi.debug("unable to find /rom"..profiles[devname])
     end
-    luci.http.redirect(luci.dispatcher.build_url("admin", "mtk", "wifi", "dev_cfg_view", devname))
+    luci.http.redirect(luci.dispatcher.build_url("admin", "network", "wifi", "dev_cfg_view", devname))
 end
 
 function vif_del(dev, vif)
@@ -275,17 +268,17 @@ function vif_del(dev, vif)
             mtkwifi.debug(profile.." cannot be found!")
         end
     end
-    luci.http.redirect(luci.dispatcher.build_url("admin", "mtk", "wifi"))
+    luci.http.redirect(luci.dispatcher.build_url("admin", "network", "wifi"))
 end
 
 function vif_disable(iface)
     os.execute("ifconfig "..iface.." down")
-    luci.http.redirect(luci.dispatcher.build_url("admin", "mtk", "wifi"))
+    luci.http.redirect(luci.dispatcher.build_url("admin", "network", "wifi"))
 end
 
 function vif_enable(iface)
     os.execute("ifconfig "..iface.." up")
-    luci.http.redirect(luci.dispatcher.build_url("admin", "mtk", "wifi"))
+    luci.http.redirect(luci.dispatcher.build_url("admin", "network", "wifi"))
 end
 
 
@@ -540,11 +533,11 @@ function vif_cfg(dev, vif)
     if http.formvalue("__action") == "vif_cfg_view" then
         vif_idx = devs[devname]["vifs"][vifname].vifidx
         mtkwifi.debug("vif_idx=", vif_idx, devname, vifname)
-        to_url = luci.dispatcher.build_url("admin", "mtk", "wifi", "vif_cfg_view", devname, vifname)
+        to_url = luci.dispatcher.build_url("admin", "network", "wifi", "vif_cfg_view", devname, vifname)
     elseif http.formvalue("__action") == "vif_add_view" then
         cfgs.BssidNum = tonumber(cfgs.BssidNum) + 1
         vif_idx = tonumber(cfgs.BssidNum)
-        to_url = luci.dispatcher.build_url("admin", "mtk", "wifi")
+        to_url = luci.dispatcher.build_url("admin", "network", "wifi")
         -- initializing ; separated parameters for the new interface
         cfgs = initialize_multiBssParameters(cfgs, vif_idx)
 
@@ -591,12 +584,12 @@ function reset_wifi(devname)
     end
     os.execute("rm -rf /tmp/mtk/wifi")
     __mtkwifi_reload(devname)
-    return luci.http.redirect(luci.dispatcher.build_url("admin", "mtk", "wifi"))
+    return luci.http.redirect(luci.dispatcher.build_url("admin", "network", "wifi"))
 end
 
 function reload_wifi(devname)
     __mtkwifi_reload(devname)
-    return luci.http.redirect(luci.dispatcher.build_url("admin", "mtk", "wifi"))
+    return luci.http.redirect(luci.dispatcher.build_url("admin", "network", "wifi"))
 end
 
 function get_raw_profile()
@@ -763,7 +756,7 @@ function apcli_cfg(dev, vif)
     if http.formvalue("__apply") then
         __mtkwifi_reload(devname)
     end
-    luci.http.redirect(luci.dispatcher.build_url("admin", "mtk", "wifi", "apcli_cfg_view", dev, vif))
+    luci.http.redirect(luci.dispatcher.build_url("admin", "network", "wifi", "apcli_cfg_view", dev, vif))
 end
 
 function apcli_connect(dev, vif)
@@ -808,7 +801,7 @@ function apcli_connect(dev, vif)
     end
     os.execute("iwpriv "..vifname.." set ApCliSsid=\""..cfgs.ApCliSsid.."\"")
     os.execute("iwpriv "..vifname.." set ApCliEnable=1")
-    luci.http.redirect(luci.dispatcher.build_url("admin", "mtk", "wifi"))
+    luci.http.redirect(luci.dispatcher.build_url("admin", "network", "wifi"))
 end
 
 function apcli_disconnect(dev, vif)
@@ -840,6 +833,6 @@ function apcli_disconnect(dev, vif)
     end
     os.execute("ifconfig "..vifname.." down")
 
-    luci.http.redirect(luci.dispatcher.build_url("admin", "mtk", "wifi"))
+    luci.http.redirect(luci.dispatcher.build_url("admin", "network", "wifi"))
 end
 

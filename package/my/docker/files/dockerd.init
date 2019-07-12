@@ -1,0 +1,106 @@
+#!/bin/sh /etc/rc.common
+USE_PROCD=1
+START=90
+
+start_docker_daemon() {
+  local enable
+  local datadir
+  local bridge
+
+  config_get enable "$1" enable
+  config_get datadir "$1" datadir
+  config_get bridge "$1" bridge
+
+  [[ "${enable}" = 1 ]] || return
+
+  procd_open_instance docker
+  procd_set_param command /usr/sbin/dockerd --iptables=false
+  procd_append_param command -g "${datadir}"
+
+  if [[ ! -z "${bridge}" ]]; then
+    procd_append_param command --bridge "${bridge}"
+  fi
+
+  procd_close_instance
+}
+setup_container() {
+  local image network
+
+  config_get image "$1" image
+  config_get network "$1" network
+
+  name="${1}"
+  logger "Setting up container: ${name} with ${image}"
+
+  container_exists=1
+  existing_container_info=$(docker inspect "${name}") || container_exists=0
+  logger "Container status: ${container_exists}"
+
+
+  if [[ "${container_exists}" -eq 0 ]]; then
+    CREATE_COMMAND="docker create --name ${name} --sysctl net.ipv6.conf.all.disable_ipv6=0"
+    if [[ ! -z "${network}" ]]; then
+      CREATE_COMMAND="${CREATE_COMMAND} --network none --cap-add NET_ADMIN --env NETWORKWAIT=true"
+    fi
+    CREATE_COMMAND="${CREATE_COMMAND} -i -t ${image}"
+    logger "Container creation command: ${CREATE_COMMAND}"
+    eval "${CREATE_COMMAND}"
+    docker start "${name}"
+  else
+    container_pid="$(docker inspect -f '{{.State.Pid}}' "${name}")"
+    if [ "${container_pid}" -eq 0 ]; then
+      logger "Container ${name} stopped, starting"
+      docker start "${name}"
+    fi
+  fi
+
+  # When network is used, we create veth pairs ourselves and attach
+  # them to the container. This needs to be done when the container is running
+  if [[ ! -z "${network}" ]]; then
+    sleep 5
+    setup_container_veth "${name}" "${network}"
+  fi
+
+}
+setup_container_veth() {
+  local name="${1}"
+  local networks="${2}"
+  container_pid="$(docker inspect -f '{{.State.Pid}}' "${name}")"
+  if [[ "${container_pid}" -eq 0 ]]; then
+    logger "Container ${name} is not running, cannot setup veth"
+    return
+  fi
+  rm -f "/var/run/netns/${name}"
+  ln -s "/proc/${container_pid}/ns/net" "/var/run/netns/${name}"
+  i=0
+  for network in ${networks}; do
+    host_network_name=$(echo "${network}" | awk -F ':' '{{print $1}}')
+    inside_network_name=$(echo "${network}" | awk -F ':' '{{print $2}}')
+
+    logger "Adding network ${host_network_name} to container ${name}"
+    container_side="veth${container_pid}_${i}"
+    ip link add "veth${container_pid}host_${i}" type veth peer name "${container_side}"
+    ip link set "${container_side}" netns "${name}"
+    brctl addif "br-${network}" "veth${container_pid}host_${i}"
+    ip link set "veth${container_pid}host_${i}" up
+    if [ ! -z "${inside_network_name}" ]; then
+      logger "Renaming ${container_side} to ${inside_network_name} in container"
+      ip netns exec "${name}" ip link set name "${inside_network_name}" dev "${container_side}"
+      ip netns exec "${name}" ip link set "${inside_network_name}" up
+    else
+      ip netns exec "${name}" ip link set "${container_side}" up
+    fi
+    docker exec "${name}" /bin/sh -c "echo done > /tmp/.nsnetsetup"
+    i=$(($i+1))
+  done
+}
+start_service() {
+  mkdir -p /var/run/netns/
+  config_load docker
+  config_foreach start_docker_daemon daemon
+  config_foreach setup_container container
+}
+reload_service() {
+  config_load docker
+  config_foreach setup_container container
+}

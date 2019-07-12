@@ -1,0 +1,33 @@
+From ca96c645d61b4462fe6ee3d815717335214f27c2 Mon Sep 17 00:00:00 2001
+From: Ram Chandra Jangir <rjangir@codeaurora.org>
+Date: Sat, 9 Jun 2018 20:31:50 +0530
+Subject: [PATCH] Fix rootfs conflict with OpenWrt auto mounting
+
+Signed-off-by: Ram Chandra Jangir <rjangir@codeaurora.org>
+---
+ drivers/mtd/mtdpart.c | 9 ++++++---
+ 1 files changed, 6 insertions(+), 3 deletions(-)
+
+diff --git a/drivers/mtd/mtdpart.c b/drivers/mtd/mtdpart.c
+index c87b71c..4980f93 100644
+--- a/drivers/mtd/mtdpart.c
++++ b/drivers/mtd/mtdpart.c
+@@ -831,9 +831,12 @@ static void mtd_partition_split(struct mtd_info *master, struct mtd_part *part)
+ 		return;
+ 
+ 	if (!strcmp(part->mtd.name, "rootfs")) {
+-		run_parsers_by_type(part, MTD_PARSER_TYPE_ROOTFS);
+-
+-		rootfs_found = 1;
++		if(mtd_type_is_nand(master)) {
++			part->mtd.name="ubi";
++		} else {
++			run_parsers_by_type(part, MTD_PARSER_TYPE_ROOTFS);
++			rootfs_found = 1;
++		}
+ 	}
+ 
+ 	if (!strcmp(part->mtd.name, SPLIT_FIRMWARE_NAME) &&
+-- 
+2.7.2
+

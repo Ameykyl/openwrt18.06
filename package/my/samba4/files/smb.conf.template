@@ -72,7 +72,7 @@
 	mdns name = mdns
 	
 	## Clients that only support netbios won't be able to see your samba server when netbios support is disabled.
-	#disable netbios = Yes
+	disable netbios = no
 	
 	## Setting this value to no will cause nmbd never to become a local master browser.
 	#local master = no

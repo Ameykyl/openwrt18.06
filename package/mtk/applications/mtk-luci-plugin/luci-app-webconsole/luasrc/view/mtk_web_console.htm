@@ -25,7 +25,7 @@
 <script type="text/javascript">
 
 function postcmd(cmd) {
-    (new XHR()).post("<%=luci.dispatcher.build_url("admin", "mtk", "webcmd")%>", {"cmd":cmd}, function(x) {
+    (new XHR()).post("<%=luci.dispatcher.build_url("admin", "network", "webcmd")%>", {"cmd":cmd}, function(x) {
         console.log(x.response)
         console.log(x)
         document.getElementById("result").innerHTML = x.response;

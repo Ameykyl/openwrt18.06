@@ -419,6 +419,15 @@ msgstr "使用dnsforwarder UDP查询并缓存"
 msgid "Use dnscrypt-proxy query and cache"
 msgstr "使用dnscrypt-proxy查询并缓存"
 
+msgid "Use chinadns query and cache"
+msgstr "使用chinadns查询并缓存"
+
+msgid "Chiadns Resolve Dns Mode"
+msgstr "chinaDNS解析方式"
+
+msgid "Use Local DNS Service"
+msgstr "使用设定dns解析"
+
 msgid "DNS Server IP:Port"
 msgstr "DNS服务器 IP:Port"
 
@@ -445,6 +454,9 @@ msgstr "不走代理的WAN IP"
 
 msgid "WAN Force Proxy IP"
 msgstr "强制走代理的WAN IP"
+
+msgid "WAN Fk Proxy IP"
+msgstr "强制回国的WAN IP"
 
 msgid "LAN Bypassed Host List"
 msgstr "不走代理的局域网LAN IP"
@@ -595,3 +607,15 @@ msgstr "启用管理控制台"
 
 msgid "Ping Latency"
 msgstr "Ping 延迟"
+
+msgid "Appointlist List"
+msgstr "指定列表"
+
+msgid "Appoint dns List"
+msgstr "指定DNS解析列表"
+
+msgid "Using System Default DNS"
+msgstr "使用系统默认dns"
+
+msgid "Using acceleration center DNS"
+msgstr "使用加速中心dns"

@@ -17,16 +17,58 @@ config_qbittorrent()
 enabled=false
 program=
 
-[LegalNotice]
-Accepted=true
+[BitTorrent]
+Session\CreateTorrentSubfolder=true
+Session\DisableAutoTMMByDefault=true
+Session\DisableAutoTMMTriggers\CategoryChanged=false
+Session\DisableAutoTMMTriggers\CategorySavePathChanged=true
+Session\DisableAutoTMMTriggers\DefaultSavePathChanged=true
 
-[Network]
-Cookies=@Invalid()
+[Core]
+AutoDeleteAddedTorrentFile=Never
 
 [Preferences]
+Bittorrent\AddTrackers=false
+Bittorrent\MaxRatioAction=0
+Bittorrent\PeX=true
+Connection\GlobalDLLimitAlt=10
+Connection\GlobalUPLimitAlt=10
+Downloads\PreAllocation=false
 Downloads\SavePath=$download_dir
+Downloads\ScanDirsV2=@Variant(\0\0\0\x1c\0\0\0\0)
+Downloads\StartInPause=false
+DynDNS\DomainName=changeme.dyndns.org
+DynDNS\Enabled=false
+DynDNS\Password=
+DynDNS\Service=0
+DynDNS\Username=
 General\Locale=zh
+General\UseRandomPort=false
+MailNotification\email=
+MailNotification\enabled=false
+MailNotification\password=
+MailNotification\req_auth=true
+MailNotification\req_ssl=false
+MailNotification\sender=qBittorrent_notification@example.com
+MailNotification\smtp_server=smtp.changeme.com
+MailNotification\username=
+WebUI\Address=*
+WebUI\AlternativeUIEnabled=false
+WebUI\AuthSubnetWhitelist=@Invalid()
+WebUI\AuthSubnetWhitelistEnabled=false
+WebUI\CSRFProtection=true
+WebUI\ClickjackingProtection=true
+WebUI\HTTPS\CertificatePath=
+WebUI\HTTPS\Enabled=false
+WebUI\HTTPS\KeyPath=
+WebUI\HostHeaderValidation=true
+WebUI\LocalHostAuth=true
 WebUI\Port=$port
+WebUI\RootFolder=
+WebUI\ServerDomains=*
+WebUI\SessionTimeout=3600
+WebUI\UseUPnP=true
+WebUI\Username=admin
 EOF
 	fi
 }
@@ -39,13 +81,13 @@ run_qbittorrent()
     if [ $enable ]; then
         local profile_dir
         config_get profile_dir $1 profile_dir
-	config_foreach config_qbittorrent 'Preferences' $profile_dir        
         if [ "$profile_dir" != "" ]; then
         	config_get library_dir $1 library_dir
         	config_get program_dir $1 program_dir
         	export PATH=$PATH:$program_dir
         	export LD_LIBRARY_PATH=$library_dir
-            qbittorrent-nox -d --profile=$profile_dir 
+            qbittorrent-nox -d --profile=$profile_dir
+        	config_foreach config_qbittorrent 'Preferences' $profile_dir
         else
             echo "no profile_dir,stop!"
         fi

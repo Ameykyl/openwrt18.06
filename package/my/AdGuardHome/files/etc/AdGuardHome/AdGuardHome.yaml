@@ -20,13 +20,16 @@ dns:
   safesearch_enabled: false
   safebrowsing_enabled: false
   upstream_dns:
-  - 127.0.0.1:5383
   - tls://1dot1dot1dot1.cloudflare-dns.com
   - https://cloudflare-dns.com/dns-query
   - https://1.0.0.1/dns-query
   - https://dns.quad9.net/dns-query
   - tcp://8.8.8.8
   - tcp://8.8.4.4
+  - 223.5.5.5
+  - 223.6.6.6
+  - 114.114.114.114
+  - 180.76.76.76
 tls:
   enabled: false
   server_name: ""

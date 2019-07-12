@@ -29,17 +29,18 @@ clean_log
 if [ $dns_enable -eq 1 ]; then
 	if [ $dnscache_enable = "3" ];  then
 		if ! pidof AdGuardHome>/dev/null; then
-			AdGuardHome -c /etc/AdGuardHome/AdGuardHome.yaml -w /etc/AdGuardHome -h 0.0.0.0 -p 3000 >/dev/null 2>&1 &
+			if [ ! -d "/var/etc/AdGuardHome/" ];  then
+				mkdir -p /var/etc/AdGuardHome
+				ln -s /etc/AdGuardHome/* /var/etc/AdGuardHome/
+			fi
+			AdGuardHome -c /var/etc/AdGuardHome/AdGuardHome.yaml -w /var/etc/AdGuardHome -h 0.0.0.0 -p 3000 >/dev/null 2>&1 &
 			echo "$curtime 重启服务！" >> ${logfile}
-		fi
-		if ! pidof dnscache>/dev/null; then
-			dnscache -f /var/run/dnscache/dnscache.conf -d
 		fi
 	else
 		if ! pidof dnscache>/dev/null; then
 			if [ $dnscache_enable = "1" ];  then
 			/usr/sbin/dnscache -c /var/etc/dnscache.conf -d
-			elif [ $dnscache_enable = "2" ] || [ $dnscache_enable = "3" ];  then
+			elif [ $dnscache_enable = "2" ];  then
 			dnscache -f /var/run/dnscache/dnscache.conf -d
 			fi
 			echo "$curtime 重启服务！" >> ${logfile}

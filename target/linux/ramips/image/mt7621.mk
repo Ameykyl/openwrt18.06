@@ -232,9 +232,17 @@ define Device/k2p
   DTS := K2P
   IMAGE_SIZE := $(ralink_default_fw_size_16M)
   DEVICE_TITLE := Phicomm K2P
-  DEVICE_PACKAGES := kmod-mt_wifi mtk-luci-plugin
+  DEVICE_PACKAGES := kmod-mt7615e wpad-basic
 endef
 TARGET_DEVICES += k2p
+
+define Device/ke2p
+  DTS := KE2P
+  IMAGE_SIZE := $(ralink_default_fw_size_16M)
+  DEVICE_TITLE := Phicomm KE2P
+  DEVICE_PACKAGES := mtk-luci-plugin kmod-mt_wifi
+endef
+TARGET_DEVICES += ke2p
 
 define Device/xiaomi_mir3p
   DTS := MIR3P
@@ -248,7 +256,7 @@ define Device/xiaomi_mir3p
   IMAGE/sysupgrade.bin := sysupgrade-tar | append-metadata
   IMAGE/factory.bin := append-kernel | pad-to $$(KERNEL_SIZE) | append-ubi | check-size $$$$(IMAGE_SIZE)
   DEVICE_PACKAGES := \
-	kmod-usb3 kmod-usb-ledtrig-usbport wpad-basic uboot-envtools
+	kmod-mt7615e kmod-usb3 kmod-usb-ledtrig-usbport wpad-basic uboot-envtools
 endef
 TARGET_DEVICES += xiaomi_mir3p
 

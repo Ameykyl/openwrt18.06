@@ -3,15 +3,15 @@
    LOGTIME=$(date "+%Y-%m-%d %H:%M:%S")
    LOG_FILE="/tmp/openclash.log"
    echo "开始下载 GEOIP 数据库..." >$START_LOG
-   wget-ssl --no-check-certificate https://geolite.maxmind.com/download/geoip/database/GeoLite2-Country.tar.gz -O /tmp/ipdb.tar.gz
-   if [ "$?" -eq "0" ]; then
+   wget-ssl --no-check-certificate --quiet --timeout=3 --tries=2 https://geolite.maxmind.com/download/geoip/database/GeoLite2-Country.tar.gz -O /tmp/ipdb.tar.gz
+   if [ "$?" -eq "0" ] && [ "$(ls -l /tmp/ipdb.tar.gz |awk '{print int($5/1024)}')" -ne 0 ]; then
       echo "GEOIP 数据库下载成功，检查数据库版本是否更新..." >$START_LOG
       tar zxvf /tmp/ipdb.tar.gz -C /tmp >/dev/null 2>&1\
       && rm -rf /tmp/ipdb.tar.gz >/dev/null 2>&1
       cmp -s /tmp/GeoLite2-Country_*/GeoLite2-Country.mmdb /etc/openclash/Country.mmdb
          if [ "$?" -ne "0" ]; then
-            echo "数据库版本有更新，开始替换数据库版本..." >$START_LOG
-            /etc/init.d/openclash stop\
+            /etc/init.d/openclash stop
+            echo "数据库版本有更新，开始替换数据库版本..." >$START_LOG\
             && mv /tmp/GeoLite2-Country_*/GeoLite2-Country.mmdb /etc/openclash/Country.mmdb >/dev/null 2>&1\
             && /etc/init.d/openclash start\
             && echo "删除下载缓存..." >$START_LOG\

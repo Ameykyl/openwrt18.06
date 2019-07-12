@@ -7,17 +7,15 @@ function index()
 
 
 	entry({"admin", "services", "openclash"},alias("admin", "services", "openclash", "client"), _("OpenClash"), 50).dependent = true
-	entry({"admin", "services", "openclash", "client"},cbi("openclash/client"),_("Clash Global State"), 20).leaf = true
+	entry({"admin", "services", "openclash", "client"},form("openclash/client"),_("Overview"), 20).leaf = true
 	entry({"admin", "services", "openclash", "status"},call("action_status")).leaf=true
 	entry({"admin", "services", "openclash", "state"},call("action_state")).leaf=true
 	entry({"admin", "services", "openclash", "startlog"},call("action_start")).leaf=true
 	entry({"admin", "services", "openclash", "currentversion"},call("action_currentversion"))
 	entry({"admin", "services", "openclash", "lastversion"},call("action_lastversion"))
-	entry({"admin", "services", "openclash", "config"},cbi("openclash/config"),_("Server Config"), 30).leaf = true
-	entry({"admin", "services", "openclash", "settings"},cbi("openclash/settings"),_("Clash Settings"), 40).leaf = true
-	entry({"admin", "services", "openclash", "update"},cbi("openclash/update"),_("Update Setting"), 50).leaf = true
-	entry({"admin", "services", "openclash", "rule"},cbi("openclash/rule"),_("Rules Setting"), 60).leaf = true
-	entry({"admin", "services", "openclash", "log"},cbi("openclash/log"),_("Logs"), 70).leaf = true
+	entry({"admin", "services", "openclash", "settings"},cbi("openclash/settings"),_("Takeover Settings"), 30).leaf = true
+	entry({"admin", "services", "openclash", "config"},form("openclash/config"),_("Server Config"), 40).leaf = true
+	entry({"admin", "services", "openclash", "log"},form("openclash/log"),_("Logs"), 50).leaf = true
 
 	
 end
@@ -36,7 +34,47 @@ local function is_watchdog()
 end
 
 local function config_check()
-	return luci.sys.call("grep '^Proxy Group:$' /etc/openclash/config.yml 1>/dev/null && grep '^Rule:$' /etc/openclash/config.yml 1>/dev/null && grep '  nameserver:$' /etc/openclash/config.yml 1>/dev/null") == 0
+  local yaml = luci.sys.call("ls -l /etc/openclash/config.yaml >/dev/null 2>&1")
+  local nameserver,proxy,group,rule
+  if (yaml == 0) then
+     nameserver = luci.sys.call("egrep '^ {0,}nameserver:' /etc/openclash/config.yaml >/dev/null 2>&1")
+     proxy = luci.sys.call("egrep '^ {0,}Proxy:' /etc/openclash/config.yaml >/dev/null 2>&1")
+     group = luci.sys.call("egrep '^ {0,}Proxy Group:' /etc/openclash/config.yaml >/dev/null 2>&1")
+     rule = luci.sys.call("egrep '^ {0,}Rule:' /etc/openclash/config.yaml >/dev/null 2>&1")
+  else
+     local yml = luci.sys.call("ls -l /etc/openclash/config.yml >/dev/null 2>&1")
+     if (yml == 0) then
+        nameserver = luci.sys.call("egrep '^ {0,}nameserver:' /etc/openclash/config.yml >/dev/null 2>&1")
+        proxy = luci.sys.call("egrep '^ {0,}Proxy:' /etc/openclash/config.yml >/dev/null 2>&1")
+        group = luci.sys.call("egrep '^ {0,}Proxy Group:' /etc/openclash/config.yml >/dev/null 2>&1")
+        rule = luci.sys.call("egrep '^ {0,}Rule:' /etc/openclash/config.yml >/dev/null 2>&1")
+     end
+  end
+  if (yaml == 0) or (yml == 0) then
+     if (nameserver == 0) then
+        nameserver = ""
+     else
+        nameserver = " - DNS服务器"
+     end
+     if (proxy == 0) then
+        proxy = ""
+     else
+        proxy = " - 代理服务器"
+     end
+     if (group == 0) then
+        group = ""
+     else
+        group = " - 策略组"
+     end
+     if (rule == 0) then
+        rule = ""
+     else
+        rule = " - 规则"
+     end
+	   return nameserver..proxy..group..rule
+	elseif (yaml ~= 0) and (yml ~= 0) then
+	   return "1"
+	end
 end
 
 local function cn_port()
@@ -44,27 +82,46 @@ local function cn_port()
 end
 
 local function mode()
-	return luci.sys.exec("grep 'enhanced-mode:' /etc/openclash/config.yml |awk -F ' ' '{print $2}' 2>/dev/null")
+	return luci.sys.exec("uci get openclash.config.en_mode 2>/dev/null")
+end
+
+local function cmode()
+	return luci.sys.exec("egrep '^ {2,}enhanced-mode:' /etc/openclash/config.yaml 2>/dev/null |awk -F ' ' '{print $2}' |awk -F '#' '{print $1}' 2>/dev/null")
 end
 
 local function config()
-	return luci.sys.exec("ls -l --full-time /etc/openclash/config.bak|awk '{print $6,$7;}' 2>/dev/null")
+   local config_update = luci.sys.exec("ls -l --full-time /etc/openclash/config.bak 2>/dev/null |awk '{print $6,$7;}'")
+   if (config_update ~= "") then
+      return config_update
+   else
+      local yaml = luci.sys.call("ls -l /etc/openclash/config.yaml >/dev/null 2>&1")
+      if (yaml == 0) then
+         return "0"
+      else
+         local yml = luci.sys.call("ls -l /etc/openclash/config.yml >/dev/null 2>&1")
+         if (yml == 0) then
+            return "0"
+         else
+            return "1"
+         end
+      end
+   end
 end
 
 local function ipdb()
-	return luci.sys.exec("ls -l --full-time /etc/openclash/Country.mmdb|awk '{print $6,$7;}' 2>/dev/null")
+	return luci.sys.exec("ls -l --full-time /etc/openclash/Country.mmdb 2>/dev/null |awk '{print $6,$7;}'")
 end
 
 local function lhie1()
-	return luci.sys.exec("ls -l --full-time /etc/openclash/lhie1.yml|awk '{print $6,$7;}' 2>/dev/null")
+	return luci.sys.exec("ls -l --full-time /etc/openclash/lhie1.yaml 2>/dev/null |awk '{print $6,$7;}'")
 end
 
 local function ConnersHua()
-	return luci.sys.exec("ls -l --full-time /etc/openclash/ConnersHua.yml|awk '{print $6,$7;}' 2>/dev/null")
+	return luci.sys.exec("ls -l --full-time /etc/openclash/ConnersHua.yaml 2>/dev/null |awk '{print $6,$7;}'")
 end
 
 local function ConnersHua_return()
-	return luci.sys.exec("ls -l --full-time /etc/openclash/ConnersHua_return.yml|awk '{print $6,$7;}' 2>/dev/null")
+	return luci.sys.exec("ls -l --full-time /etc/openclash/ConnersHua_return.yaml 2>/dev/null |awk '{print $6,$7;}'")
 end
 
 local function daip()
@@ -76,11 +133,11 @@ local function dase()
 end
 
 local function check_lastversion()
-	return luci.sys.exec("sh /usr/share/openclash/openclash_version.sh && sed -n '/^data:/,$p' /tmp/openclash_last_version 2>/dev/null")
+	return luci.sys.exec("sh /usr/share/openclash/openclash_version.sh && sed -n '/^https:/,$p' /tmp/openclash_last_version 2>/dev/null")
 end
 
 local function check_currentversion()
-	return luci.sys.exec("sed -n '/^data:/,$p' /etc/openclash/openclash_version 2>/dev/null")
+	return luci.sys.exec("sed -n '/^data:image/,$p' /etc/openclash/openclash_version 2>/dev/null")
 end
 
 local function startlog()
@@ -96,6 +153,7 @@ function action_status()
 		dase = dase(),
 		web = is_web(),
 		cn_port = cn_port(),
+		cmode = cmode(),
 		mode = mode();
 	})
 end

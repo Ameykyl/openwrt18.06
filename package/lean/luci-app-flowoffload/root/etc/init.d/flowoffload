@@ -2,10 +2,8 @@
 # Copyright (c) 2011-2015 OpenWrt.org
 
 START=90
+STOP=15
 
-USE_PROCD=1
-
-DNSMASQ_RESTART=N
 DNS_SERVER="114.114.114.114,114.114.115.115,223.5.5.5,223.6.6.6,180.76.76.76,119.29.29.29,119.28.28.28,1.2.4.8,210.2.4.8"
 IPV6DNS_SERVER="2001:4860:4860::8888,2001:4860:4860::8844,2001:2001::1111,2001:2001::1001,2400:da00::6666,240C::6666,240C::6644"
 
@@ -135,12 +133,6 @@ EOF
 start_dnsforwarder() {
 	DNS_SERVER=$(uci get flowoffload.@flow[0].dns_server 2>/dev/null)
 	IPV6DNS_SERVER=$(uci get flowoffload.@flow[0].ipv6dns_server 2>/dev/null)
-	dnscache_enable=$(uci get flowoffload.@flow[0].dnscache_enable 2>/dev/null)
-	if [ $dnscache_enable = "2" ];  then
-		localserver=0.0.0.0:5333
-	elif [ $dnscache_enable = "3" ];  then
-		localserver=0.0.0.0:5383
-	fi
 
 	cp -a /usr/bin/dnsforwarder /usr/sbin/dnscache
 	sleep 1
@@ -154,7 +146,7 @@ start_dnsforwarder() {
 LogOn false
 LogFileThresholdLength 102400
 LogFileFolder /var/run/dnscache
-UDPLocal $localserver
+UDPLocal 0.0.0.0:5333
 UDPGroup $DNS_SERVER,$IPV6DNS_SERVER * on
 GroupFile
 BlockIP 243.185.187.39,46.82.174.68,37.61.54.158,93.46.8.89,59.24.3.173,203.98.7.65,8.7.198.45,78.16.49.15,159.106.121.75,69.63.187.12,31.13.76.8,31.13.64.49
@@ -215,7 +207,7 @@ revert_dns() {
 
 }
 
-start_service(){
+start(){
 	dns=$(uci get flowoffload.@flow[0].dns 2>/dev/null)
 	dnscache_enable=$(uci get flowoffload.@flow[0].dnscache_enable 2>/dev/null)
 	bbr=$(uci get flowoffload.@flow[0].bbr 2>/dev/null)
@@ -232,10 +224,14 @@ start_service(){
 		sleep 1
 		if [ $dnscache_enable = "1" ];  then
 			start_pdnsd
-		elif [ $dnscache_enable = "2" ] || [ $dnscache_enable = "3" ];  then
+		elif [ $dnscache_enable = "2" ];  then
 			start_dnsforwarder
 		elif [ $dnscache_enable = "3" ];  then
-			AdGuardHome -c /etc/AdGuardHome/AdGuardHome.yaml -w /etc/AdGuardHome -h 0.0.0.0 -p 3000 >/dev/null 2>&1 &
+			if [ ! -d "/var/etc/AdGuardHome/" ];  then
+				mkdir -p /var/etc/AdGuardHome
+				ln -s /etc/AdGuardHome/* /var/etc/AdGuardHome/
+			fi
+			AdGuardHome -c /var/etc/AdGuardHome/AdGuardHome.yaml -w /var/etc/AdGuardHome -h 0.0.0.0 -p 3000 >/dev/null 2>&1 &
 		fi
 		change_dns
 		nohup /usr/share/dnscache/dnscache-while.sh > /var/log/dnscache.file 2>&1 &
@@ -251,32 +247,40 @@ start_service(){
 	fi
 
 	uci set firewall.@defaults[0].flow_offloading=$(uci get flowoffload.@flow[0].flow_offloading)
-	uci set firewall.@defaults[0].flow_offloading_hw=$(uci get flowoffload.@flow[0].flow_offloading_hw)
+	if [ X = "$(uci get flowoffload.@flow[0].flow_offloading_hw)"X ];  then
+		flow_offloading_hw=0
+	else
+		flow_offloading_hw=$(uci get flowoffload.@flow[0].flow_offloading_hw)
+	fi
+	uci set firewall.@defaults[0].flow_offloading_hw=$flow_offloading_hw
 	uci commit firewall
 	if [ "$DNSMASQ_RESTART" = N ]; then
 		/etc/init.d/dnsmasq restart && echo "DNSMASQ change"
-		/etc/init.d/firewall restart
+		/etc/init.d/firewall restart > /dev/null 2>&1
 	fi
 }
 
-stop_service(){
+stop(){
     dns=$(uci get firewall.@defaults[0].dns 2>/dev/null)
 	stop_dnscache
     revert_dns
     uci set firewall.@defaults[0].flow_offloading=$(uci get flowoffload.@flow[0].flow_offloading)
-    uci set firewall.@defaults[0].flow_offloading_hw=$(uci get flowoffload.@flow[0].flow_offloading_hw)
+	if [ X = "$(uci get flowoffload.@flow[0].flow_offloading_hw)"X ];  then
+		flow_offloading_hw=0
+	else
+		flow_offloading_hw=$(uci get flowoffload.@flow[0].flow_offloading_hw)
+	fi
+	uci set firewall.@defaults[0].flow_offloading_hw=$flow_offloading_hw
     uci commit firewall
 	if [ "$DNSMASQ_RESTART" = N ]; then
 		/etc/init.d/dnsmasq restart && echo "DNSMASQ revert"
-		/etc/init.d/firewall restart
+		/etc/init.d/firewall restart > /dev/null 2>&1
 	fi
 }
 
 restart(){
-    DNSMASQ_RESTART=Y
     stop
+	sleep 1
     start
-	/etc/init.d/dnsmasq restart && echo "DNSMASQ restart"
-	/etc/init.d/firewall restart
 }
 

@@ -7,8 +7,8 @@ include $(TOPDIR)/rules.mk
 
 LUCI_TITLE:=LuCI Support for clash
 LUCI_DEPENDS:=+clash +pdnsd-alt +bash +coreutils-nohup +wget
-PKG_VERSION:=0.21.0
-PKG_RELEASE:=2
+PKG_VERSION:=0.22.0
+PKG_RELEASE:=0
 
 include $(TOPDIR)/feeds/luci/luci.mk
 

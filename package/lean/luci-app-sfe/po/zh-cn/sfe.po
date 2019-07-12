@@ -37,6 +37,30 @@ msgstr "开启IPv6加速"
 msgid "Enable BBR"
 msgstr "启用 BBR"
 
+msgid "CUBIC"
+msgstr "CUBIC"
+
+msgid "BBR"
+msgstr "BBR"
+
+msgid "Enable BBR"
+msgstr "启用 BBR"
+
+msgid "TCP Congestion Control Algorithm"
+msgstr "TCP拥塞控制算法"
+
+msgid "BBR_mod"
+msgstr "魔改BBR"
+
+msgid "bbr_bbrplus"
+msgstr "BBR plus"
+
+msgid "bbr_tsunami"
+msgstr "魔改BBR Yankee版"
+
+msgid "bbr_nanqinlang"
+msgstr "魔改BBR 南琴浪版"
+
 msgid "Bottleneck Bandwidth and Round-trip propagation time (BBR)"
 msgstr "BBR拥塞控制算法可以加强TCP应用表现，但会降低路由器本机上的WIFI吞吐性能"
 
