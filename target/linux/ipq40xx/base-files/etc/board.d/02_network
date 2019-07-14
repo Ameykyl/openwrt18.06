@@ -30,6 +30,10 @@ ipq40xx_setup_interfaces()
 		ucidef_add_switch "switch0" \
 			"0t@eth0" "3:lan" "4:lan" "5:wan"
 		;;
+	canbox,canbox-cm520-79f)
+		ucidef_add_switch "switch0" \
+			"0t@eth0" "3:lan" "4:lan" "5:wan"
+		;;
 	asus,rt-acrh17|\
 	asus,rt-ac58u|\
 	avm,fritzbox-4040|\

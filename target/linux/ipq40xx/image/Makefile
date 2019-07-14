@@ -289,6 +289,20 @@ define Device/qcom_ap-dk04.1-c1
 endef
 TARGET_DEVICES += qcom_ap-dk04.1-c1
 
+define Device/canbox-cm520-79f
+	$(call Device/FitImage)
+	$(call Device/UbiFit)
+	DEVICE_DTS := canbox-cm520-79f
+	KERNEL_INSTALL := 1
+	KERNEL_SIZE := 4048k
+	BLOCKSIZE := 128k
+	PAGESIZE := 2048
+	BOARD_NAME := ap-dk04.1-c1
+	DEVICE_TITLE := CANBOX CM520-79F
+	DEVICE_PACKAGES := ath10k-firmware-qca9984 kmod-ath10k ath10k-firmware-qca4019
+endef
+TARGET_DEVICES += canbox-cm520-79f
+
 define Device/qcom_ipq4019-ap-dk07.1-c1
 	$(call Device/FitImage)
 	$(call Device/UbiFit)
