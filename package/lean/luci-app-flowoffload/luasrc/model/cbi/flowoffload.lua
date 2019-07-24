@@ -101,6 +101,11 @@ end
 o.default = 1
 o:depends("dns", 1)
 
+o = s:option(Flag, "mem_mode", translate("Memory mode operation"))
+o.default = 0
+o.rmempty = false
+o:depends("dnscache_enable", 3)
+
 o = s:option(Value, "dns_server", translate("Upsteam DNS Server"))
 o.default = "114.114.114.114,114.114.115.115,223.5.5.5,223.6.6.6,180.76.76.76,119.29.29.29,119.28.28.28,1.2.4.8,210.2.4.8"
 o.description = translate("Muitiple DNS server can saperate with ','")

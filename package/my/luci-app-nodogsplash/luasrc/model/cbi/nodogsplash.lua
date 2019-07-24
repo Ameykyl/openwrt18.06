@@ -16,7 +16,6 @@ s.anonymous = true
 --Base Setting
 e = s:taboption("tab_basic", Flag, "enabled", translate("enable"))
 
-
 n = s:taboption("tab_basic", ListValue, "gatewayinterface", translate("Interface name"))
 
 for _, iface in ipairs(ifaces) do

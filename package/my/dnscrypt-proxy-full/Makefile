@@ -59,7 +59,7 @@ define Build/Configure
 endef
 
 define Build/Compile
-	chmod +x $(PKG_BUILD_DIR)/$(PKG_BUILD_DNSCRYPT)/dnscrypt-proxy && upx --lzma $(PKG_BUILD_DIR)/$(PKG_BUILD_DNSCRYPT)/dnscrypt-proxy
+	chmod +x $(PKG_BUILD_DIR)/$(PKG_BUILD_DNSCRYPT)/dnscrypt-proxy && upx --lzma --ultra-brute $(PKG_BUILD_DIR)/$(PKG_BUILD_DNSCRYPT)/dnscrypt-proxy
 endef
 
 define Package/$(PKG_NAME)/install

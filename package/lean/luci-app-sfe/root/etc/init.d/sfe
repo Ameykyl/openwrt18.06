@@ -190,6 +190,7 @@ stop_dnscache() {
 	kill $(pidof dnscache) >/dev/null 2>&1 || kill -9 $(ps | grep dnscache | grep -v "grep" | awk '{print $1}') >/dev/null 2>&1
 	rm -rf /var/run/dnscache
 	rm -rf /var/dnscache
+	rm -rf /var/etc/AdGuardHome
 	echo "Stop DNS Cache"
 
 }
@@ -218,6 +219,7 @@ start() {
 	dnscache_enable=$(uci get sfe.config.dnscache_enable 2>/dev/null)
 	bbr=$(uci get sfe.config.bbr 2>/dev/null)
 	aaaa=$(uci get sfe.config.filter_aaaa 2>/dev/null)
+	mem_mode=$(uci get sfe.config.mem_mode 2>/dev/null)
 	if [ $aaaa -eq 1 ];  then
 		sed -i '/filter-aaaa/d' /etc/dnsmasq.conf
 		echo "filter-aaaa" >> /etc/dnsmasq.conf
@@ -254,7 +256,11 @@ start() {
 		elif [ $dnscache_enable = "3" ];  then
 			if [ ! -d "/var/etc/AdGuardHome/" ];  then
 				mkdir -p /var/etc/AdGuardHome
-				ln -s /etc/AdGuardHome/* /var/etc/AdGuardHome/
+				if [ $mem_mode -eq 1 ];  then
+					ln -s /etc/AdGuardHome/AdGuardHome.yaml /var/etc/AdGuardHome/AdGuardHome.yaml
+				else
+					ln -s /etc/AdGuardHome/* /var/etc/AdGuardHome/
+				fi
 			fi
 			AdGuardHome -c /var/etc/AdGuardHome/AdGuardHome.yaml -w /var/etc/AdGuardHome -h 0.0.0.0 -p 3000 >/dev/null 2>&1 &
 		fi

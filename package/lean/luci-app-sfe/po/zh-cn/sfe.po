@@ -105,3 +105,6 @@ msgstr "AdGuardHome设置完后正常关闭dns加速即可保存配置文件.AdG
 
 msgid "Dnsmasq rejects IPv6 parsing and optimizes domestic complex dual-stack network"
 msgstr "dnsmasq不返回ipv6解析结果,优化国内复杂双栈网络"
+
+msgid "Memory mode operation"
+msgstr "内存模式运行"

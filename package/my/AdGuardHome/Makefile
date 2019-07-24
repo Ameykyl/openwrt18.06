@@ -8,7 +8,7 @@ include $(TOPDIR)/rules.mk
 
 PKG_NAME:=AdGuardHome
 PKG_VERSION:=v0.97.0
-PKG_RELEASE=1
+PKG_RELEASE=3
 PKG_BUILD_DIR:=$(BUILD_DIR)/$(PKG_NAME)-$(PKG_VERSION)
 
 include $(INCLUDE_DIR)/package.mk
@@ -53,7 +53,7 @@ define Build/Configure
 endef
 
 define Build/Compile
-	chmod +x $(PKG_BUILD_DIR)/AdGuardHome/AdGuardHome && upx --ultra-brute $(PKG_BUILD_DIR)/AdGuardHome/AdGuardHome
+	chmod +x $(PKG_BUILD_DIR)/AdGuardHome/AdGuardHome && upx --lzma --ultra-brute $(PKG_BUILD_DIR)/AdGuardHome/AdGuardHome
 endef
 
 define Package/$(PKG_NAME)/install

@@ -29,10 +29,6 @@ clean_log
 if [ $dns_enable -eq 1 ]; then
 	if [ $dnscache_enable = "3" ];  then
 		if ! pidof AdGuardHome>/dev/null; then
-			if [ ! -d "/var/etc/AdGuardHome/" ];  then
-				mkdir -p /var/etc/AdGuardHome
-				ln -s /etc/AdGuardHome/* /var/etc/AdGuardHome/
-			fi
 			AdGuardHome -c /var/etc/AdGuardHome/AdGuardHome.yaml -w /var/etc/AdGuardHome -h 0.0.0.0 -p 3000 >/dev/null 2>&1 &
 			echo "$curtime 重启服务！" >> ${logfile}
 		fi

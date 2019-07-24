@@ -742,4 +742,3 @@ define KernelPackage/crypto-xts
 endef
 
 $(eval $(call KernelPackage,crypto-xts))
-
