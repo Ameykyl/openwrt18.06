@@ -67,6 +67,7 @@ del_cron()
 }
 
 run_mode=$(uci_get_by_type global run_mode)
+v2ray_path=$(uci_get_by_type server_subscribe v2ray_path)
 
 gen_config_file() {
 	local use_conf_file=$(uci_get_by_name $1 use_conf_file)
@@ -632,7 +633,8 @@ start_redir() {
 	elif [ "$stype" == "ssr" ] ;then
 		sscmd="/usr/bin/ssr-redir"
 	elif [ "$stype" == "v2ray" ] ;then
-		sscmd="/usr/bin/v2ray/v2ray"
+		sscmd="$v2ray_path/v2ray"
+		[ ! -e "$v2ray_path/v2ray" ] && /usr/share/shadowsocksr/v2ray_update1.sh
     fi
 		
 	local utype=$(uci_get_by_name $UDP_RELAY_SERVER type)
@@ -641,7 +643,8 @@ start_redir() {
 	elif [ "$utype" == "ssr" ] ;then
 		ucmd="/usr/bin/ssr-redir"
 	elif [ "$utype" == "v2ray" ] ;then
-		ucmd="/usr/bin/v2ray/v2ray"
+		ucmd="$v2ray_path/v2ray"
+		[ ! -e "$v2ray_path/v2ray" ] && /usr/share/shadowsocksr/v2ray_update1.sh
 	fi
   
 	if [ "$(uci_get_by_type global threads 0)" = "0" ] ;then
@@ -689,7 +692,7 @@ start_redir() {
     local dnsserver=`echo "$dnsstr"|awk -F ':'  '{print $1}'`
     local dnsport=`echo "$dnsstr"|awk -F ':'  '{print $2}'`
 		if [ "$dnsserver" = "0.0.0.0" ]; then
-			echo "$(date "+%Y-%m-%d %H:%M:%S") dns="$dnsserver"" >> /tmp/ssrplus.log
+			echo "$(date "+%Y-%m-%d %H:%M:%S") dns="$dnsstr"" >> /tmp/ssrplus.log
 		else
 			if [ "$run_mode" = "gfw" ]; then
 				ipset add gfwlist $dnsserver 2>/dev/null
@@ -839,7 +842,8 @@ start_service() {
 		fi
 		sed -i 's/\\//g' /var/etc/v2-ssr-retcp.json
 
-		/usr/bin/v2ray/v2ray -config /var/etc/v2ray-server-${server_count}.json >/dev/null 2>&1 &
+		[ ! -e "$v2ray_path/v2ray" ] && /usr/share/shadowsocksr/v2ray_update1.sh
+		$v2ray_path/v2ray -config /var/etc/v2ray-server-${server_count}.json >/dev/null 2>&1 &
 
 		iptables -t filter -A SSR-SERVER-RULE -p tcp --dport $(uci_get_by_name $1 server_port) -j ACCEPT
 		iptables -t filter -A SSR-SERVER-RULE -p udp --dport $(uci_get_by_name $1 server_port) -j ACCEPT
@@ -900,7 +904,8 @@ start_local() {
 	elif [ "$stype" == "v2ray" ] ;then
 		lua /usr/share/shadowsocksr/genv2config_local.lua $local_server tcp $(uci_get_by_name $local_server local_port) $(uci_get_by_type socks5_proxy local_port 1080) > /var/etc/v2-ssr-local.json
 		sed -i 's/\\//g' /var/etc/v2-ssr-local.json
-		/usr/bin/v2ray/v2ray -config /var/etc/v2-ssr-local.json >/dev/null 2>&1 &
+		[ ! -e "$v2ray_path/v2ray" ] && /usr/share/shadowsocksr/v2ray_update1.sh
+		$v2ray_path/v2ray -config /var/etc/v2-ssr-local.json >/dev/null 2>&1 &
 		local_enable=3
 	fi
 

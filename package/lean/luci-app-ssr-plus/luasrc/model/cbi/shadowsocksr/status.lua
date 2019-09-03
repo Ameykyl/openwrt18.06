@@ -203,14 +203,13 @@ s.value = translate("Not Running")
 end
 end
 
-if nixio.fs.access("/usr/bin/v2ray/v2ray") then
+
 s=m:field(DummyValue,"ssock5_run",translate("V2SOCKS5 Proxy")) 
 s.rawhtml  = true
 if v2sock5_run == 1 then
 s.value =font_blue .. bold_on .. translate("Running") .. bold_off .. font_off
 else
 s.value = translate("Not Running")
-end
 end
 
 if nixio.fs.access("/usr/sbin/privoxy") then
@@ -243,14 +242,13 @@ s.value = translate("Not Running")
 end
 end
 
-if nixio.fs.access("/usr/bin/v2ray") then
+
 s=m:field(DummyValue,"v2server_run",translate("Global V2RAY Server")) 
 s.rawhtml  = true
 if v2server_run == 1 then
 s.value =font_blue .. bold_on .. translate("Running") .. bold_off .. font_off
 else
 s.value = translate("Not Running")
-end
 end
 
 if nixio.fs.access("/usr/bin/kcptun-client") then

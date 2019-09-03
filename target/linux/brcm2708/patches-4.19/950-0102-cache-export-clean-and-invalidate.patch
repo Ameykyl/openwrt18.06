@@ -1,7 +1,7 @@
-From e8cf1886f2434ec0e5a672d9b94a96f7fea80789 Mon Sep 17 00:00:00 2001
+From 92ea93a96eb1da7c749e21d6fc7ee4a262c0c9be Mon Sep 17 00:00:00 2001
 From: popcornmix <popcornmix@gmail.com>
 Date: Fri, 25 Aug 2017 19:18:13 +0100
-Subject: [PATCH 102/703] cache: export clean and invalidate
+Subject: [PATCH 102/773] cache: export clean and invalidate
 
 ---
  arch/arm/mm/cache-v6.S | 4 ++--

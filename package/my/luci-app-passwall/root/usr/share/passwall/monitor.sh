@@ -51,7 +51,7 @@ if [ $SOCKS5_PROXY_SERVER != "nil" ] ;then
 fi
 
 #dns
-icount=`ps -w | grep -i $dns_mode | grep -v grep | wc -l`
+icount=`netstat -apn | grep 7913 | wc -l`
 if [ $icount = 0 ] ;then
 	/etc/init.d/passwall restart
 	exit 0

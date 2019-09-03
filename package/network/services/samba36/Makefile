@@ -9,7 +9,7 @@ include $(TOPDIR)/rules.mk
 
 PKG_NAME:=samba
 PKG_VERSION:=3.6.25
-PKG_RELEASE:=15
+PKG_RELEASE:=13
 
 PKG_SOURCE_URL:=https://download.samba.org/pub/samba \
 		https://download.samba.org/pub/samba/stable
@@ -41,12 +41,6 @@ define Package/samba36-server
   $(call Package/samba/Default)
   TITLE+= server
   DEPENDS:=+USE_GLIBC:librt $(ICONV_DEPENDS)
-endef
-
-define Package/samba36-hotplug
-  $(call Package/samba/Default)
-  TITLE+= hotplug script for auto sharing
-  DEPENDS:=+blockd
 endef
 
 define Package/samba36-client
@@ -85,7 +79,6 @@ CONFIGURE_VARS += \
 	libreplace_cv_HAVE_C99_VSNPRINTF=yes \
 	libreplace_cv_HAVE_GETADDRINFO=yes \
 	libreplace_cv_HAVE_IFACE_IFCONF=yes \
-	$(if $(CONFIG_IPV6),,libreplace_cv_HAVE_IPV6=no libreplace_cv_HAVE_IPV6_V6ONLY=no) \
 	LINUX_LFS_SUPPORT=yes \
 	samba_cv_CC_NEGATIVE_ENUM_VALUES=yes \
 	samba_cv_HAVE_GETTIMEOFDAY_TZ=yes \
@@ -168,11 +161,6 @@ define Package/samba36-server/install
 	$(LN) samba_multicall $(1)/usr/sbin/smbpasswd
 endef
 
-define Package/samba36-hotplug/install
-	$(INSTALL_DIR) $(1)/etc/hotplug.d/mount
-	$(INSTALL_CONF) ./files/samba.hotplug $(1)/etc/hotplug.d/mount/60-samba
-endef
-
 define Package/samba36-client/install
 	$(INSTALL_DIR) $(1)/usr/sbin
 	$(INSTALL_BIN) $(PKG_BUILD_BIN)/smbclient $(1)/usr/sbin
@@ -186,6 +174,5 @@ endef
 
 $(eval $(call BuildPackage,samba36-client))
 $(eval $(call BuildPackage,samba36-server))
-$(eval $(call BuildPackage,samba36-hotplug))
 $(eval $(call BuildPackage,samba36-net))
 

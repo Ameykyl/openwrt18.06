@@ -1,16 +1,6 @@
---- a/arch/arm/boot/dts/Makefile
-+++ b/arch/arm/boot/dts/Makefile
-@@ -106,6 +106,7 @@ dtb-$(CONFIG_ARCH_BCM_5301X) += \
- 	bcm4709-netgear-r8000.dtb \
- 	bcm4709-tplink-archer-c9-v1.dtb \
-     bcm4709-arris-sbr-ac1900p.dtb \
-+    bcm4709-arris-sbr-ac3200p.dtb \
- 	bcm47094-dlink-dir-885l.dtb \
- 	bcm47094-linksys-panamera.dtb \
- 	bcm47094-luxul-abr-4500.dtb \
 --- /dev/null
 +++ b/arch/arm/boot/dts/bcm4709-arris-sbr-ac3200p.dts
-@@ -0,0 +1,82 @@
+@@ -0,0 +1,92 @@
 +// SPDX-License-Identifier: GPL-2.0-or-later OR MIT
 +/*
 + * DTS for ARRIS SBR-AC3200P

@@ -34,7 +34,7 @@ ssrserver_process=$11
 v2rayserver_process=$12
 haproxy_process=$13
 privoxy_process=$14
-chinadns_process=$14
+chinadns_process=$15
 if  [ -z "$pdnsd_process" ] ;then
 	pdnsd_process=0
 fi

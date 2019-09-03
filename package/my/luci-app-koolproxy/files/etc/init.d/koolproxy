@@ -29,15 +29,6 @@ config_t_get() {
 }
 
 add_ipset_conf() {
-	if [ -s /etc/adblocklist/adbypass ]; then
-		echo_date 添加白名单软连接...
-		cat /etc/adblocklist/adbypass | sed "s/,/\n/g" | sed "s/^/ipset=&\/./g" | sed "s/$/\/white_kp_list/g"  >> /tmp/adbypass.conf
-		rm -rf /tmp/dnsmasq.d/adbypass.conf
-		ln -sf /tmp/adbypass.conf /tmp/dnsmasq.d/adbypass.conf
-
-		dnsmasq_restart=1
-	fi
-
 	if [ "$koolproxy_mode" == "2" ]; then
 		if [ "$koolproxy_host" == "1" ];then
 			echo_date 添加Adblock Plus Host软连接...
@@ -60,13 +51,6 @@ add_ipset_conf() {
 }
 
 remove_ipset_conf() {
-	if [ -L "/tmp/dnsmasq.d/adbypass.conf" ]; then
-		echo_date 移除白名单软连接...
-		rm -rf /tmp/adbypass.conf
-		rm -rf /tmp/dnsmasq.d/adbypass.conf
-		dnsmasq_restart=1
-	fi
-
 	if [ -L "/tmp/dnsmasq.d/koolproxy_ipset.conf" ]; then
 		echo_date 移除黑名单软连接...
 		rm -rf /tmp/dnsmasq.d/koolproxy_ipset.conf
@@ -111,7 +95,6 @@ add_white_black_ip() {
 		ipset -A white_kp_list $ip >/dev/null 2>&1
 
 	done
-	sed -e "s/^/add white_kp_list &/g" /etc/adblocklist/adbypassip | awk '{print $0} END{print "COMMIT"}' | ipset -R 2>/dev/null
 	ipset -A black_koolproxy 110.110.110.110 >/dev/null 2>&1
 	sed -e "s/^/add black_koolproxy &/g" /etc/adblocklist/adblockip | awk '{print $0} END{print "COMMIT"}' | ipset -R 2>/dev/null
 }
@@ -191,48 +174,9 @@ __load_exrule() {
 	fi
 }
 
-load_user_rules() {
+gen_user_rule() {
 	cp $KP_DIR/data/user.txt $KP_DIR/data/rules/user.txt
 	config_foreach __load_exrule rss_rule
-}
-
-load_rules() {
-	sed -i '1,7s/1/0/g' $KP_DIR/data/source.list
-
-	local rulelist="$(uci -q get koolproxy.@global[0].koolproxy_rules)"
-	for rule in $rulelist
-	do
-		case "$rule" in
-			koolproxy.txt)
-				sed -i '1s/0/1/g' $KP_DIR/data/source.list
-			;;
-			daily.txt)
-				sed -i '2s/0/1/g' $KP_DIR/data/source.list
-			;;
-			kp.dat)
-				sed -i '3s/0/1/g' $KP_DIR/data/source.list
-			;;
-			user.txt)
-				sed -i '4s/0/1/g' $KP_DIR/data/source.list
-			;;
-		esac
-	done
-
-	local rulelist="$(uci -q get koolproxy.@global[0].thirdparty_rules)"
-	for rule in $rulelist
-	do
-		case "$rule" in
-			easylistchina.txt)
-				sed -i '5s/0/1/g' $KP_DIR/data/source.list
-			;;
-			chengfeng.txt)
-				sed -i '6s/0/1/g' $KP_DIR/data/source.list
-			;;
-			fanboy.txt)
-				sed -i '7s/0/1/g' $KP_DIR/data/source.list
-			;;
-		esac
-	done
 }
 
 get_mode_name() {
@@ -382,20 +326,13 @@ pre_start() {
 	[ $? -ne 1 ] && return 0
 	iptables -t nat -C PREROUTING -p tcp -j KOOLPROXY 2>/dev/null && [ $? -eq 0 ] && return 0;
 	detect_cert
-	load_rules
-	load_user_rules
+	gen_user_rule
 	add_ipset_conf && restart_dnsmasq
 	creat_ipset
 	add_white_black_ip
 	load_nat
 	flush_ipt_rules && export_ipt_rules
 	add_cru
-	[ "$koolproxy_mode" == "1" ] && echo_date 选择【全局过滤模式】
-	[ "$koolproxy_mode" == "2" ] && echo_date 选择【IPSET过滤模式】
-	if [ "$koolproxy_mode" == "3" ]; then
-		echo_date 选择【视频过滤模式】
-		sed -i '1s/1/0/g;2s/1/0/g' $KP_DIR/data/source.list
-	fi
 	return 1
 }
 
@@ -420,6 +357,9 @@ start_service() {
 
 	procd_open_instance
 	procd_set_param command /usr/share/koolproxy/koolproxy
+	if [ $koolproxy_mode -eq 3 ]; then
+		procd_append_param command -e
+	fi
 	procd_append_param command --mark
 	procd_append_param command --ttl 160
 

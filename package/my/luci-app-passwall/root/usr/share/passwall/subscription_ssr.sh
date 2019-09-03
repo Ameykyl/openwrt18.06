@@ -1,6 +1,4 @@
 #!/bin/sh
-# Copyright (C) 2016 monokoo <realstones2012@gmail.com>
-# Copyright (C) 2019 Lienol <lawlienol@gmail.com>
 
 CONFIG=passwall
 LOCK_FILE=/var/lock/${CONFIG}_subscription_ssr.lock

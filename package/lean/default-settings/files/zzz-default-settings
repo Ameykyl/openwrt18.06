@@ -23,6 +23,7 @@ sed -i 's/\"services\"/\"nas\"/g' /usr/lib/lua/luci/controller/minidlna.lua
 sed -i 's/\"services\"/\"nas\"/g' /usr/lib/lua/luci/controller/transmission.lua
 sed -i 's/\"services\"/\"nas\"/g' /usr/lib/lua/luci/controller/mjpg-streamer.lua
 sed -i 's/\"services\"/\"nas\"/g' /usr/lib/lua/luci/controller/p910nd.lua
+sed -i 's/\"services\"/\"nas\"/g' /usr/lib/lua/luci/controller/cupsd.lua
 sed -i 's/\"services\"/\"nas\"/g' /usr/lib/lua/luci/controller/usb_printer.lua
 sed -i 's/\"services\"/\"nas\"/g' /usr/lib/lua/luci/controller/xunlei.lua
 sed -i 's/\"services\"/\"nas\"/g' /usr/lib/lua/luci/controller/nfs.lua
@@ -41,10 +42,16 @@ sed -i 's/\"network\"/\"QOS\"/g' /usr/lib/lua/luci/controller/qos.lua
 
 sed -i 's/\"services\"/\"vpn\"/g' /usr/lib/lua/luci/controller/softethervpn5.lua
 
+sed -i 's/\"network\"/\"control\"/g' /usr/lib/lua/luci/controller/appfilter.lua
+
 uci set minidlna.config.enabled=0
 uci commit minidlna
 /etc/init.d/minidlna enable
 /etc/init.d/minidlna stop
+
+uci set vsftpd.@listen[0].enable4=0
+uci commit vsftpd
+/etc/init.d/vsftpd stop
 
 ln -sf /sbin/ip /usr/bin/ip
 
@@ -68,7 +75,7 @@ sed -i '/set wireless.radio${devidx}.disabled/d' /lib/wifi/mac80211.sh
 wifi up
 
 sed -i '/DISTRIB_REVISION/d' /etc/openwrt_release
-echo "DISTRIB_REVISION='R9.x.x By Lean Mod3.1.48 By dz'" >> /etc/openwrt_release
+echo "DISTRIB_REVISION='R9.x.x By Lean Mod3.1.56 By dz'" >> /etc/openwrt_release
 sed -i '/DISTRIB_DESCRIPTION/d' /etc/openwrt_release
 echo "DISTRIB_DESCRIPTION='OpenWrt '" >> /etc/openwrt_release
 
@@ -89,8 +96,8 @@ sed -i 's/cbi.submit\"] = true/cbi.submit\"] = \"1\"/g' /usr/lib/lua/luci/dispat
 /etc/init.d/dnsforwarder disable
 /etc/init.d/vmtoolsd stop
 /etc/init.d/vmtoolsd disable
-/etc/init.d/watchcat stop
-/etc/init.d/watchcat disable
+#/etc/init.d/watchcat stop
+#/etc/init.d/watchcat disable
 /etc/init.d/dnscrypt-proxy stop
 /etc/init.d/dnscrypt-proxy disable
 /etc/init.d/igmpproxy stop

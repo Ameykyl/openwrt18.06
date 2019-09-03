@@ -1,5 +1,5 @@
 bind_host: 0.0.0.0
-bind_port: 3000
+bind_port: 3333
 auth_name: AdGuardHome
 auth_pass: AdGuardHome
 language: zh-cn
@@ -61,24 +61,12 @@ filters:
   id: 1553073381
 - enabled: true
   url: http://tools.yiclear.com/ChinaList2.0.txt
-  name: ChinaListV2.0[20190224001]
+  name: ChinaListV2.0
   id: 1553073382
 - enabled: true
   url: https://easylist-downloads.adblockplus.org/antiadblockfilters.txt
   name: Adblock Warning Removal List
   id: 1553073383
-- enabled: true
-  url: https://fanboy.co.nz/fanboy-problematic-sites.txt
-  name: Fanboy's problematic-sites
-  id: 1553073384
-- enabled: true
-  url: https://raw.githubusercontent.com/xinggsf/Adblock-Plus-Rule/master/ABP-FX.txt
-  name: "5"
-  id: 1553073385
-- enabled: true
-  url: https://raw.githubusercontent.com/adbyby/xwhyc-rules/master/lazy.txt
-  name: "6"
-  id: 1553073386
 - enabled: true
   url: https://hosts.nfz.moe/127.0.0.1/full/hosts
   name: "7"

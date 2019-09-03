@@ -159,8 +159,7 @@ zyxel_do_upgrade() {
 
 platform_do_upgrade() {
 	case "$(board_name)" in
-	8dev,jalapeno |\
-	qcom,ipq4019-ap-dk07.1-c1)
+	8dev,jalapeno)
 		nand_do_upgrade "$ARGV"
 		;;
 	asus,map-ac2200)

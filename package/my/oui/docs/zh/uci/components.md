@@ -14,6 +14,7 @@
 | config    | uci配置文件  | string   | — | — |
 | tabbed    | 将每个uci-section渲染成Tab标签页 | boolean | — | false |
 | after-loaded | uci配置加载完成后的钩子 | Function() | — | — |
+| apply-timeout | 应用超时时间(秒) | number |  — | 10 |
 
 ### 事件
 | 事件名称   | 说明         | 回调参数   |
@@ -224,6 +225,7 @@ export default {
 | placeholder | 占位符 | string | — | — |
 | password | 密码框 | boolean | — | false |
 | append | 输入框后置内容 | string | — | — |
+| suggestions | 输入建议选项 | array | — | — |
 
 ### 输入框后置内容
 
@@ -265,3 +267,4 @@ export default {
 | 名称        | 说明        | 类型      | 可选值       | 默认值  |
 |------------ |------------ |---------- |-------------|-------- |
 | initial | 初始值 | array | — | — |
+| suggestions | 输入建议选项 | array | — | — |

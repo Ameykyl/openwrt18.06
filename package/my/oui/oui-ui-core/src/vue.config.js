@@ -8,6 +8,12 @@ module.exports = {
       },
       '/cgi-bin/': {
         target: 'http://openwrt.lan'
+      },
+      '/views/': {
+        target: 'http://openwrt.lan'
+      },
+      '/i18n/': {
+        target: 'http://openwrt.lan'
       }
     }
   },

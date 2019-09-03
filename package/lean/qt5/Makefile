@@ -9,13 +9,13 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=qt5
-PKG_VERSION:=5.9
-PKG_RELEASE:=8
-PKG_MD5SUM:=70e617aeb1f9bbf84a12b8cf09b01ece
+PKG_VERSION:=5.12
+PKG_RELEASE:=4
+PKG_MD5SUM:=dda95b0239d13c5276834177af3a8588
 
-PKG_SOURCE:=qt-everywhere-opensource-src-$(PKG_VERSION).$(PKG_RELEASE).tar.xz
+PKG_SOURCE:=qt-everywhere-src-$(PKG_VERSION).$(PKG_RELEASE).tar.xz
 PKG_SOURCE_URL:=http://download.qt-project.org/archive/qt/$(PKG_VERSION)/$(PKG_VERSION).$(PKG_RELEASE)/single
-PKG_BUILD_DIR=$(BUILD_DIR)/qt-everywhere-opensource-src-$(PKG_VERSION).$(PKG_RELEASE)
+PKG_BUILD_DIR=$(BUILD_DIR)/qt-everywhere-src-$(PKG_VERSION).$(PKG_RELEASE)
 PKG_BUILD_PARALLEL:=1
 PKG_USE_MIPS16:=0
 
@@ -36,7 +36,7 @@ define Package/qt5/Default
   SUBMENU:=Qt5
   TITLE:=qt5
   URL:=http://qt-project.org
-  DEPENDS:=+icu +librt +zlib +libpcre2-16 +libstdcpp +libpthread +libatomic @!LINUX_2_6
+  DEPENDS:=+icu +librt +zlib +libpcre2-16 +libstdcpp +libpthread +libatomic +libopenssl @!LINUX_2_6
 endef
 
 define Package/qt5-core
@@ -118,7 +118,6 @@ define Build/Configure
 			-no-iconv \
 			-no-pch \
 			-no-rpath \
-			-no-qml-debug \
 			-no-strip \
 			-no-cups \
 			-no-dbus \

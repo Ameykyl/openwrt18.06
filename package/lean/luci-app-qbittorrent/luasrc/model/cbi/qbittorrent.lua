@@ -26,11 +26,6 @@ program_dir.default = "/usr/bin"
 library_dir = s_basic:option(Value,"library_dir",translate("library_dir"),translate("Store Library in the Path"))
 library_dir.default = "/usr/lib"
 
-s_download = m:section(TypedSection, "Preferences", translate("Download Settings"))
-s_download.anonymous = true
-download_dir = s_download:option(Value,"download_dir",translate("download_dir"),translate("Store download files in the Path"))
-download_dir.default = "/tmp/download"
-
 s_webui = m:section(TypedSection, "Preferences", translate("WEBUI Settings"))
 s_webui.anonymous = true
 port = s_webui:option(Value,"port",translate("port"),translate("WEBUI listening port"))

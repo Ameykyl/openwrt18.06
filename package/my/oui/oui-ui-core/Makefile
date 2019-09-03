@@ -7,6 +7,7 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=oui-ui-core
+PKG_VERSION:=$(shell git --git-dir=$(CURDIR)/../.git log -1 --pretty="%ci %h" | awk '{ print $$1 "-" $$4 }')
 PKG_RELEASE:=1
 PKG_MAINTAINER:=Jianhui Zhao <jianhuizhao329@gmail.com>
 
@@ -40,6 +41,7 @@ endef
 define Build/Prepare
 	$(INSTALL_DIR) $(PKG_BUILD_DIR)
 	$(CP) ./src/. $(PKG_BUILD_DIR)/
+	ln -sf $(PKG_BUILD_DIR) $(BUILD_DIR)/.oui-build-plugin
 endef
 
 ifneq ($(CONFIG_OUI_BUILD_DEV),)

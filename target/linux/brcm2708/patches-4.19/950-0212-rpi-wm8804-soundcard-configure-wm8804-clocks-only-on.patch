@@ -1,7 +1,7 @@
-From c56c1c63927b4fafb51b45df92d6a58eeb08141a Mon Sep 17 00:00:00 2001
+From 8ecd0e38be0422967e5323f5f276466e9d206d32 Mon Sep 17 00:00:00 2001
 From: Matthias Reichl <hias@horus.com>
 Date: Sun, 18 Nov 2018 15:32:28 +0100
-Subject: [PATCH 212/703] rpi-wm8804-soundcard: configure wm8804 clocks only on
+Subject: [PATCH 212/773] rpi-wm8804-soundcard: configure wm8804 clocks only on
  rate change
 
 This should avoid clicks when stopping and immediately afterwards

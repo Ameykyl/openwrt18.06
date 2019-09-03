@@ -128,9 +128,8 @@ o:value("ssr", translate("ShadowsocksR"))
 if nixio.fs.access("/usr/bin/ss-redir") then
 o:value("ss", translate("Shadowsocks New Version"))
 end
-if nixio.fs.access("/usr/bin/v2ray/v2ray") then
+
 o:value("v2ray", translate("V2Ray"))
-end
 o.description = translate("Using incorrect encryption mothod may causes service fail to start")
 
 use_conf_file = s:option(Flag, "use_conf_file", translate("Use Config File"), translate("Use Config File"))	

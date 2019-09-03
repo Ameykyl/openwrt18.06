@@ -259,9 +259,6 @@ ramips_board_detect() {
 	*"K2P")
 		name="k2p"
 		;;
-	*"KE2P")
-		name="ke2p"
-		;;
 	*"M3")
 		name="m3"
 		;;

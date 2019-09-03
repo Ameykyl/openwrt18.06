@@ -1,14 +1,22 @@
 #!/bin/sh
 logfile="/tmp/ssrplus.log"
 dir="/usr/share/v2ray/"
-v2ray_new_version=$(wget -qO- "https://github.com/v2ray/v2ray-core/tags"| grep "/v2ray/v2ray-core/releases/tag/"| head -n 1| awk -F "/tag/v" '{print $2}'| sed 's/\">//')
+v2ray_path=$(uci get shadowsocksr.@server_subscribe[0].v2ray_path 2>/dev/null)
+[ ! -d "$dir" ] && mkdir -p $dir
+[ ! -d "$v2ray_path" ] && mkdir -p $v2ray_path
+v2ray_new_version=$(curl -s "https://github.com/v2ray/v2ray-core/tags"| grep "/v2ray/v2ray-core/releases/tag/"| head -n 1| awk -F "/tag/v" '{print $2}'| sed 's/\">//')
 echo "$v2ray_new_version" > ${dir}v2ray_new_version
 if [ $? -eq 0 ];then
-	v2ray_new_version=$(cat ${dir}v2ray_new_version|sed -n '1p')
+	edition=$(uci get shadowsocksr.@server_subscribe[0].edition 2>/dev/null)
+	if [ "$edition" = "auto_detected" ];then
+		v2ray_new_version=$(cat ${dir}v2ray_new_version|sed -n '1p')
+	else
+		v2ray_new_version=$edition
+	fi
 	echo "$(date "+%Y-%m-%d %H:%M:%S") v2ray自动更新启动，验证版本..." >> ${logfile}
-	
+
 	if ( ! cmp -s ${dir}v2ray_version ${dir}v2ray_new_version );then
-		echo "$(date "+%Y-%m-%d %H:%M:%S") 检测到v2ray最新版本为$v2ray_new_version..." >> ${logfile}
+		echo "$(date "+%Y-%m-%d %H:%M:%S") 检测到v2ray版本为$v2ray_new_version..." >> ${logfile}
 
 		UpdateApp() {
 			for a in $(opkg print-architecture | awk '{print $2}'); do
@@ -38,39 +46,45 @@ if [ $? -eq 0 ];then
 		}
 
 		download_binary(){
-			echo "$(date "+%Y-%m-%d %H:%M:%S") 开始下载v2ray二进制文件..." >> ${logfile}
-			bin_dir="/tmp"
-			UpdateApp
-			cd $bin_dir
-			down_url=https://github.com/v2ray/v2ray-core/releases/download/v"$v2ray_new_version"/v2ray-linux-"$ARCH".zip
-
-			local a=0
-			while [ ! -f $bin_dir/v2ray-linux-"$ARCH"*.zip ]; do
-				[ $a = 6 ] && exit
-				/usr/bin/wget -T10 $down_url
-				sleep 2
-				let "a = a + 1"
-			done
+				echo "$(date "+%Y-%m-%d %H:%M:%S") 开始下载v2ray二进制文件......" >> ${logfile}
+				bin_dir="/tmp"
+				rm -rf $bin_dir/v2ray*.zip				
+				echo "$(date "+%Y-%m-%d %H:%M:%S") 当前下载目录为$bin_dir" >> ${logfile}
+				UpdateApp
+				cd $bin_dir
+				down_url=https://github.com/v2ray/v2ray-core/releases/download/v"$v2ray_new_version"/v2ray-linux-"$ARCH".zip
+				echo "$(date "+%Y-%m-%d %H:%M:%S") 正在下载v2ray可执行文件......" >> ${logfile}
+				local a=0
+				while [ ! -f $bin_dir/v2ray-linux-"$ARCH"*.zip ]; do
+					[ $a = 6 ] && exit
+					curl -OL --progress-bar --connect-timeout 20 --retry 5 --location --insecure $down_url
+					sleep 2
+					let "a = a + 1"
+				done
 	
-			if [ -f $bin_dir/v2ray-linux-"$ARCH"*.zip ]; then
-				echo "$(date "+%Y-%m-%d %H:%M:%S") 成功下载v2ray二进制文件" >> ${logfile}
-				killall -q -9 v2ray
-	
-				unzip -o v2ray-linux-"$ARCH"*.zip -d $bin_dir/v2ray-v"$v2ray_new_version"-linux-"$ARCH"/
-				mv $bin_dir/v2ray-v"$v2ray_new_version"-linux-"$ARCH"/v2ray /usr/bin/v2ray/v2ray
-				mv $bin_dir/v2ray-v"$v2ray_new_version"-linux-"$ARCH"/v2ctl /usr/bin/v2ray/v2ctl
-				mv $bin_dir/v2ray-v"$v2ray_new_version"-linux-"$ARCH"/geoip.dat /usr/bin/v2ray/geoip.dat
-				mv $bin_dir/v2ray-v"$v2ray_new_version"-linux-"$ARCH"/geosite.dat /usr/bin/v2ray/geosite.dat
-				rm -rf $bin_dir/v2ray*.zip
-				rm -rf $bin_dir/v2ray-v"$v2ray_new_version"-linux-"$ARCH"
-				if [ -f "/usr/bin/v2ray/v2ray" ]; then
-					chmod +x /usr/bin/v2ray/v2*
-					/etc/init.d/shadowsocksr restart
+				if [ -e $bin_dir/v2ray-linux-"$ARCH"*.zip ]; then
+					echo "$(date "+%Y-%m-%d %H:%M:%S") 成功下载v2ray可执行文件" >> ${logfile}
+					echo "$(date "+%Y-%m-%d %H:%M:%S") 当前安装目录为$v2ray_path..." >> ${logfile}
+					echo "$(date "+%Y-%m-%d %H:%M:%S") 正在安装v2ray可执行文件" >> ${logfile}
+					killall -q -9 v2ray
+					[ -e $v2ray_path/v2ray ] && rm -rf $v2ray_path/*
+					unzip -o v2ray-linux-"$ARCH"*.zip -d $bin_dir/v2ray-v"$v2ray_new_version"-linux-"$ARCH"/ > /dev/null 2>&1
+					mv $bin_dir/v2ray-v"$v2ray_new_version"-linux-"$ARCH"/v2ray $v2ray_path
+					mv $bin_dir/v2ray-v"$v2ray_new_version"-linux-"$ARCH"/v2ctl $v2ray_path
+					mv $bin_dir/v2ray-v"$v2ray_new_version"-linux-"$ARCH"/geoip.dat $v2ray_path
+					mv $bin_dir/v2ray-v"$v2ray_new_version"-linux-"$ARCH"/geosite.dat $v2ray_path
+					rm -rf $bin_dir/v2ray-v"$v2ray_new_version"-linux-"$ARCH"
+					rm -rf $bin_dir/v2ray*.zip
+					if [ -e "$v2ray_path/v2ray" ]; then
+						chmod +x $v2ray_path/v2ray
+						chmod +x $v2ray_path/v2ctl
+						echo "$(date "+%Y-%m-%d %H:%M:%S") 成功安装v2ray，正在重启进程" >> ${logfile}
+						/etc/init.d/shadowsocksr restart
+					fi
+				else
+					echo "$(date "+%Y-%m-%d %H:%M:%S") 下载v2ray二进制文件失败，请重试！" >> ${logfile}
 				fi
-			else
-				echo "$(date "+%Y-%m-%d %H:%M:%S") 下载v2ray二进制文件失败，请重试！" >> ${logfile}
-			fi
-
+		}
 
 		}
 

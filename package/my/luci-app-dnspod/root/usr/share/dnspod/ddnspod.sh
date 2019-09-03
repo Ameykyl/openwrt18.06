@@ -4,14 +4,14 @@
 # AnripDdns v5.08
 # Dynamic DNS using DNSPod API
 # Original by anrip<mail@anrip.com>, http://www.anrip.com/ddnspod
-# Edited by dz
 # Edited by ProfFan
+# Edited by dz
 #################################################
 enable=1
 sleeptime=60
 ip_mode=2
 WanIp=""
-LastIpFile=last.ip
+LastIpFile=/usr/share/dnspod/last.ip
 logfile="/var/log/ddnspod.log"
 sleeptime=$(uci get dnspod.base_arg.time 2>/dev/null)
 enable=$(uci get dnspod.base_arg.enabled 2>/dev/null)
@@ -268,11 +268,7 @@ arDdnsUpdate() {
     # Get domain ID
     domainID=$(arApiPost "Domain.Info" "domain=${1}")
     domainID=$(echo $domainID | sed 's/.*{"id":"\([0-9]*\)".*/\1/')
-    
-    # Get Record ID
-    recordID=$(arApiPost "Record.List" "domain_id=${domainID}&sub_domain=${2}&record_line=默认")
-    recordID=$(echo $recordID | sed 's/.*\[{"id":"\([0-9]*\)".*/\1/')
-    
+
     # Update IP
 	arIpAddress
     myIP=$(arIpAddress)
@@ -284,6 +280,11 @@ arDdnsUpdate() {
 		post_type="Record.Modify"
 		record_types="AAAA"
 	fi
+
+    # Get Record ID
+    recordID=$(arApiPost "Record.List" "domain_id=${domainID}&sub_domain=${2}&record_type=${record_types}&record_line=默认")
+    recordID=$(echo $recordID | sed 's/.*\[{"id":"\([0-9]*\)".*/\1/')
+    
     recordRS=$(arApiPost "$post_type" "domain_id=${domainID}&record_id=${recordID}&sub_domain=${2}&record_type=${record_types}&value=${myIP}&record_line=默认")
     recordCD=$(echo $recordRS | sed 's/.*{"code":"\([0-9]*\)".*/\1/')
 
@@ -305,7 +306,7 @@ arDdnsCheck() {
 
     local postRS
     local hostIP=$(arIpAddress)
-    local lastIP=$(arNslookup "${2}.${1}")
+    local lastIP=$(arNslookup "${3}-${2}.${1}")
 	echo "domain name: ${2}.${1}"
     echo "hostIP: ${3} ${hostIP}"
     echo "lastIP: ${3} ${lastIP}"
@@ -317,9 +318,9 @@ arDdnsCheck() {
 	echo "$(date "+%Y-%m-%d %H:%M:%S") 更新域名记录" >> ${logfile}
 	if [ -f $LastIpFile ]
 	then
-		grep -v "${2}.${1}" $LastIpFile > $LastIpFile.bak
+		grep -v "${3}-${2}.${1}" $LastIpFile > $LastIpFile.bak
 	fi
-	echo "${2}.${1} ${hostIP}" >> $LastIpFile.bak
+	echo "${3}-${2}.${1} ${hostIP}" >> $LastIpFile.bak
 	mv $LastIpFile.bak $LastIpFile
 
 	echo "--- Update dns zone"

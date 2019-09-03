@@ -1,4 +1,5 @@
 #!/bin/sh
+
 CONFIG=passwall
 LOG_FILE=/var/log/$CONFIG.log
 url_main="https://raw.githubusercontent.com/hq450/fancyss/master/rules"

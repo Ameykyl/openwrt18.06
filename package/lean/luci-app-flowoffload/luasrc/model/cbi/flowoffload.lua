@@ -1,6 +1,6 @@
 local m,s,o
 local SYS  = require "luci.sys"
-local trport = 3000
+local trport = 3333
 local button = ""
 local version = "4.14.131"
 
@@ -79,6 +79,10 @@ end
 bbr.default = "cubic"
 bbr.rmempty = false
 bbr.description = translate("Bottleneck Bandwidth and Round-trip propagation time (BBR)")
+
+o = s:option(Flag, "free_memory", translate("Automatic Free Memory"))
+o.default = 0
+o.rmempty = false
 
 aaaa = s:option(Flag, "filter_aaaa", translate("Filter AAAA"))
 aaaa.default = 0

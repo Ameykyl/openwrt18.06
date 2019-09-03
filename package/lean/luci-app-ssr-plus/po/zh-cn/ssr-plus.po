@@ -619,3 +619,18 @@ msgstr "使用系统默认dns"
 
 msgid "Using acceleration center DNS"
 msgstr "使用加速中心dns"
+
+msgid "Edition"
+msgstr "版本"
+
+msgid "Auto Detected"
+msgstr "自动检测"
+
+msgid "V2ray Path"
+msgstr "v2ray安装目录"
+
+msgid "Manual Upgrade V2ray"
+msgstr "手动升级V2ray"
+
+msgid "After modifying the path, you need to download v2ray manually"
+msgstr "切换v2ray安装目录后，需手动下载v2ray"

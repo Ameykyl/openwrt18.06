@@ -8,6 +8,7 @@ local crypt = require "oui.c".crypt
 local statvfs = require "oui.c".statvfs
 local parse_route_addr = require "oui.c".parse_route_addr
 local parse_route6_addr = require "oui.c".parse_route6_addr
+local parse_flow = require "oui.c".parse_flow
 
 local RPC_OUI_MENU_FILES = "/usr/share/oui/menu.d/*.json"
 
@@ -168,13 +169,20 @@ local function network_ifupdown(name, up)
 end
 
 local methods = {
-	["oui.ui"] = {
-		lang = {
+    ["oui.ui"] = {
+        lang = {
             function(req, msg)
                 local c = uci.cursor()
+
+                if msg.lang then
+                    c:set("oui", "main", "lang", msg.lang)
+                    c:commit("oui")
+                end
+
                 local lang = c:get("oui", "main", "lang")
-				ubus.reply(req, {lang = lang})
-            end, {}
+
+                ubus.reply(req, {lang = lang})
+            end, {lang = libubus.STRING}
         },
         menu = {
             function(req, msg)
@@ -227,7 +235,7 @@ local methods = {
                     f:close()
                 end
 
-				ubus.reply(req, {acls = acls})
+                ubus.reply(req, {acls = acls})
             end, {}
         },
         crypt = {
@@ -345,9 +353,9 @@ local methods = {
                 local r, lines = pcall(io.lines, "/proc/net/arp")
                 if r then
                     for line in lines do
-                        local ipaddr, macaddr, device = line:match("^[^IP](%S+) +%S+ +%S+ +(%S+) +%S+ +(%S+)")
+                        local ipaddr, macaddr, device = line:match("(%S+) +%S+ +%S+ +(%S+) +%S+ +(%S+)")
 
-                        if ipaddr then
+                        if ipaddr ~= "IP" then
                             entries[#entries + 1] = {
                                 ipaddr = ipaddr,
                                 macaddr = macaddr,
@@ -582,6 +590,27 @@ local methods = {
             function(req, msg)
                 if not msg.name then return UBUS_STATUS_INVALID_ARGUMENT end
                 ubus.reply(req, network_ifupdown(msg.name, false))
+            end, {name = libubus.STRING}
+        },
+        bwm = {
+            function(req, msg)
+                local entries = {}
+                local r, lines = pcall(io.lines, "/proc/oui/term")
+                if r then
+                    for line in lines do
+                        local mac, ip, rx, tx = line:match("(%S+) +(%S+) +(%S+) +(%S+)")
+
+                        if mac and mac ~= "MAC" then
+                            entries[#entries + 1] = {
+                                macaddr = mac,
+                                ipaddr = ip,
+                                rx = {parse_flow(rx)},
+                                tx = {parse_flow(tx)}
+                            }
+                        end
+                    end
+                end
+                ubus.reply(req, {entries = entries})
             end, {name = libubus.STRING}
         }
     },

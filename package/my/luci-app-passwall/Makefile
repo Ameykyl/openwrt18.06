@@ -7,25 +7,7 @@ include $(TOPDIR)/rules.mk
 
 PKG_NAME:=luci-app-passwall
 PKG_VERSION:=2.0
-PKG_RELEASE:=60-20190623
-
-PKG_CONFIG_DEPENDS:= CONFIG_PACKAGE_$(PKG_NAME)_INCLUDE_Shadowsocks \
-	CONFIG_PACKAGE_$(PKG_NAME)_INCLUDE_ShadowsocksR \
-	CONFIG_PACKAGE_$(PKG_NAME)_INCLUDE_Shadowsocks_socks \
-	CONFIG_PACKAGE_$(PKG_NAME)_INCLUDE_ShadowsocksR_socks \
-	CONFIG_PACKAGE_$(PKG_NAME)_INCLUDE_V2ray \
-	CONFIG_PACKAGE_$(PKG_NAME)_INCLUDE_Brook \
-	CONFIG_PACKAGE_$(PKG_NAME)_INCLUDE_kcptun \
-	CONFIG_PACKAGE_$(PKG_NAME)_INCLUDE_haproxy \
-	CONFIG_PACKAGE_$(PKG_NAME)_INCLUDE_ChinaDNS \
-	CONFIG_PACKAGE_$(PKG_NAME)_INCLUDE_pdnsd \
-	CONFIG_PACKAGE_$(PKG_NAME)_INCLUDE_dns2socks \
-	CONFIG_PACKAGE_$(PKG_NAME)_INCLUDE_dns-forwarder \
-	CONFIG_PACKAGE_$(PKG_NAME)_INCLUDE_dnscrypt_proxy \
-	CONFIG_PACKAGE_$(PKG_NAME)_INCLUDE_pcap-dnsproxy \
-	CONFIG_PACKAGE_$(PKG_NAME)_INCLUDE_simple-obfs\
-	CONFIG_PACKAGE_$(PKG_NAME)_INCLUDE_GoQuiet-client\
-	CONFIG_PACKAGE_$(PKG_NAME)_INCLUDE_v2ray-plugin
+PKG_RELEASE:=78-20190803
 
 PKG_BUILD_DIR := $(BUILD_DIR)/$(PKG_NAME)-$(PKG_VERSION)
 PO2LMO:=./po2lmo
@@ -79,56 +61,32 @@ config PACKAGE_$(PKG_NAME)_INCLUDE_dns2socks
 	bool "Include dns2socks"
 	default n
 	
-config PACKAGE_$(PKG_NAME)_INCLUDE_dnscrypt_proxy
-	bool "Include dnscrypt_proxy"
-	default n
-	
 config PACKAGE_$(PKG_NAME)_INCLUDE_dns-forwarder
 	bool "Include dns-forwarder"
-	default n
-	
-config PACKAGE_$(PKG_NAME)_INCLUDE_pcap-dnsproxy
-	bool "Include pcap-dnsproxy"
-	default n
-
-config PACKAGE_$(PKG_NAME)_INCLUDE_simple-obfs
-	bool "Isimple-obfs"
-	default n
-	
-config PACKAGE_$(PKG_NAME)_INCLUDE_GoQuiet-client
-	bool "GoQuiet-client"
-	default n
-
-config PACKAGE_$(PKG_NAME)_INCLUDE_v2ray-plugin
-	bool "v2ray-plugin"
 	default n
 
 endmenu
 endef
 
 define Package/$(PKG_NAME)
-  CATEGORY:=LuCI
+  CATEGORY:=LuCI for Lienol
   SUBMENU:=3. Applications
-  TITLE:=SS/SSR/V2Ray/BROOK LuCI interface
+  TITLE:=LuCI support for PassWall(fanqiang) By Lienol
   PKGARCH:=all
-  DEPENDS:=+curl +libcurl +libmbedtls +ca-bundle +ca-certificates +resolveip +iptables-mod-tproxy +kmod-ipt-tproxy +iptables-mod-ipopt +kmod-ipt-ipopt +ip +ipset +coreutils +coreutils-base64 +coreutils-nohup +luci-lib-jsonc \
-           +dnsmasq-full \
-           +PACKAGE_$(PKG_NAME)_INCLUDE_Shadowsocks:shadowsocks-libev-ss-redir \
-           +PACKAGE_$(PKG_NAME)_INCLUDE_ShadowsocksR:shadowsocksr-libev-alt \
-           +PACKAGE_$(PKG_NAME)_INCLUDE_Shadowsocks_socks:shadowsocks-libev-ss-local \
-           +PACKAGE_$(PKG_NAME)_INCLUDE_ShadowsocksR_socks:shadowsocksr-libev-ssr-local \
-           +PACKAGE_$(PKG_NAME)_INCLUDE_V2ray:v2ray \
-           +PACKAGE_$(PKG_NAME)_INCLUDE_Brook:brook \
-           +PACKAGE_$(PKG_NAME)_INCLUDE_kcptun:kcptun \
-           +PACKAGE_$(PKG_NAME)_INCLUDE_haproxy:haproxy \
-           +PACKAGE_$(PKG_NAME)_INCLUDE_ChinaDNS:ChinaDNS \
-           +PACKAGE_$(PKG_NAME)_INCLUDE_pdnsd:pdnsd-alt \
-           +PACKAGE_$(PKG_NAME)_INCLUDE_dns2socks:dns2socks \
-           +PACKAGE_$(PKG_NAME)_INCLUDE_dns-forwarder:dns-forwarder \
-           +PACKAGE_$(PKG_NAME)_INCLUDE_pcap-dnsproxy:pcap-dnsproxy \
-           +PACKAGE_$(PKG_NAME)_INCLUDE_simple-obfs:simple-obfs \
-           +PACKAGE_$(PKG_NAME)_INCLUDE_GoQuiet-client:gq-client \
-           +PACKAGE_$(PKG_NAME)_INCLUDE_v2ray-plugin:v2ray-plugin
+  DEPENDS:=+curl +libcurl +libmbedtls +ca-bundle +ca-certificates +resolveip +iptables-mod-tproxy +kmod-ipt-tproxy +iptables-mod-ipopt +kmod-ipt-ipopt +ip +ipset +coreutils +coreutils-base64 +coreutils-nohup +luci-lib-jsonc +unzip \
+  +dnsmasq-full \
+  +PACKAGE_$(PKG_NAME)_INCLUDE_Shadowsocks:shadowsocks-libev-ss-redir \
+  +PACKAGE_$(PKG_NAME)_INCLUDE_ShadowsocksR:shadowsocksr-libev-alt \
+  +PACKAGE_$(PKG_NAME)_INCLUDE_Shadowsocks_socks:shadowsocks-libev-ss-local \
+  +PACKAGE_$(PKG_NAME)_INCLUDE_ShadowsocksR_socks:shadowsocksr-libev-ssr-local \
+  +PACKAGE_$(PKG_NAME)_INCLUDE_V2ray:v2ray \
+  +PACKAGE_$(PKG_NAME)_INCLUDE_Brook:brook \
+  +PACKAGE_$(PKG_NAME)_INCLUDE_kcptun:kcptun \
+  +PACKAGE_$(PKG_NAME)_INCLUDE_haproxy:haproxy \
+  +PACKAGE_$(PKG_NAME)_INCLUDE_ChinaDNS:ChinaDNS \
+  +PACKAGE_$(PKG_NAME)_INCLUDE_pdnsd:pdnsd-alt \
+  +PACKAGE_$(PKG_NAME)_INCLUDE_dns2socks:dns2socks \
+  +PACKAGE_$(PKG_NAME)_INCLUDE_dns-forwarder:dns-forwarder
 endef
 
 define Build/Prepare

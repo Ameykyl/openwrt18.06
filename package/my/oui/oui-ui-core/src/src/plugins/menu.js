@@ -1,4 +1,6 @@
 import {ubus} from './ubus'
+import axios from 'axios'
+import i18n from '@/i18n'
 
 const menu = {}
 
@@ -40,6 +42,47 @@ function parseMenus(raw) {
   return menus;
 }
 
+function buildRoute(menu) {
+  if (menu.i18n) {
+    const msgs = menu.i18n;
+    for (const locale in msgs)
+      i18n.mergeLocaleMessage(locale, msgs[locale]);
+  }
+
+  return {
+    path: menu.path,
+    component: resolve => {
+      if (menu.plugin) {
+        axios.get(`/views/${menu.view}.js`).then(r => {
+          resolve(eval(r.data));
+        });
+      } else {
+        return import(`@/views/${menu.view}`);
+      }
+    },
+    meta: {
+      title: menu.title
+    },
+    beforeEnter: (to, from, next) => {
+      if (to.meta.i18n) {
+        next();
+        return;
+      }
+
+      to.meta.i18n = true;
+
+      axios.get(`/i18n${to.path}.json`).then(r => {
+        const msgs = r.data;
+        for (const locale in msgs)
+          i18n.mergeLocaleMessage(locale, msgs[locale]);
+        next();
+      }).catch(() => {
+        next();
+      });
+    }
+  };
+}
+
 function buildRoutes(menus) {
   const routes = [];
 
@@ -55,22 +98,10 @@ function buildRoutes(menus) {
 
     if (menu.view) {
       route.redirect = menu.path;
-      route.children.push({
-        path: menu.path,
-        component: () => import(`@/views/${menu.view}`),
-        meta: {
-          title: menu.title
-        }
-      });
+      route.children.push(buildRoute(menu));
     } else if (menu.children) {
       menu.children.forEach(sm => {
-        route.children.push({
-          path: sm.path,
-          component: () => import(`@/views/${sm.view}`),
-          meta: {
-            title: sm.title
-          }
-        });
+        route.children.push(buildRoute(sm));
       });
     }
 

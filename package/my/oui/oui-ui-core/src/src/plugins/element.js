@@ -1,4 +1,8 @@
 import Vue from 'vue'
+import i18n from '@/i18n'
+import en from 'element-ui/lib/locale/lang/en'
+import zhCN from 'element-ui/lib/locale/lang/zh-CN'
+import locale from 'element-ui/lib/locale'
 import {
   Pagination,
   Dialog,
@@ -9,6 +13,7 @@ import {
   Submenu,
   MenuItem,
   Input,
+  Autocomplete,
   Radio,
   Checkbox,
   Switch,
@@ -50,6 +55,10 @@ import {
   Divider
 } from 'element-ui'
 
+i18n.mergeLocaleMessage('en', en)
+i18n.mergeLocaleMessage('zh-CN', zhCN)
+locale.i18n((key, value) => i18n.t(key, value))
+
 Vue.use(Pagination);
 Vue.use(Dialog);
 Vue.use(Dropdown);
@@ -59,6 +68,7 @@ Vue.use(Menu);
 Vue.use(Submenu);
 Vue.use(MenuItem);
 Vue.use(Input);
+Vue.use(Autocomplete);
 Vue.use(Radio);
 Vue.use(Checkbox);
 Vue.use(Switch);

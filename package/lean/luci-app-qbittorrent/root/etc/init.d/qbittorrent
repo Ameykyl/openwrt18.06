@@ -3,76 +3,13 @@ START=99
 
 config_qbittorrent()
 {
-	local download_dir
 	local port
-	config_get download_dir $1 download_dir
 	config_get port $1 port
 	if [ -f $2/qBittorrent/config/qBittorrent.conf ]; then
 		sed -i  's/WebUI\\Port=[0-9]*/WebUI\\Port='"$port"'/g' $2/qBittorrent/config/qBittorrent.conf
-		sed -i  's/Downloads\\SavePath=[a-z,/]*//g' $2/qBittorrent/config/qBittorrent.conf
-		echo "Downloads\SavePath=$down" >> $2/qBittorrent/config/qBittorrent.conf
-	else
-	cat>$2/qBittorrent/config/qBittorrent.conf<<EOF
-[AutoRun]
-enabled=false
-program=
-
-[BitTorrent]
-Session\CreateTorrentSubfolder=true
-Session\DisableAutoTMMByDefault=true
-Session\DisableAutoTMMTriggers\CategoryChanged=false
-Session\DisableAutoTMMTriggers\CategorySavePathChanged=true
-Session\DisableAutoTMMTriggers\DefaultSavePathChanged=true
-
-[Core]
-AutoDeleteAddedTorrentFile=Never
-
-[Preferences]
-Bittorrent\AddTrackers=false
-Bittorrent\MaxRatioAction=0
-Bittorrent\PeX=true
-Connection\GlobalDLLimitAlt=10
-Connection\GlobalUPLimitAlt=10
-Downloads\PreAllocation=false
-Downloads\SavePath=$download_dir
-Downloads\ScanDirsV2=@Variant(\0\0\0\x1c\0\0\0\0)
-Downloads\StartInPause=false
-DynDNS\DomainName=changeme.dyndns.org
-DynDNS\Enabled=false
-DynDNS\Password=
-DynDNS\Service=0
-DynDNS\Username=
-General\Locale=zh
-General\UseRandomPort=false
-MailNotification\email=
-MailNotification\enabled=false
-MailNotification\password=
-MailNotification\req_auth=true
-MailNotification\req_ssl=false
-MailNotification\sender=qBittorrent_notification@example.com
-MailNotification\smtp_server=smtp.changeme.com
-MailNotification\username=
-WebUI\Address=*
-WebUI\AlternativeUIEnabled=false
-WebUI\AuthSubnetWhitelist=@Invalid()
-WebUI\AuthSubnetWhitelistEnabled=false
-WebUI\CSRFProtection=true
-WebUI\ClickjackingProtection=true
-WebUI\HTTPS\CertificatePath=
-WebUI\HTTPS\Enabled=false
-WebUI\HTTPS\KeyPath=
-WebUI\HostHeaderValidation=true
-WebUI\LocalHostAuth=true
-WebUI\Port=$port
-WebUI\RootFolder=
-WebUI\ServerDomains=*
-WebUI\SessionTimeout=3600
-WebUI\UseUPnP=true
-WebUI\Username=admin
-EOF
 	fi
 }
-	
+
 run_qbittorrent()
 {
     local enable

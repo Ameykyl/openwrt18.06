@@ -1,0 +1,27 @@
+msgid ""
+msgstr "Content-Type: text/plain; charset=UTF-8\n"
+
+msgid "cupsd"
+msgstr "cupsd打印服务器"
+
+msgid "CUPSD"
+msgstr "CUPSD打印服务器"
+
+msgid "<strong><font color=\"green\">Running</font></strong>"
+msgstr "<strong><font color=\"green\">运行</font></strong>"
+
+msgid "<strong><font color=\"red\">Not Running</font></strong>"
+msgstr "<strong><font color=\"red\">未运行</font></strong>"
+
+msgid "Settings"
+msgstr "设置"
+
+msgid "General Settings"
+msgstr "基本设置"
+
+msgid "Enable"
+msgstr "启用"
+
+msgid "Enable or disable cupsd server"
+msgstr "启用或禁用cupsd打印服务器"
+

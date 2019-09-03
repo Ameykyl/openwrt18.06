@@ -30,6 +30,26 @@ end
 o.default=2
 o.rmempty = false
 
+o = s:option(ListValue, "edition", translate("Edition"))
+o:value("auto_detected", "Auto Detected")
+o:value("4.20.0", "4.20.0")
+o:value("4.19.1", "4.19.1")
+o:value("4.18.2", "4.18.2")
+o:value("4.18.1", "4.18.1")
+o:value("4.18.0", "4.18.0")
+o.rmempty = false
+
+o = s:option(Value, "v2ray_path", translate("V2ray Path"))
+o.default = "/usr/bin/v2ray"
+o.rmempty = true
+o.description = translate("After modifying the path, you need to download v2ray manually")
+
+o = s:option(Button,"update_v2ray",translate("Manual Upgrade V2ray"))
+o.inputstyle = "reload"
+o.write = function()
+  luci.sys.call("bash /usr/share/shadowsocksr/v2ray_update1.sh >>/tmp/ssrplus.log 2>&1")
+end
+
 o = s:option(DynamicList, "subscribe_url", translate("Subscribe URL"))
 o.rmempty = true
 

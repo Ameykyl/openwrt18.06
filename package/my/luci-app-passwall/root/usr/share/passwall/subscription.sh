@@ -1,5 +1,4 @@
 #!/bin/sh
-# Copyright (C) 2019 Lienol <lawlienol@gmail.com>
 
 CONFIG=passwall
 LOCK_FILE=/var/lock/${CONFIG}_subscription.lock

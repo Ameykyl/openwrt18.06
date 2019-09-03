@@ -1,7 +1,7 @@
-From 9fdc1aa7e5d82029afb4e14c3ef3613264f6eca0 Mon Sep 17 00:00:00 2001
+From 82876bead4101ba80c7ddfe76a3a2375deff1c2f Mon Sep 17 00:00:00 2001
 From: popcornmix <popcornmix@gmail.com>
 Date: Wed, 9 Nov 2016 13:02:52 +0000
-Subject: [PATCH 019/703] bcm: Make RASPBERRYPI_POWER depend on PM
+Subject: [PATCH 019/773] bcm: Make RASPBERRYPI_POWER depend on PM
 
 ---
  drivers/soc/bcm/Kconfig | 1 +

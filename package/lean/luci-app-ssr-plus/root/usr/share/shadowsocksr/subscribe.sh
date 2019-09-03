@@ -28,6 +28,8 @@ CheckIPAddr() {
 
 Server_Update() {
 	local uci_set="uci -q set $name.$1."
+    ${uci_set}grouphashkey="$ssr_grouphashkey"
+    ${uci_set}hashkey="$ssr_hashkey"
 	${uci_set}alias="[$ssr_group] $ssr_remarks"
 	${uci_set}auth_enable="0"
 	${uci_set}switch_enable="1"
@@ -49,6 +51,7 @@ Server_Update() {
 	${uci_set}kcp_param="--nocomp"
 
 	#v2ray
+	if [ "$ssr_type" = "v2ray" ]; then
 	${uci_set}alter_id="$ssr_alter_id"
 	${uci_set}vmess_id="$ssr_vmess_id"
 	${uci_set}security="$ssr_security"
@@ -59,6 +62,7 @@ Server_Update() {
 	${uci_set}tls="1"
 	fi
 	${uci_set}tcp_guise="$ssr_tcp_guise"
+	fi
 }
 
 name=shadowsocksr
@@ -76,12 +80,14 @@ do
 	echo_date "从 ${subscribe_url[o]} 获取订阅"
 	echo_date "开始更新在线订阅列表..."
 	echo_date "开始下载订阅链接到本地临时文件，请稍等..."
-	subscribe_data=$(wget-ssl --user-agent="User-Agent: Mozilla" --no-check-certificate -T 3 -O- ${subscribe_url[o]})
+	subscribe_data=$(curl -sL --connect-timeout 3 ${subscribe_url[o]})
 	curl_code=$?
+	# 计算group的hashkey
+	ssr_grouphashkey=$(echo "${subscribe_url[o]}" | md5sum | cut -d ' ' -f1)
 	if [ ! $curl_code -eq 0 ];then
 		echo_date "下载订阅成功..."
 		echo_date "开始解析节点信息..."
-		subscribe_data=$(wget-ssl --no-check-certificate -T 3 -O- ${subscribe_url[o]})
+		subscribe_data=$(curl -sL --connect-timeout 3  ${subscribe_url[o]})
 		curl_code=$?
 	fi
 	if [ $curl_code -eq 0 ];then
@@ -119,9 +125,10 @@ do
 					curr_ssr=$(uci show $name | grep @servers | grep -c server=)
 					for ((x=0;x<$curr_ssr;x++)) # 循环已有服务器信息，匹配当前订阅群组
 					do
-						temp_alias=$(uci -q get $name.@servers[$x].alias | grep "\[$ssr_group\]")
-						[ -n "$temp_alias" ] && temp_host_o[${#temp_host_o[@]}]=$(uci get $name.@servers[$x].server)
+						temp_alias=$(uci -q get $name.@servers[$x].grouphashkey | grep "$ssr_grouphashkey")
+						[ -n "$temp_alias" ] && temp_host_o[${#temp_host_o[@]}]=$(uci get $name.@servers[$x].hashkey)
 					done
+
 					for ((x=0;x<$subscribe_max;x++)) # 循环链接
 					do
 						[ ${#subscribe_max_x[@]} -eq 0 ] && temp_x=$x || temp_x=${subscribe_max_x[x]}
@@ -129,6 +136,8 @@ do
 						if [[ "$result" != "" ]]
 						then
 							temp_info=$(urlsafe_b64decode ${ssr_url[temp_x]//ssr:\/\//}) # 解码 SSR 链接
+							# 计算hashkey
+							ssr_hashkey=$(echo "$temp_info" | md5sum | cut -d ' ' -f1)
 
 							info=${temp_info///?*/}
 							temp_info_array=(${info//:/ })
@@ -161,6 +170,9 @@ do
 				done
 			else
 				temp_info=$(urlsafe_b64decode ${ssr_url[temp_x]//vmess:\/\//}) # 解码 Vmess 链接
+				# 计算hashkey
+				ssr_hashkey=$(echo "$temp_info" | md5sum | cut -d ' ' -f1)
+
 				ssr_type="v2ray"
 				json_load "$temp_info"
 				json_get_var ssr_remarks ps
@@ -176,14 +188,16 @@ do
 				ssr_tcp_guise="none"
 			fi
 
-
-			uci_name_tmp=$(uci show $name | grep -w $ssr_host | awk -F . '{print $2}')
+			if [ -z "ssr_remarks" ]; then # 没有备注的话则生成一个
+				ssr_remarks="$ssr_host:$ssr_port";
+			fi
+			uci_name_tmp=$(uci show $name | grep -w "$ssr_hashkey" | awk -F . '{print $2}')
 			if [ -z "$uci_name_tmp" ]; then # 判断当前服务器信息是否存在
 				uci_name_tmp=$(uci add $name servers)
 				subscribe_n=$(($subscribe_n + 1))
 			fi
 			Server_Update $uci_name_tmp
-			subscribe_x=$subscribe_x$ssr_host" "
+			subscribe_x=$subscribe_x$ssr_hashkey" "
 			ssrtype=$(echo $ssr_type | tr '[a-z]' '[A-Z]')
 			echo_date "$ssrtype节点：【$ssr_remarks】"
 
@@ -219,4 +233,4 @@ else
 	logger -st $log_name[$$] -p3 "${subscribe_url[$o]} 订阅数据获取失败 错误代码: $curl_code"
 fi
 done
-/etc/init.d/$name restart >/dev/null 2>&1
+/etc/init.d/$name restart >/dev/null 2>&1 

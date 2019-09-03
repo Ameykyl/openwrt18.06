@@ -312,7 +312,7 @@ define KernelPackage/dvb-usb-rtl28xxu
   KCONFIG:=CONFIG_DVB_USB_RTL28XXU
   FILES:=$(LINUX_DIR)/drivers/media/usb/dvb-usb-v2/dvb-usb-rtl28xxu.ko
   AUTOLOAD:=$(call AutoProbe,dvb-usb-rtl28xxu)
-  $(call AddDepends/dvb-usb-v2,+kmod-dvb-rtl2830 +kmod-dvb-rtl2832 +kmod-media-tuner-r820t +kmod-dvb-mn88473)
+  $(call AddDepends/dvb-usb-v2,+kmod-dvb-rtl2830 +kmod-dvb-rtl2832 +kmod-media-tuner-r820t +kmod-dvb-mn88473 +kmod-dvb-mn88472)
 endef
 
 define KernelPackage/dvb-usb-rtl28xxu/description
@@ -334,34 +334,6 @@ define KernelPackage/dvb-usb-anysee/description
 endef
 
 $(eval $(call KernelPackage,dvb-usb-anysee))
-
-define KernelPackage/dvb-usb-af9015
-  TITLE:=Afatech AF9015 DVB-T USB2.0 support
-  KCONFIG:=CONFIG_DVB_USB_AF9015
-  FILES:=$(LINUX_DIR)/drivers/media/usb/dvb-usb-v2/dvb-usb-af9015.ko
-  AUTOLOAD:=$(call AutoProbe,dvb-usb-af9015)
-  $(call AddDepends/dvb-usb-v2,+kmod-dvb-af9013)
-endef
-
-define KernelPackage/dvb-usb-af9015/description
- Support for the Afatech AF9015 based DVB-T USB2.0 receiver.
-endef
-
-$(eval $(call KernelPackage,dvb-usb-af9015))
-
-define KernelPackage/dvb-usb-af9035
-  TITLE:=Afatech AF9035 DVB-T USB2.0 support
-  KCONFIG:=CONFIG_DVB_USB_AF9035
-  FILES:=$(LINUX_DIR)/drivers/media/usb/dvb-usb-v2/dvb-usb-af9035.ko
-  AUTOLOAD:=$(call AutoProbe,dvb-usb-af9035)
-  $(call AddDepends/dvb-usb-v2,+kmod-dvb-af9033)
-endef
-
-define KernelPackage/dvb-usb-af9035/description
- Say Y here to support the Afatech AF9035 based DVB USB receiver.
-endef
-
-$(eval $(call KernelPackage,dvb-usb-af9035))
 
 define KernelPackage/dvb-usb-az6007
   TITLE:=AzureWave 6007 and clones DVB-T/C USB2.0 support
@@ -435,6 +407,17 @@ define KernelPackage/dvb-rtl2830/description
 endef
 
 $(eval $(call KernelPackage,dvb-rtl2830))
+
+define KernelPackage/dvb-mn88472
+  TITLE:=Panasonic MN88472
+  $(call DvbFrontend,mn88472,CONFIG_DVB_MN88472)
+endef
+
+define KernelPackage/dvb-mn88472/description
+ Panasonic MN88472
+endef
+
+$(eval $(call KernelPackage,dvb-mn88472))
 
 define KernelPackage/dvb-mn88473
   TITLE:=Panasonic MN88473
@@ -526,27 +509,163 @@ endef
 
 $(eval $(call KernelPackage,dvb-tda10048))
 
-define KernelPackage/dvb-af9013
-  TITLE:=Afatech AF9013 demodulator
-  $(call DvbFrontend,af9013,CONFIG_DVB_AF9013)
+
+define KernelPackage/dvb-a8293
+  TITLE := Allegro A8293
+  $(call DvbFrontend,a8293,CONFIG_DVB_A8293)
 endef
+$(eval $(call KernelPackage,dvb-a8293))
 
-define KernelPackage/dvb-af9013/description
- Support for AF9013 DVB frontend.
+define KernelPackage/dvb-as102-fe
+  TITLE := Abilis AS102 FE
+  $(call DvbFrontend,as102_fe,CONFIG_DVB_AS102_FE)
 endef
+$(eval $(call KernelPackage,dvb-as102-fe))
 
-$(eval $(call KernelPackage,dvb-af9013))
 
-define KernelPackage/dvb-af9033
-  TITLE:=Afatech AF9033 DVB-T demodulator
-  $(call DvbFrontend,af9033,CONFIG_DVB_AF9033)
+define KernelPackage/dvb-ascot2e
+  TITLE := Sony Ascot2E
+  $(call DvbFrontend,ascot2e,CONFIG_DVB_ASCOT2E)
 endef
+$(eval $(call KernelPackage,dvb-ascot2e))
 
-define KernelPackage/dvb-af9033/description
- Support for AF9033 DVB frontend.
+
+define KernelPackage/dvb-atbm8830
+  TITLE := AltoBeam ATBM8830/8831
+  $(call DvbFrontend,atbm8830,CONFIG_DVB_ATBM8830)
 endef
+$(eval $(call KernelPackage,dvb-atbm8830))
 
-$(eval $(call KernelPackage,dvb-af9033))
+
+define KernelPackage/dvb-au8522-common
+  TITLE := Auvitek AU8522
+  $(call DvbFrontend,au8522_common,CONFIG_DVB_AU8522)
+endef
+$(eval $(call KernelPackage,dvb-au8522-common))
+
+
+define KernelPackage/dvb-au8522-decoder
+  SUBMENU := $(DVB_MENU)
+  TITLE := Auvitek AU8522 ATV
+  V4L_KCONFIG := CONFIG_DVB_AU8522_DTV
+  DEPENDS := +kmod-dvb-au8522-common
+  FILES := $(PKG_BUILD_DIR)/v4l/au8522_decoder.ko
+  AUTOLOAD := $(call AutoProbe,au8522_decoder)
+endef
+$(eval $(call KernelPackage,dvb-au8522-decoder))
+
+
+define KernelPackage/dvb-au8522-dig
+  SUBMENU := $(DVB_MENU)
+  TITLE := Auvitek AU8522 DTV
+  V4L_KCONFIG := CONFIG_DVB_AU8522_DTV
+  DEPENDS := +kmod-dvb-au8522-common
+  FILES := $(PKG_BUILD_DIR)/v4l/au8522_dig.ko
+  AUTOLOAD := $(call AutoProbe,au8522_dig)
+endef
+$(eval $(call KernelPackage,dvb-au8522-dig))
+
+
+define KernelPackage/dvb-avl6882
+  TITLE := Availink AVL6882
+  $(call DvbFrontend,avl6882,CONFIG_DVB_AVL6882)
+  DEPENDS += @V4L_SRC_TBSDTV
+endef
+$(eval $(call KernelPackage,dvb-avl6882))
+
+
+define KernelPackage/dvb-bcm3510
+  TITLE := Broadcom BCM3510
+  $(call DvbFrontend,bcm3510,CONFIG_DVB_BCM3510)
+endef
+$(eval $(call KernelPackage,dvb-bcm3510))
+
+define KernelPackage/dvb-cx22700
+  TITLE := Conexant CX22700
+  $(call DvbFrontend,cx22700,CONFIG_DVB_CX22700)
+endef
+$(eval $(call KernelPackage,dvb-cx22700))
+
+
+define KernelPackage/dvb-cx22702
+  TITLE := Conexant CX22702
+  $(call DvbFrontend,cx22702,CONFIG_DVB_CX22702)
+endef
+$(eval $(call KernelPackage,dvb-cx22702))
+
+
+define KernelPackage/dvb-cx24110
+  TITLE := Conexant CX24110
+  $(call DvbFrontend,cx24110,CONFIG_DVB_CX24110)
+endef
+$(eval $(call KernelPackage,dvb-cx24110))
+
+
+define KernelPackage/dvb-cx24113
+  TITLE := Conexant CX24113
+  $(call DvbFrontend,cx24113,CONFIG_DVB_CX24113)
+endef
+$(eval $(call KernelPackage,dvb-cx24113))
+
+
+define KernelPackage/dvb-cx24116
+  TITLE := Conexant CX24116
+  $(call DvbFrontend,cx24116,CONFIG_DVB_CX24116)
+endef
+$(eval $(call KernelPackage,dvb-cx24116))
+
+
+define KernelPackage/dvb-cx24117
+  TITLE := Conexant CX24117
+  $(call DvbFrontend,cx24117,CONFIG_DVB_CX24117)
+endef
+$(eval $(call KernelPackage,dvb-cx24117))
+
+
+define KernelPackage/dvb-cx24120
+  TITLE := Conexant CX24120
+  $(call DvbFrontend,cx24120,CONFIG_DVB_CX24120)
+endef
+$(eval $(call KernelPackage,dvb-cx24120))
+
+
+define KernelPackage/dvb-cx24123
+  TITLE := Conexant CX24123
+  $(call DvbFrontend,cx24123,CONFIG_DVB_CX24123)
+endef
+$(eval $(call KernelPackage,dvb-cx24123))
+
+
+define KernelPackage/dvb-cxd2099
+  TITLE := Sony CXD2099AR
+  $(call DvbFrontend,cxd2099,CONFIG_DVB_CXD2099)
+  DEPENDS +=
+endef
+$(eval $(call KernelPackage,dvb-cxd2099))
+
+
+define KernelPackage/dvb-cxd2820r
+  TITLE := Sony CXD2820R
+  $(call DvbFrontend,cxd2820r,CONFIG_DVB_CXD2820R)
+  DEPENDS += +kmod-dvb-core
+endef
+$(eval $(call KernelPackage,dvb-cxd2820r))
+
+
+define KernelPackage/dvb-cxd2841er
+  TITLE := Sony CXD2841ER
+  $(call DvbFrontend,cxd2841er,CONFIG_DVB_CXD2841ER)
+  DEPENDS += +kmod-dvb-core
+endef
+$(eval $(call KernelPackage,dvb-cxd2841er))
+
+
+define KernelPackage/dvb-cxd2880
+  TITLE := Sony CXD2880
+  $(call DvbFrontend,cxd2880,CONFIG_DVB_CXD2880)
+  DEPENDS += +kmod-dvb-core
+endef
+$(eval $(call KernelPackage,dvb-cxd2880))
 
 define KernelPackage/dvb-tuner-dib0070
   TITLE:=DiBcom DiB0070 silicon base-band tuner
@@ -572,6 +691,12 @@ define KernelPackage/dvb-dib3000mb/description
 endef
 
 $(eval $(call KernelPackage,dvb-dib3000mb))
+
+define KernelPackage/dvb-dib0090
+  TITLE := DiBcom DiB0090
+  $(call DvbFrontend,dib0090,CONFIG_DVB_TUNER_DIB0090)
+endef
+$(eval $(call KernelPackage,dvb-dib0090))
 
 define KernelPackage/dvb-dibx000-common
   SUBMENU:=$(DVB_MENU)

@@ -8,7 +8,7 @@ include $(TOPDIR)/rules.mk
 
 LUCI_TITLE:=LuCI Support for Auto DNS for dnspod
 LUCI_DEPENDS:= +bash +curl
-PKG_VERSION:=1.10
+PKG_VERSION:=1.14
 
 include $(TOPDIR)/feeds/luci/luci.mk
 

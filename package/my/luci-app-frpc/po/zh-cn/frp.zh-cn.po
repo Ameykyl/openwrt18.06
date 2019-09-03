@@ -1,0 +1,284 @@
+msgid "Server"
+msgstr "服务器地址"
+
+msgid "Running"
+msgstr "运行中"
+
+msgid "Privilege Token"
+msgstr "特权令牌"
+
+msgid "Use Compression"
+msgstr "使用压缩"
+
+msgid "Enable State"
+msgstr "开启状态"
+
+msgid "Other Settings"
+msgstr "其他设置"
+
+msgid "Client Log"
+msgstr "客户端日志"
+
+msgid "Time duration between server of frpc and frps mustn't exceed 15 minutes."
+msgstr "frpc 所在机器和 frps 所在机器的时间相差不能超过 15 分钟。"
+
+msgid "Vhost HTTP Port"
+msgstr "HTTP穿透服务端口"
+
+msgid "Vhost HTTPS Port"
+msgstr "HTTPS穿透服务端口"
+
+msgid "Exit program when first login failed"
+msgstr "初始登录失败即退出程序"
+
+msgid "decide if exit program when first login failed, otherwise continuous relogin to frps."
+msgstr "第一次登录失败就退出程序，否则将持续尝试登陆 Frp 服务器。"
+
+msgid "TCP Stream Multiplexing"
+msgstr "TCP 多路复用"
+
+msgid "Default is Ture. This feature in frps.ini and frpc.ini must be same."
+msgstr "该功能默认启用，该配置项在服务端和客户端必须保持一致。"
+
+msgid "Protocol Type"
+msgstr "协议类型"
+
+msgid "Frp support kcp protocol since v0.12.0"
+msgstr "从 v0.12.0 版本开始，底层通信协议支持选择 kcp 协议加速。 "
+
+msgid "TCP Protocol"
+msgstr "TCP 协议"
+
+msgid "KCP Protocol"
+msgstr "KCP 协议"
+
+msgid "Connect frps by HTTP PROXY"
+msgstr "通过代理连接 frps"
+
+msgid "frpc can connect frps using HTTP PROXY"
+msgstr "frpc 支持通过 HTTP PROXY 和 frps 进行通信 "
+
+msgid "HTTP PROXY"
+msgstr "HTTP代理"
+
+msgid "Enable Connection Pool"
+msgstr "启用连接池功能"
+
+msgid "This feature is fit for a large number of short connections."
+msgstr "适合有大量短连接请求时开启"
+
+msgid "Connection Pool"
+msgstr " 指定预创建连接的数量"
+
+msgid "Connections will be established in advance."
+msgstr " frpc 会预先和服务端建立起指定数量的连接。"
+
+msgid "Service registration interval"
+msgstr "服务注册间隔"
+
+msgid "0 means disable this feature, unit: min"
+msgstr "0表示禁用定时注册功能，单位：分钟"
+
+msgid "Log Level"
+msgstr "日志记录等级"
+
+msgid "Trace"
+msgstr "追踪"
+
+msgid "Debug"
+msgstr "调试"
+
+msgid "Info"
+msgstr "信息"
+
+msgid "Warning"
+msgstr "警告"
+
+msgid "Error"
+msgstr "错误"
+
+msgid "Log Keepd Max Days"
+msgstr "日志记录天数"
+
+msgid "Services List"
+msgstr "服务列表"
+
+msgid "Service Remark Name"
+msgstr "服务备注名"
+
+msgid "Frp Protocol Type"
+msgstr "Frp 协议类型"
+
+msgid "Domain/Subdomain"
+msgstr "域名/子域名"
+
+msgid "Remote Port"
+msgstr "远程主机端口"
+
+msgid "Local Host Address"
+msgstr "内网主机地址"
+
+msgid "Local Host Port"
+msgstr "内网主机端口"
+
+msgid "Use Encryption"
+msgstr "开启数据加密"
+
+msgid "<strong><font color=\"green\">frpc is Running</font></strong>"
+msgstr "<strong><font color=\"green\">frpc 运行中</font></strong>"
+
+msgid "<strong><font color=\"red\">frpc is Not Running</font></strong>"
+msgstr "<strong><font color=\"red\">frpc 未运行！</font></strong>"
+
+msgid "Frp is a fast reverse proxy to help you expose a local server behind a NAT or firewall to the internet."
+msgstr "Frp是一个可用于内网穿透的高性能的反向代理应用，支持 tcp, udp, http, https 协议。"
+
+msgid "Frp Setting"
+msgstr "Frp 内网穿透"
+
+msgid "Global Setting"
+msgstr "全局设置"
+
+msgid "Basic Settings"
+msgstr "基本设置"
+
+msgid "Software version"
+msgstr "软件版本"
+
+msgid "Custom version.<strong><font color=\"green\">current version:</font></strong>"
+msgstr "自定义版本。  <strong><font color=\"green\">当前运行版本：</font></strong>"
+
+msgid "Lastest version"
+msgstr "查看最新版本"
+
+msgid "Frp Domain Config"
+msgstr "Frp域名配置"
+
+msgid "Config Frp Protocol"
+msgstr "配置 Frp 协议参数"
+
+msgid "Frp Protocol Type"
+msgstr "Frp 协议类型"
+
+msgid "Domain Type"
+msgstr "域名类型"
+
+msgid "Custom Domains"
+msgstr "自定义域名"
+
+msgid "SubDomain"
+msgstr "子域名"
+
+msgid "Both the above two Domain types"
+msgstr "同时使用以上两种域名"
+
+msgid "If SubDomain is used, Custom Domains couldn't be subdomain or wildcard domain of the maindomain(subdomain_host)."
+msgstr "如果服务端配置了主域名(subdomain_host)，则自定义域名不能是属于主域名(subdomain_host) 的子域名或者泛域名。"
+
+msgid "subdomain_host must be configured in server: frps in advance."
+msgstr "使用子域名时，必须预先在服务端配置主域名(subdomain_host)参数。"
+
+msgid "STCP Role"
+msgstr "STCP 服务类型"
+
+msgid "Remote Port"
+msgstr "远程端口"
+
+msgid "Use Plugin"
+msgstr "使用插件"
+
+msgid "If plugin is defined, local_ip and local_port is useless, plugin will handle connections got from frps."
+msgstr "使用插件使用插件模式时，本地 IP 地址和端口无需配置，插件将会处理来自服务端的链接请求。"
+
+msgid "Local Host Address"
+msgstr "内网主机地址"
+
+msgid "Local Host Port"
+msgstr "内网主机端口"
+
+msgid "STCP Screct Key"
+msgstr "STCP 服务类型"
+
+msgid "STCP Server Name"
+msgstr "STCP 代理名称"
+
+msgid "STCP Server Name is Service Remark Name of STCP Server"
+msgstr "STCP 代理名称就是 STCP 服务端的服务备注名内网主机地址"
+
+msgid "Enable URL routing"
+msgstr "启用 URL 路由"
+
+msgid "Frp support forward http requests to different backward web services by url routing"
+msgstr "Frp 支持根据请求的 URL 路径路由转发到不同的后端服务。"
+
+msgid "URL routing"
+msgstr "URL 路由"
+
+msgid "Http requests with url prefix /news will be forwarded to this service."
+msgstr "例如指定 locations=/news，则所有 URL 以 /news 开头的请求都会被转发到这个服务。多个URL地址以英文逗号分隔，如 locations=/news,/about "
+
+msgid "Choose Plugin"
+msgstr "选择插件"
+
+msgid "Proxy Authentication"
+msgstr "代理认证"
+
+msgid "Other PCs could access the Internet through frpc's network by using http_proxy plugin."
+msgstr "http proxy 插件，可以使其他机器通过 frpc 的网络访问互联网；开启身份验证之后需要用户名、密码才能连接到 HTTP 代理。"
+
+msgid "HTTP Proxy UserName"
+msgstr "HTTP 代理用户名"
+
+msgid "HTTP Proxy Password"
+msgstr "HTTP 代理密码"
+
+msgid "Plugin Unix Sock Path"
+msgstr "Unix Sock 插件路径"
+
+msgid "Password protecting your web service"
+msgstr "使用密码访问web服务"
+
+msgid "Http username and password are safety certification for http protocol."
+msgstr "使用HTTP 用户名、密码来安全访问web服务 "
+
+msgid "HTTP UserName"
+msgstr "HTTP 用户名"
+
+msgid "HTTP PassWord"
+msgstr "HTTP 密码"
+
+msgid "Rewriting the Host Header"
+msgstr "修改 Host Header"
+
+msgid "Frp can rewrite http requests with a modified Host header."
+msgstr "Frp 可以动态修改 http 请求中的 host 字段"
+
+msgid "The Host header will be rewritten to match the hostname portion of the forwarding address."
+msgstr "原始 http 请求中的 host 字段转发到后端服务时会被替换为该值"
+
+msgid "Encrypted the communication between frpc and frps, will effectively prevent the traffic intercepted."
+msgstr "将 frpc 与 frps 之间的通信内容加密传输，将会有效防止流量被拦截。"
+
+msgid "The contents will be compressed to speed up the traffic forwarding speed, but this will consume some additional cpu resources."
+msgstr "对传输内容进行压缩，加快流量转发速度，但是会额外消耗一些 cpu 资源。"
+
+msgid "Service Remark Name"
+msgstr "服务备注名"
+
+msgid "<font color=\"red\">Please ensure the remark name is unique.</font>"
+msgstr "<font color=\"red\">请确保备注名的唯一性</font>"
+
+msgid "CPU model"
+msgstr "CPU 类型"
+
+msgid "Operating mode"
+msgstr "运行模式"
+
+msgid "RAM  /tmp/etc/frp/frpc"
+msgstr "内存  /tmp/etc/frp/frpc"
+
+msgid "Flash mode requires 6M of storage space, if not enough space, please use memory mode"
+msgstr "Flash 模式需要6M的储存空间，如果空间不够请用内存模式"
+
+msgid "Download source address"
+msgstr "下载源地址"

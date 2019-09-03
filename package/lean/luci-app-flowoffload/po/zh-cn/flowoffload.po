@@ -86,10 +86,13 @@ msgid "dnsmasq killqqad"
 msgstr "dnsmasq去广告"
 
 msgid "AdGuardHome After setting up, shut down DNS acceleration normally and save configuration file"
-msgstr "AdGuardHome设置完后正常关闭dns加速即可保存配置文件.AdGuardHome管理页面IP:3000 管理账号密码：AdGuardHome"
+msgstr "AdGuardHome管理页面IP:3333 管理账号密码：AdGuardHome"
 
 msgid "Dnsmasq rejects IPv6 parsing and optimizes domestic complex dual-stack network"
 msgstr "dnsmasq不返回ipv6解析结果,优化国内复杂双栈网络"
 
 msgid "Memory mode operation"
 msgstr "内存模式运行"
+
+msgid "Automatic Free Memory"
+msgstr "自动释放内存"

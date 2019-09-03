@@ -9,7 +9,7 @@ include $(TOPDIR)/rules.mk
 
 PKG_NAME:=tvheadend
 PKG_VERSION:=4.3
-PKG_REV=8ff1555
+PKG_REV=ebb0968
 PKG_RELEASE:=1
 
 PKG_SOURCE_SUBDIR:=$(PKG_NAME)
@@ -71,32 +71,34 @@ else
 endif
 
 CONFIGURE_ARGS += \
-	--arch=$(ARCH) \
-        --disable-dvbscan \
-	--disable-dbus_1 \
-	--disable-libav \
-	--enable-bundle \
-        --disable-dvbscan \
-        --disable-avahi \
-        --disable-hdhomerun_static \
-        --disable-pie \
-        --disable-imagecache \
-        --disable-ffmpeg_static \
-        --disable-libx264 \
-        --disable-libx264_static \
-        --disable-libx265 \
-        --disable-libx265_static \
-        --disable-libvpx \
-        --disable-libvpx_static \
-        --disable-libtheora \
-        --disable-libtheora_static \
-        --disable-libvorbis \
-        --disable-libvorbis_static \
-        --disable-libfdkaac \
-        --disable-libfdkaac_static \
-        --disable-nvenc \
-        --disable-libmfx_static \
-        --disable-timeshift
+  --arch=$(ARCH) \
+  --enable-bundle \
+  --disable-dbus_1 \
+  --disable-libav \
+  --disable-ffmpeg_static \
+  --disable-cccam \
+  --disable-avahi \
+  --disable-hdhomerun_static \
+  --disable-pie \
+  --disable-imagecache \
+  --disable-ffmpeg_static \
+  --disable-libx264 \
+  --disable-libx264_static \
+  --disable-libx265 \
+  --disable-libx265_static \
+  --disable-libvpx \
+  --disable-libvpx_static \
+  --disable-libtheora \
+  --disable-libtheora_static \
+  --disable-libvorbis \
+  --disable-libvorbis_static \
+  --disable-libfdkaac \
+  --disable-libfdkaac_static \
+  --disable-nvenc \
+  --disable-libmfx_static \
+  --disable-timeshift \
+  --disable-capmt \
+  --disable-constcw
 
 define Build/Prepare
 	$(call Build/Prepare/Default)

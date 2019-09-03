@@ -33,3 +33,8 @@ prepare: .tmp/.npm_stamp
 
 build: prepare
 	@$(NPM) run build
+
+plugin:
+	mv babel.config.js babel.config.js.bk
+	@$(NPM) run plugin
+	mv babel.config.js.bk babel.config.js

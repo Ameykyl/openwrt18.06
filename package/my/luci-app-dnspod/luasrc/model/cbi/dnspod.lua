@@ -26,8 +26,15 @@ enable.default = 0
 enable.rmempty = false
 
 o = s:option(Value,"time",translate("Inspection Time"),translate("域名检查间隔时间，单位秒"))
-o.default = 60
+o.default = 600
 o.rmempty=false
+
+o = s:option(Button,"delete",translate("删除全部域名记录"))
+o.inputstyle = "reset"
+o.write = function()
+  luci.sys.call("cat /dev/null > /usr/share/dnspod/last.ip") 
+  luci.http.redirect(luci.dispatcher.build_url("admin", "services", "dnspod"))
+end
 
 ------------------------------------------------------------
 s = m:section(TypedSection, "ip_last", translate("ip获取设置"))
@@ -79,7 +86,7 @@ pass = s:option(Value, "login_password", translate("登录密码"),"登录DNSPOD
 pass.password=true
 pass:depends("mode", "login")
 
-token = s:option(Value, "artoken", translate("token"))
+token = s:option(Value, "artoken", translate("ID,TOKEN"))
 token:depends("mode", "token")
 
 -----------------------------------------------------------
