@@ -11,9 +11,9 @@ PKG_RELEASE:=1
 
 PKG_SOURCE_PROTO:=git
 PKG_SOURCE_URL=$(PROJECT_GIT)/project/iwinfo.git
-PKG_SOURCE_DATE:=2018-12-25
-PKG_SOURCE_VERSION:=dd508af481406bbbe42eaa20a54226645f0301cc
-PKG_MIRROR_HASH:=1137b2bc2bdb8157b0ed7dfd6902453285df765358469accc4916a79a7aab989
+PKG_SOURCE_DATE:=2019-09-01
+PKG_SOURCE_VERSION:=f599a8dc01e01231fd116c9d1745f364c409c57f
+PKG_MIRROR_HASH:=25d0e15bfbc9ce07bfa65d21986621f2119485507784b9d138da93e961f3d9cc
 PKG_MAINTAINER:=Jo-Philipp Wich <jo@mein.io>
 PKG_LICENSE:=GPL-2.0
 
@@ -33,7 +33,7 @@ define Package/libiwinfo
   CATEGORY:=Libraries
   TITLE:=Generalized Wireless Information Library (iwinfo)
   DEPENDS:=+PACKAGE_kmod-cfg80211:libnl-tiny +libuci +libubus
-  ABI_VERSION:=$(PKG_RELEASE)
+  ABI_VERSION:=20181126
 endef
 
 define Package/libiwinfo/description
