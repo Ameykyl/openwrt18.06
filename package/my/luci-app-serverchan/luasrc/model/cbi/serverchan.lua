@@ -1,5 +1,3 @@
--- Copyright (C) 2014-2018 OpenWrt
--- Licensed to the public under the GNU General Public License v3.
 local nt = require "luci.sys".net
 local log=require"nixio.fs"
 local e=luci.model.uci.cursor()

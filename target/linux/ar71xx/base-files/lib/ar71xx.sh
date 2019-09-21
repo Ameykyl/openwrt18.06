@@ -814,6 +814,9 @@ ar71xx_board_detect() {
 	*"JWAP230")
 		name="jwap230"
 		;;
+	*"CSAC")
+		name="csac"
+		;;
 	*"K2T A1/A2/A3 board")
 		#fixup: update the machine name
 		machine=$(echo -n "$machine" | sed "s,A1/A2/A3,$(head -c400 $(find_mtd_chardev config) | grep -o hw_ver.* | cut -d\" -f3),")

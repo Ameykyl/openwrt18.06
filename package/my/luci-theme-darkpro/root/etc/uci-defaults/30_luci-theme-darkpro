@@ -1,0 +1,7 @@
+#!/bin/sh
+uci batch <<-EOF
+	set luci.themes.Darkpro=/luci-static/darkpro
+	set luci.main.mediaurlbase=/luci-static/darkpro
+	commit luci
+EOF
+exit 0

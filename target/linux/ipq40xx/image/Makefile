@@ -211,6 +211,16 @@ define Device/meraki_mr33
 endef
 TARGET_DEVICES += meraki_mr33
 
+define Device/qcom_cm520
+	$(call Device/FitImage)
+	$(call Device/UbiFit)
+	DEVICE_DTS := qcom-ipq4019-cm520
+	BLOCKSIZE := 128k
+	PAGESIZE := 2048
+	DEVICE_TITLE := Qualcomm CM520
+endef
+TARGET_DEVICES += qcom_cm520
+
 define Device/netgear_ex61x0v2
 	$(call Device/DniImage)
 	DEVICE_DTS_CONFIG := config@4
@@ -288,6 +298,18 @@ define Device/qcom_ap-dk04.1-c1
 	DEVICE_TITLE := QCA AP-DK04.1-C1
 endef
 TARGET_DEVICES += qcom_ap-dk04.1-c1
+
+define Device/hugo_ac1200
+        $(call Device/FitImage)
+        DEVICE_TITLE :=  Hugo AC1200
+        BOARD_NAME := hugo_ac1200
+        DEVICE_DTS := qcom-ipq4019-hugo-ac1200
+        KERNEL_SIZE := 4096k
+        IMAGE_SIZE := 31232k
+        IMAGES := sysupgrade.bin
+        IMAGE/sysupgrade.bin := append-kernel | append-rootfs | pad-rootfs | append-metadata
+endef
+TARGET_DEVICES += hugo_ac1200
 
 define Device/zyxel_nbg6617
 	$(call Device/FitImageLzma)

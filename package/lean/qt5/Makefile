@@ -126,6 +126,7 @@ define Build/Configure
 			-no-opengl \
 			-no-directfb \
 			-no-xcb \
+			-openssl-runtime \
 			-qt-zlib \
 			-qt-freetype \
 			-make libs \

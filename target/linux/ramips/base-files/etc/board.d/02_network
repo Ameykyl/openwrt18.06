@@ -34,6 +34,10 @@ ramips_setup_interfaces()
 	11acnas|\
 	d-team,newifi-d2|\
 	w2914nsv2|\
+	XiaoYu-C5)
+		ucidef_add_switch "switch0" \
+			"0:lan" "1:lan" "2:lan" "3:lan" "4:wan" "6@eth0"
+		;;
 	zbt-we2026)
 		ucidef_add_switch "switch0" \
 			"0:lan:4" "1:lan:3" "2:lan:2" "3:lan:1" "4:wan:5" "6@eth0"
@@ -101,6 +105,8 @@ ramips_setup_interfaces()
 	hc5962|\
 	hlk-rm04|\
 	k2p|\
+	ke2p|\
+	ke2p-32mb|\
 	kn|\
 	kn_rc|\
 	mac1200rv2|\
@@ -574,6 +580,14 @@ ramips_setup_macs()
 		lan_mac=$(macaddr_setbit_la "$wan_mac")
 		;;
 	k2p)
+		lan_mac=$(mtd_get_mac_binary factory 0xe000)
+		wan_mac=$(mtd_get_mac_binary factory 0xe006)
+		;;
+	ke2p)
+		lan_mac=$(mtd_get_mac_binary factory 0xe000)
+		wan_mac=$(mtd_get_mac_binary factory 0xe006)
+		;;
+	ke2p-32mb)
 		lan_mac=$(mtd_get_mac_binary factory 0xe000)
 		wan_mac=$(mtd_get_mac_binary factory 0xe006)
 		;;

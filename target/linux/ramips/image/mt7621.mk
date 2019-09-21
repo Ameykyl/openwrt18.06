@@ -236,6 +236,22 @@ define Device/k2p
 endef
 TARGET_DEVICES += k2p
 
+define Device/ke2p
+  DTS := KE2P
+  IMAGE_SIZE := $(ralink_default_fw_size_16M)
+  DEVICE_TITLE := Phicomm KE2P
+  DEVICE_PACKAGES :=
+endef
+TARGET_DEVICES += ke2p
+
+define Device/ke2p-32mb
+  DTS := KE2P-32MB
+  IMAGE_SIZE := $(ralink_default_fw_size_16M)
+  DEVICE_TITLE := Phicomm KE2P-32MB
+  DEVICE_PACKAGES :=
+endef
+TARGET_DEVICES += ke2p-32mb
+
 define Device/adslr_g7
   DTS := ADSLR-G7
   IMAGE_SIZE := 16064k
@@ -579,6 +595,15 @@ define Device/wsr-600
   DEVICE_PACKAGES := kmod-mt7603 kmod-rt2800-pci wpad-basic
 endef
 TARGET_DEVICES += wsr-600
+
+define Device/XiaoYu-C5
+  DTS := XiaoYu-C5
+  IMAGE_SIZE := $(ralink_default_fw_size_32M)
+  DEVICE_TITLE := XiaoYu-C5
+  DEVICE_PACKAGES := \
+	kmod-ata-core kmod-ata-ahci kmod-usb3 kmod-usb-ledtrig-usbport
+endef
+TARGET_DEVICES += XiaoYu-C5
 
 define Device/zbt-we1326
   DTS := ZBT-WE1326

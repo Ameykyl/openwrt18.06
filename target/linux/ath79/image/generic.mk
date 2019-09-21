@@ -626,6 +626,15 @@ define Device/phicomm_k2t
 endef
 TARGET_DEVICES += phicomm_k2t
 
+define Device/csac_csac10
+  ATH_SOC := qca9563
+  DEVICE_TITLE := CSAC CSAC10
+  IMAGE_SIZE := 15744k
+  IMAGE/sysupgrade.bin := append-kernel | append-rootfs | pad-rootfs | append-metadata | check-size $$$$(IMAGE_SIZE)
+  DEVICE_PACKAGES := kmod-leds-reset kmod-ath10k-ct ath10k-firmware-qca9888-ct
+endef
+TARGET_DEVICES += csac_csac10
+
 define Device/rosinson_wr818
   ATH_SOC := qca9563
   DEVICE_TITLE := ROSINSON WR818
