@@ -11,13 +11,15 @@
 	   </td></tr>
 	   <tr><td colspan="4" width="100%">
      	  <p align="center">
-	  			 <img id="star" src="https://img.shields.io/badge/Star--lightgrey?logo=github&style=social" alt="star" onclick="return homepage()" />
+    	     <img id="wiki" src="https://img.shields.io/badge/Tutorials--lightgrey?logo=Wikipedia&style=social" alt="Wiki" onerror="return imgerrorfuns(this,this.src)" onclick="return wikipage()" />
     	     &nbsp;&nbsp;&nbsp;
-    	     <img id="wiki" src="https://img.shields.io/badge/Tutorials--lightgrey?logo=Wikipedia&style=social" alt="Wiki" onclick="return wikipage()" />
+    	     <img id="star" src="https://img.shields.io/badge/Star--lightgrey?logo=github&style=social" alt="star" onerror="return imgerrorfuns(this,this.src)" onclick="return homepage()" />
     	     &nbsp;&nbsp;&nbsp;
-    	     <img id="telegram" src="https://img.shields.io/badge/Telegram--lightgrey?logo=Telegram&style=social" alt="Telegram" onclick="return telegrampage()" />
+    	     <!--
+    	     <img id="telegram" src="https://img.shields.io/badge/Telegram--lightgrey?logo=Telegram&style=social" alt="Telegram" onerror="return imgerrorfuns(this,this.src)" onclick="return telegrampage()" />
     	     &nbsp;&nbsp;&nbsp;
-    	     <img id="sponsor" src="https://img.shields.io/badge/Sponsor--lightgrey?logo=ko-fi&style=social" alt="Sponsor" onclick="return sponsorpage()" />
+    	     -->
+    	     <img id="sponsor" src="https://img.shields.io/badge/Sponsor--lightgrey?logo=ko-fi&style=social" alt="Sponsor" onerror="return imgerrorfuns(this,this.src)" onclick="return sponsorpage()" />
         </p>
      </td></tr>
 	  <tr><td width="100%" colspan="4">
@@ -53,6 +55,22 @@
 			{
 			   mode.innerHTML = status.clash ? "<b><font color=green><%: Redir-Host（兼容）模式 %></font></b>" : '<b><font color=red><%:NOT RUNNING%></font></b>';
 			}
+			else if ( status.mode == "redir-host-tun\n" )
+			{
+			   mode.innerHTML = status.clash ? "<b><font color=green><%: Redir-Host（TUN）模式 %></font></b>" : '<b><font color=red><%:NOT RUNNING%></font></b>';
+			}
+			else if ( status.mode == "fake-ip-tun\n" )
+			{
+			   mode.innerHTML = status.clash ? "<b><font color=green><%: Fake-IP（TUN）模式 %></font></b>" : '<b><font color=red><%:NOT RUNNING%></font></b>';
+			}
+			else if ( status.mode == "redir-host-vpn\n" )
+			{
+			   mode.innerHTML = status.clash ? "<b><font color=green><%: Redir-Host（游戏）模式 %></font></b>" : '<b><font color=red><%:NOT RUNNING%></font></b>';
+			}
+			else if ( status.mode == "fake-ip-vpn\n" )
+			{
+			   mode.innerHTML = status.clash ? "<b><font color=green><%: Fake-IP（游戏）模式 %></font></b>" : '<b><font color=red><%:NOT RUNNING%></font></b>';
+			}
 			watchdog.innerHTML = status.watchdog ? '<b><font color=green><%:RUNNING%></font> </b>' : '<b><font color=red><%:NOT RUNNING%></font></b>';
 			daip.innerHTML = status.daip ? "<b><font color=green>"+status.daip+"</font></b>" : "<b><font color=red>"+"<%:Not Set%>"+"</font></b>";
 			dase.innerHTML = status.dase ? "<b><font color=green>"+status.dase+"</font></b>" : "<b><font color=red>"+"<%:Not Set%>"+"</font></b>";
@@ -71,6 +89,22 @@
 			else if ( status.mode == "redir-host\n" )
 			{
 			   mode.innerHTML = status.clash ? "<b><font color=green><%: Redir-Host（兼容）模式 %></font></b>" : '<b><font color=red><%:NOT RUNNING%></font></b>';
+			}
+			else if ( status.mode == "redir-host-tun\n" )
+			{
+			   mode.innerHTML = status.clash ? "<b><font color=green><%: Redir-Host（TUN）模式 %></font></b>" : '<b><font color=red><%:NOT RUNNING%></font></b>';
+			}
+			else if ( status.mode == "fake-ip-tun\n" )
+			{
+			   mode.innerHTML = status.clash ? "<b><font color=green><%: Fake-IP（TUN）模式 %></font></b>" : '<b><font color=red><%:NOT RUNNING%></font></b>';
+			}
+			else if ( status.mode == "redir-host-vpn\n" )
+			{
+			   mode.innerHTML = status.clash ? "<b><font color=green><%: Redir-Host（游戏）模式 %></font></b>" : '<b><font color=red><%:NOT RUNNING%></font></b>';
+			}
+			else if ( status.mode == "fake-ip-vpn\n" )
+			{
+			   mode.innerHTML = status.clash ? "<b><font color=green><%: Fake-IP（游戏）模式 %></font></b>" : '<b><font color=red><%:NOT RUNNING%></font></b>';
 			}
 			watchdog.innerHTML = status.watchdog ? '<b><font color=green><%:RUNNING%></font> </b>' : '<b><font color=red><%:NOT RUNNING%></font></b>';
 			daip.innerHTML = status.daip ? "<b><font color=green>"+status.daip+"</font></b>" : "<b><font color=red>"+"<%:Not Set%>"+"</font></b>";
@@ -114,7 +148,7 @@
     
     function telegrampage()
     {
-        url6='https://telegram.clash.dev';
+        url6='https://t.me/joinchat/D4mVX0n-n5mOK6YO_W3_Og';
         window.open(url6);
     }
     
@@ -125,13 +159,13 @@
     }
     
 
-	XHR.get('<%=luci.dispatcher.build_url("admin", "services", "openclash", "currentversion")%>', status.currentversion, function(x, status) {
-	   if ( x && x.status == 200 ) {
-	   clashversion.innerHTML = '<img id="currenntver" src="'+status.currentversion+'" alt="currentversion" width="181px" onload="return clashversion_check()" onclick="return go_update()">';
-	   }
-	});
+	  XHR.get('<%=luci.dispatcher.build_url("admin", "services", "openclash", "currentversion")%>', status.currentversion, function(x, status) {
+	     if ( x && x.status == 200 ) {
+	        clashversion.innerHTML = '<img id="currenntver" src="'+status.currentversion+'" alt="currentversion" width="181px" onload="return clashversion_check()" onclick="return go_update()">';
+	     }
+	  });
 
-function clashversion_check()
+    function clashversion_check()
     {
     XHR.get('<%=luci.dispatcher.build_url("admin", "services", "openclash", "lastversion")%>', status.lastversion, function(x, status) {
        if ( x && x.status == 200 ) {
@@ -143,18 +177,25 @@ function clashversion_check()
         });
     }
 
-function clashversion_error()
+    function clashversion_error()
     {
-
-     clashversion.innerHTML = '<img id="currenntver" src="'+status.currentversion+'" alt="currentversion" width="181px" onclick="return go_update()">';
-
+       XHR.get('<%=luci.dispatcher.build_url("admin", "services", "openclash", "currentversion")%>', status.currentversion, function(x, status) {
+	        if ( x && x.status == 200 ) {
+             clashversion.innerHTML = '<img id="currenntver" src="'+status.currentversion+'" alt="currentversion" width="181px" onclick="return go_update()">';
+	        }
+	     });
     }
     
-
-function go_update()
+    function imgerrorfuns(imgobj,imgSrc){
+    	setTimeout(function(){
+        imgobj.src=imgSrc;
+      },1000*10);
+     }
+     
+    function go_update()
     {
-        url4='https://github.com/vernesong/OpenClash/releases';
-        window.open(url4);
+       url4='https://github.com/vernesong/OpenClash/releases';
+       window.open(url4);
     }
     
 	var startlog = document.getElementById('_clashstart');

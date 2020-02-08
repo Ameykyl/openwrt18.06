@@ -1,5 +1,18 @@
 #!/bin/sh
-    
+    #删除旧hosts配置
+    hostlen=$(sed -n '/hosts:/=' "$7" 2>/dev/null)
+    dnslen=$(sed -n '/dns:/=' "$7" 2>/dev/null)
+    dnsheadlen=$(expr "$dnslen" - 1)
+    if [ ! -z "$hostlen" ] && [ "$hostlen" -gt "$dnslen" ]; then
+       sed -i '/^ \{0,\}hosts:/,$d' "$7" 2>/dev/null
+	  elif [ ! -z "$hostlen" ]; then
+       sed -i '/##Custom HOSTS##/,/##Custom HOSTS END##/d' "$7" 2>/dev/null
+       if [ -z "$(awk '/^ {0,}hosts:/,/^dns:/{print}' "$7" 2>/dev/null |awk -F ':' '{print $2}' 2>/dev/null)" ]; then
+          sed -i "/${hostlen}p/,/${dnsheadlen}p/d" "$7" 2>/dev/null
+          sed -i '/^ \{0,\}hosts:/d' "$7" 2>/dev/null
+       fi
+	  fi
+	   
     if [ -z "$(grep '^  enhanced-mode: $2' "$7")" ]; then
        if [ ! -z "$(grep "^ \{0,\}enhanced-mode:" "$7")" ]; then
           sed -i "/^ \{0,\}enhanced-mode:/c\  enhanced-mode: ${2}" "$7"
@@ -47,27 +60,35 @@
        fi
     fi
     
-    if [ -z "$(grep '^mode:' "$7")" ]; then
+    if [ -z "$(grep '^mode: $13' "$7")" ]; then
        if [ ! -z "$(grep "^ \{0,\}mode:" "$7")" ]; then
-          sed -i "s/^ \{0,\}mode:/mode:/" "$7"
+          sed -i "/^ \{0,\}mode:/c\mode: ${13}" "$7"
        else
-          sed -i "/^dns:/i\mode: Rule" "$7"
+          sed -i "/^dns:/i\mode: ${13}" "$7"
        fi
     fi
     
-    if [ -z "$(grep '^log-level:' "$7")" ]; then
+    if [ -z "$(grep '^log-level: $12' "$7")" ]; then
        if [ ! -z "$(grep "^ \{0,\}log-level:" "$7")" ]; then
-          sed -i "s/^ \{0,\}log-level:/log-level:/" "$7"
+          sed -i "/^ \{0,\}log-level:/c\log-level: ${12}" "$7"
        else
-          sed -i "/^dns:/i\log-level: silent" "$7"
+          sed -i "/^dns:/i\log-level: ${12}" "$7"
        fi
     fi
     
-    if [ -z "$(grep '^external-controller: 0.0.0.0:$5' "$7")" ]; then
+    if [ "$14" -ne 1 ]; then
+       controller_address="0.0.0.0"
+       bind_address="*"
+    else
+       controller_address="$11"
+       bind_address="$11"
+    fi
+    
+    if [ -z "$(grep '^external-controller: $controller_address:$5' "$7")" ]; then
        if [ ! -z "$(grep "^ \{0,\}external-controller:" "$7")" ]; then
-          sed -i "/^ \{0,\}external-controller:/c\external-controller: 0.0.0.0:${5}" "$7"
+          sed -i "/^ \{0,\}external-controller:/c\external-controller: ${controller_address}:${5}" "$7"
        else
-          sed -i "/^dns:/i\external-controller: 0.0.0.0:${5}" "$7"
+          sed -i "/^dns:/i\external-controller: ${controller_address}:${5}" "$7"
        fi
     fi
     
@@ -78,6 +99,10 @@
           sed -i "/^dns:/i\secret: \"${4}\"" "$7"
        fi
     fi
+    
+    sed -i '/^ \{0,\}tun:/,/^ \{0,\}enable:/d' "$7" 2>/dev/null
+    sed -i '/^ \{0,\}device-url:/d' "$7" 2>/dev/null
+    sed -i '/^ \{0,\}dns-listen:/d' "$7" 2>/dev/null
 
     if [ -z "$(grep "^   enable: true" "$7")" ]; then
        if [ ! -z "$(grep "^ \{0,\}enable:" "$7")" ]; then
@@ -96,7 +121,7 @@
     fi
     
     sed -i '/bind-address:/d' "$7" 2>/dev/null
-    sed -i "/^allow-lan:/a\bind-address: \"*\"" "$7"
+    sed -i "/^allow-lan:/a\bind-address: \"${bind_address}\"" "$7"
     
     if [ -z "$(grep '^external-ui: "/usr/share/openclash/dashboard"' "$7")" ]; then
        if [ ! -z "$(grep "^ \{0,\}external-ui:" "$7")" ]; then
@@ -123,35 +148,30 @@
           fi
        fi
     fi
+#TUN
+    if [ "$15" -eq 1 ]; then
+       sed -i "/^dns:/i\tun:" "$7"
+       sed -i "/^dns:/i\  enable: true" "$7"
+    elif [ ! -z "$15" ]; then
+       sed -i "/^dns:/i\tun:" "$7"
+       sed -i "/^dns:/i\  enable: true" "$7"
+       sed -i "/^dns:/i\  device-url: dev://clash0" "$7"
+       dns_port=$(uci get openclash.config.dns_port 2>/dev/null)
+       sed -i "/^dns:/i\  dns-listen: 0.0.0.0:${dns_port}" "$7"
+    fi
 
 #添加自定义Hosts设置
-
-	if [ "$2" = "redir-host" ]; then
-	   if [ -z "$(grep '^ \{0,\}hosts:' $7)" ]; then
-	      sed -i '/^dns:/i\hosts:' "$7" 2>/dev/null
-   	 else
-	      if [ ! -z "$(grep '^ \{1,\}hosts:' $7)" ]; then
-	         sed -i '/^ \{1,\}hosts:/d' "$7" 2>/dev/null
-	         sed -i '/^dns:/i\hosts:' "$7" 2>/dev/null
-	      fi
-	   fi
-	   sed -i "s/^ \{0,\}/  /" "$12" 2>/dev/null #修改参数空格
-	   sed -i "1i\##Custom HOSTS##" "$12" 2>/dev/null
-	   echo "##Custom HOSTS END##" >>"$12" 2>/dev/null
-	   sed -i '/##Custom HOSTS##/,/##Custom HOSTS END##/d' "$7" 2>/dev/null
-	   sed -i '/^hosts:/r/etc/config/openclash_custom_hosts.list' "$7" 2>/dev/null
-	   sed -i '/##Custom HOSTS##/d' "$12" 2>/dev/null
-	   sed -i '/##Custom HOSTS END##/d' "$12" 2>/dev/null
-	else
-	   sed -i '/##Custom HOSTS##/,/##Custom HOSTS END##/d' "$7" 2>/dev/null
-	   sed -i '/^ *$/d' "$7" 2>/dev/null #删除空行
-	   hostlen=$(sed -n '/hosts:/=' "$7" 2>/dev/null)
-	   lasthlen=$(sed -n '$=' "$7" 2>/dev/null) #兼容旧版本
-	   dnslen=$(sed -n '/dns:/=' "$7" 2>/dev/null)
-	   if [ "$hostlen" = "$lasthlen" ] && [ ! -z "$hostlen" ]; then
-	      sed -i '/^ \{0,\}hosts:/d' "$7" 2>/dev/null
-	   fi
-	   if [ "$hostlen" = "$(expr $dnslen - 1)" ] && [ ! -z "$hostlen" ]; then
-	      sed -i '/^ \{0,\}hosts:/d' "$7" 2>/dev/null
-	   fi
-	fi
+	   
+    if [ "$2" = "redir-host" ]; then
+	     if [ -z "$(grep '^ \{0,\}hosts:' $7)" ]; then
+	        sed -i '/^dns:/i\hosts:' "$7" 2>/dev/null
+   	   else
+	        if [ ! -z "$(grep '^ \{1,\}hosts:' $7)" ]; then
+	           sed -i "/^ \{0,\}hosts:/c\hosts:" "$7"
+	        fi
+	     fi
+       sed -i '/^hosts:/a\##Custom HOSTS END##' "$7" 2>/dev/null
+       sed -i '/^hosts:/a\##Custom HOSTS##' "$7" 2>/dev/null
+	     sed -i '/##Custom HOSTS##/r/etc/openclash/custom/openclash_custom_hosts.list' "$7" 2>/dev/null
+	     sed -i "/^hosts:/,/^dns:/ {s/^ \{0,\}'/  '/}" "$7" 2>/dev/null #修改参数空格
+	  fi

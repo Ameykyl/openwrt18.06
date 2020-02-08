@@ -1,33 +1,68 @@
 #!/bin/sh
-
-status=$(ps|grep -c openclash_watchdog.sh)
-[ "$status" -gt "3" ] && echo "another clash_watchdog.sh is running,exit "
-[ "$status" -gt "3" ] && exit 0
+CLASH="/etc/openclash/clash"
+CLASH_CONFIG="/etc/openclash"
+LOG_FILE="/tmp/openclash.log"
+enable_redirect_dns=$(uci get openclash.config.enable_redirect_dns 2>/dev/null)
+dns_port=$(uci get openclash.config.dns_port 2>/dev/null)
+disable_masq_cache=$(uci get openclash.config.disable_masq_cache 2>/dev/null)
+CRASH_NUM=0
 
 while :;
 do
+   LOGTIME=$(date "+%Y-%m-%d %H:%M:%S")
    enable=$(uci get openclash.config.enable)
+   
 if [ "$enable" -eq 1 ]; then
 	if ! pidof clash >/dev/null; then
-     LOGTIME=$(date "+%Y-%m-%d %H:%M:%S")
-	   echo "${LOGTIME} Watchdog: OpenClash Problem, Restart " >>/tmp/openclash.log
-	   /etc/init.d/openclash restart
+		 CRASH_NUM=$(expr "$CRASH_NUM" + 1)
+		 if [ "$CRASH_NUM" -le 3 ]; then
+	      CONFIG_FILE=$(uci get openclash.config.config_path 2>/dev/null)
+	      echo "${LOGTIME} Watchdog: Clash Core Problem, Restart." >> $LOG_FILE
+	      nohup $CLASH -d "$CLASH_CONFIG" -f "$CONFIG_FILE" >> $LOG_FILE 2>&1 &
+	      sleep 3
+	      /usr/share/openclash/openclash_history_set.sh
+	   else
+	      echo "${LOGTIME} Watchdog: Already Restart 3 Times With Clash Core Problem, Auto-Exit." >> $LOG_FILE
+	      exit 0
+	   fi
+	else
+	   CRASH_NUM=0
   fi
 fi
+
+## Porxy history
+    /usr/share/openclash/openclash_history_get.sh
+
 ## Log File Size Manage:
-    LOGTIME=$(date "+%Y-%m-%d %H:%M:%S")
     LOGSIZE=`ls -l /tmp/openclash.log |awk '{print int($5/1024)}'`
     if [ "$LOGSIZE" -gt 90 ]; then 
-       echo "[$LOGTIME] Watchdog: Size Limit, Clean Up All Log Records." > /tmp/openclash.log
+       echo "$LOGTIME Watchdog: Size Limit, Clean Up All Log Records." > $LOG_FILE
     fi
-    
+
 ## 端口转发重启
-   zone_line=`iptables -t nat -nL PREROUTING --line-number |grep "zone" 2>/dev/null |awk '{print $1}' 2>/dev/null |awk 'END {print}'`
-   op_line=`iptables -t nat -nL PREROUTING --line-number |grep "openclash" 2>/dev/null |awk '{print $1}' 2>/dev/null |head -1`
-   if [ "$zone_line" -gt "$op_line" ]; then
-      /etc/init.d/firewall restart >/dev/null 2>&1
-      /etc/init.d/miniupnpd restart >/dev/null 2>&1
-      echo "[$LOGTIME] Watchdog: Restart Firewall For Enable Redirect." > /tmp/openclash.log
+   last_line=$(iptables -t nat -nL PREROUTING --line-number |awk '{print $1}' 2>/dev/null |awk 'END {print}' |sed -n '$p')
+   op_line=$(iptables -t nat -nL PREROUTING --line-number |grep "openclash" 2>/dev/null |awk '{print $1}' 2>/dev/null |head -1)
+   if [ "$last_line" -ne "$op_line" ]; then
+      iptables -t nat -D PREROUTING -p tcp -j openclash
+      iptables -t nat -A PREROUTING -p tcp -j openclash
+      echo "$LOGTIME Watchdog: Reset Firewall For Enabling Redirect." >>$LOG_FILE
    fi
+   
+## DNS转发劫持
+   if [ "$enable_redirect_dns" != "0" ]; then
+      if [ -z "$(uci get dhcp.@dnsmasq[0].server 2>/dev/null |grep "$dns_port")" ] || [ ! -z "$(uci get dhcp.@dnsmasq[0].server 2>/dev/null |awk -F ' ' '{print $2}')" ]; then
+         echo "$LOGTIME Watchdog: Force Reset DNS Hijack." >> $LOG_FILE
+         uci del dhcp.@dnsmasq[-1].server >/dev/null 2>&1
+         uci add_list dhcp.@dnsmasq[0].server=127.0.0.1#"$dns_port"
+         uci delete dhcp.@dnsmasq[0].resolvfile
+         uci set dhcp.@dnsmasq[0].noresolv=1
+         [ "$disable_masq_cache" -eq "1" ] && {
+         	uci set dhcp.@dnsmasq[0].cachesize=0
+         }
+         uci commit dhcp
+         /etc/init.d/dnsmasq restart >/dev/null 2>&1
+      fi
+   fi
+
    sleep 60
 done 2>/dev/null

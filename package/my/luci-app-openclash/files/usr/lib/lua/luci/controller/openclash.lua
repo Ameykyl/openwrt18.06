@@ -17,16 +17,30 @@ function index()
 	entry({"admin", "services", "openclash", "update_ma"},call("action_update_ma"))
 	entry({"admin", "services", "openclash", "opupdate"},call("action_opupdate"))
 	entry({"admin", "services", "openclash", "coreupdate"},call("action_coreupdate"))
+	entry({"admin", "services", "openclash", "ping"}, call("act_ping"))
+	entry({"admin", "services", "openclash", "download_game_rule"}, call("action_download_rule"))
 	entry({"admin", "services", "openclash", "settings"},cbi("openclash/settings"),_("Global Settings"), 30).leaf = true
-	entry({"admin", "services", "openclash", "servers"},cbi("openclash/servers"),_("Severs&Groups"), 40).leaf = true
+	entry({"admin", "services", "openclash", "servers"},cbi("openclash/servers"),_("Severs and Groups"), 40).leaf = true
+	entry({"admin", "services", "openclash", "game-settings"},cbi("openclash/game-settings"),_("Game Rules and Groups"), 50).leaf = true
+	entry({"admin", "services", "openclash", "config-subscribe"},cbi("openclash/config-subscribe"),_("Config Update"), 60).leaf = true
   entry({"admin", "services", "openclash", "servers-config"},cbi("openclash/servers-config"), nil).leaf = true
   entry({"admin", "services", "openclash", "groups-config"},cbi("openclash/groups-config"), nil).leaf = true
-	entry({"admin", "services", "openclash", "config"},form("openclash/config"),_("Server Config"), 50).leaf = true
-	entry({"admin", "services", "openclash", "log"},form("openclash/log"),_("Logs"), 60).leaf = true
+  entry({"admin", "services", "openclash", "proxy-provider-config"},cbi("openclash/proxy-provider-config"), nil).leaf = true
+	entry({"admin", "services", "openclash", "config"},form("openclash/config"),_("Server Config"), 70).leaf = true
+	entry({"admin", "services", "openclash", "log"},form("openclash/log"),_("Logs"), 80).leaf = true
 
-	
 end
+local fs = require "luci.openclash"
+CONFIG_FILE=string.sub(luci.sys.exec("uci get openclash.config.config_path"), 1, -2)
 
+if CONFIG_FILE == "" or not fs.isfile(CONFIG_FILE) then
+   CONFIG_FILE_FIRST=luci.sys.exec("ls -lt '/etc/openclash/config/' | grep -E '.yaml|.yml' | head -n 1 |awk '{print $9}'")
+   if CONFIG_FILE_FIRST ~= "" then
+      CONFIG_FILE="/etc/openclash/config/" .. string.sub(CONFIG_FILE_FIRST, 1, -2)
+   else
+      CONFIG_FILE = ""
+   end
+end
 
 local function is_running()
 	return luci.sys.call("pidof clash >/dev/null") == 0
@@ -37,29 +51,27 @@ local function is_web()
 end
 
 local function is_watchdog()
-	return luci.sys.exec("ps |grep openclash_watchdog.sh |grep -v grep 2>/dev/null")
+	return luci.sys.exec("ps |grep openclash_watchdog.sh |grep -v grep 2>/dev/null |sed -n 1p")
 end
 
 local function config_check()
-  local yaml = luci.sys.call("ls -l /etc/openclash/config.yaml >/dev/null 2>&1")
-  local yml = luci.sys.call("ls -l /etc/openclash/config.yml >/dev/null 2>&1")
+  local yaml = fs.isfile(CONFIG_FILE)
   local proxy,group,rule
-  if (yaml == 0) then
-     proxy = luci.sys.call("egrep '^ {0,}Proxy:' /etc/openclash/config.yaml >/dev/null 2>&1")
-     group = luci.sys.call("egrep '^ {0,}Proxy Group:' /etc/openclash/config.yaml >/dev/null 2>&1")
-     rule = luci.sys.call("egrep '^ {0,}Rule:' /etc/openclash/config.yaml >/dev/null 2>&1")
-  else
-     if (yml == 0) then
-        proxy = luci.sys.call("egrep '^ {0,}Proxy:' /etc/openclash/config.yml >/dev/null 2>&1")
-        group = luci.sys.call("egrep '^ {0,}Proxy Group:' /etc/openclash/config.yml >/dev/null 2>&1")
-        rule = luci.sys.call("egrep '^ {0,}Rule:' /etc/openclash/config.yml >/dev/null 2>&1")
-     end
+  if yaml then
+  	 proxy_provier = luci.sys.call(string.format('egrep "^ {0,}proxy-provider:" "%s" >/dev/null 2>&1',CONFIG_FILE))
+     proxy = luci.sys.call(string.format('egrep "^ {0,}Proxy:" "%s" >/dev/null 2>&1',CONFIG_FILE))
+     group = luci.sys.call(string.format('egrep "^ {0,}Proxy Group:" "%s" >/dev/null 2>&1',CONFIG_FILE))
+     rule = luci.sys.call(string.format('egrep "^ {0,}Rule:" "%s" >/dev/null 2>&1',CONFIG_FILE))
   end
-  if (yaml == 0) or (yml == 0) then
+  if yaml then
      if (proxy == 0) then
         proxy = ""
      else
-        proxy = " - 代理服务器"
+        if (proxy_provier == 0) then
+           proxy = ""
+        else
+           proxy = " - 代理服务器"
+        end
      end
      if (group == 0) then
         group = ""
@@ -72,13 +84,13 @@ local function config_check()
         rule = " - 规则"
      end
 	   return proxy..group..rule
-	elseif (yaml ~= 0) and (yml ~= 0) then
+	elseif (yaml ~= 0) then
 	   return "1"
 	end
 end
 
 local function cn_port()
-	return luci.sys.exec("uci get openclash.config.cn_port 2>/dev/null")
+	return luci.sys.exec("uci get openclash.config.cn_port 2>/dev/null |tr -d '\n'")
 end
 
 local function mode()
@@ -86,42 +98,31 @@ local function mode()
 end
 
 local function config()
-   local config_update = luci.sys.exec("ls -l --full-time /etc/openclash/config.bak 2>/dev/null |awk '{print $6,$7;}'")
-   if (config_update ~= "") then
-      return config_update
+   if CONFIG_FILE ~= "" then
+      return string.sub(CONFIG_FILE, 23, -1)
    else
-      local yaml = luci.sys.call("ls -l /etc/openclash/config.yaml >/dev/null 2>&1")
-      if (yaml == 0) then
-         return "0"
-      else
-         local yml = luci.sys.call("ls -l /etc/openclash/config.yml >/dev/null 2>&1")
-         if (yml == 0) then
-            return "0"
-         else
-            return "1"
-         end
-      end
+      return "1"
    end
 end
 
 local function ipdb()
-	return luci.sys.exec("ls -l --full-time /etc/openclash/Country.mmdb 2>/dev/null |awk '{print $6,$7;}'")
+	return os.date("%Y-%m-%d %H:%M:%S",fs.mtime("/etc/openclash/Country.mmdb"))
 end
 
 local function lhie1()
-	return luci.sys.exec("ls -l --full-time /etc/openclash/lhie1.yaml 2>/dev/null |awk '{print $6,$7;}'")
+	return os.date("%Y-%m-%d %H:%M:%S",fs.mtime("/etc/openclash/lhie1.yaml"))
 end
 
 local function ConnersHua()
-	return luci.sys.exec("ls -l --full-time /etc/openclash/ConnersHua.yaml 2>/dev/null |awk '{print $6,$7;}'")
+	return os.date("%Y-%m-%d %H:%M:%S",fs.mtime("/etc/openclash/ConnersHua.yaml"))
 end
 
 local function ConnersHua_return()
-	return luci.sys.exec("ls -l --full-time /etc/openclash/ConnersHua_return.yaml 2>/dev/null |awk '{print $6,$7;}'")
+	return os.date("%Y-%m-%d %H:%M:%S",fs.mtime("/etc/openclash/ConnersHua_return.yaml"))
 end
 
 local function daip()
-	return luci.sys.exec("uci get network.lan.ipaddr")
+	return luci.sys.exec("uci get network.lan.ipaddr 2>/dev/null |awk -F '/' '{print $1}' 2>/dev/null |tr -d '\n'")
 end
 
 local function dase()
@@ -141,11 +142,11 @@ local function startlog()
 end
 
 local function coremodel()
-  local coremodel = luci.sys.exec("cat /proc/cpuinfo |grep 'cpu model'  2>/dev/null |awk -F ': ' '{print $2}' 2>/dev/null")
-  if (coremodel ~= "") then
-      return coremodel
-  else
+  local coremodel = luci.sys.exec("cat /proc/cpuinfo |grep 'cpu model' 2>/dev/null |awk -F ': ' '{print $2}' 2>/dev/null")
+  if not coremodel or coremodel == "" then
      return luci.sys.exec("opkg status libc 2>/dev/null |grep 'Architecture' |awk -F ': ' '{print $2}' 2>/dev/null")
+  else
+     return coremodel
   end
 end
 
@@ -186,10 +187,10 @@ local function corever()
 end
 
 local function upchecktime()
-   local corecheck = luci.sys.exec("ls -l --full-time /tmp/clash_last_version 2>/dev/null |awk '{print $6,$7;}'")
+   local corecheck = os.date("%Y-%m-%d %H:%M:%S",fs.mtime("/tmp/clash_last_version"))
    local opcheck
    if not corecheck or corecheck == "" then
-      opcheck = luci.sys.exec("ls -l --full-time /tmp/openclash_last_version 2>/dev/null |awk '{print $6,$7;}'")
+      opcheck = os.date("%Y-%m-%d %H:%M:%S",fs.mtime("/tmp/openclash_last_version"))
       if not opcheck or opcheck == "" then
          return "1"
       else
@@ -200,6 +201,16 @@ local function upchecktime()
    end
 end
 
+function download_rule()
+	local filename = luci.http.formvalue("filename")
+	local rule_file_dir="/etc/openclash/game_rules/" .. filename
+  luci.sys.call(string.format('/usr/share/openclash/openclash_game_rule.sh "%s" >/dev/null 2>&1',filename))
+	if not fs.isfile(rule_file_dir) then
+		return "0"
+	else
+		return "1"
+	end
+end
 
 function action_status()
 	luci.http.prepare_content("application/json")
@@ -252,10 +263,10 @@ function action_update()
 			coremodel = coremodel(),
 			coremodel2 = coremodel2(),
 			corecv = corecv(),
-			corelv = corelv(),
 			opcv = opcv(),
 			corever = corever(),
 			upchecktime = upchecktime(),
+			corelv = corelv(),
 			oplv = oplv();
 	})
 end
@@ -279,5 +290,20 @@ function action_coreupdate()
 	luci.http.prepare_content("application/json")
 	luci.http.write_json({
 			coreup = coreup();
+	})
+end
+
+function act_ping()
+	local e={}
+	e.index=luci.http.formvalue("index")
+	e.ping=luci.sys.exec("ping -c 1 -W 1 %q 2>&1 | grep -o 'time=[0-9]*.[0-9]' | awk -F '=' '{print$2}'"%luci.http.formvalue("domain"))
+	luci.http.prepare_content("application/json")
+	luci.http.write_json(e)
+end
+
+function action_download_rule()
+	luci.http.prepare_content("application/json")
+	luci.http.write_json({
+		game_rule_download_status = download_rule();
 	})
 end

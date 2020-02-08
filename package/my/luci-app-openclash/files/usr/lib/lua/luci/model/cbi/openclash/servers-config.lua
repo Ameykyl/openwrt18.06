@@ -1,16 +1,30 @@
--- Copyright (C) 2017 yushi studio <ywb94@qq.com> github.com/ywb94
--- Licensed to the public under the GNU General Public License v3.
 
 local m, s, o
 local openclash = "openclash"
 local uci = luci.model.uci.cursor()
-local fs = require "nixio.fs"
+local fs = require "luci.openclash"
 local sys = require "luci.sys"
 local sid = arg[1]
 local uuid = luci.sys.exec("cat /proc/sys/kernel/random/uuid")
 
+font_red = [[<font color="red">]]
+font_off = [[</font>]]
+bold_on  = [[<strong>]]
+bold_off = [[</strong>]]
+
+function IsYamlFile(e)
+   e=e or""
+   local e=string.lower(string.sub(e,-5,-1))
+   return e == ".yaml"
+end
+function IsYmlFile(e)
+   e=e or""
+   local e=string.lower(string.sub(e,-4,-1))
+   return e == ".yml"
+end
+
 local encrypt_methods_ss = {
-	
+
 	-- stream
 	"rc4-md5",
 	"aes-128-cfb",
@@ -22,7 +36,6 @@ local encrypt_methods_ss = {
 	"aes-128-gcm",
 	"aes-192-gcm",
 	"aes-256-gcm",
-	"chacha20",
 	"chacha20-ietf",
 	"xchacha20",
 	"chacha20-ietf-poly1305",
@@ -50,12 +63,26 @@ s = m:section(NamedSection, sid, "servers")
 s.anonymous = true
 s.addremove   = false
 
+o = s:option(ListValue, "config", translate("Config File"))
+o:value("all", translate("Use For All Config File"))
+local e,a={}
+for t,f in ipairs(fs.glob("/etc/openclash/config/*"))do
+	a=fs.stat(f)
+	if a then
+    e[t]={}
+    e[t].name=fs.basename(f)
+    if IsYamlFile(e[t].name) or IsYmlFile(e[t].name) then
+       o:value(e[t].name)
+    end
+  end
+end
+
 o = s:option(ListValue, "type", translate("Server Node Type"))
 o:value("ss", translate("Shadowsocks"))
 o:value("vmess", translate("Vmess"))
+o:value("snell", translate("Snell"))
 o:value("socks5", translate("Socks5"))
 o:value("http", translate("HTTP(S)"))
-
 o.description = translate("Using incorrect encryption mothod may causes service fail to start")
 
 o = s:option(Value, "name", translate("Server Alias"))
@@ -74,13 +101,17 @@ o.password = true
 o.rmempty = false
 o:depends("type", "ss")
 
+o = s:option(Value, "psk", translate("Psk"))
+o.rmempty = false
+o:depends("type", "snell")
+
 o = s:option(ListValue, "cipher", translate("Encrypt Method"))
 for _, v in ipairs(encrypt_methods_ss) do o:value(v) end
 o.rmempty = true
 o:depends("type", "ss")
 
 o = s:option(ListValue, "securitys", translate("Encrypt Method"))
-for _, v in ipairs(securitys) do o:value(v, v:upper()) end
+for _, v in ipairs(securitys) do o:value(v) end
 o.rmempty = true
 o:depends("type", "vmess")
 
@@ -100,6 +131,14 @@ o:value("http")
 o:value("websocket", translate("websocket (ws)"))
 o:depends("type", "ss")
 
+o = s:option(ListValue, "obfs_snell", translate("obfs-mode"))
+o.rmempty = true
+o.default = "none"
+o:value("none")
+o:value("tls")
+o:value("http")
+o:depends("type", "snell")
+
 o = s:option(ListValue, "obfs_vmess", translate("obfs-mode"))
 o.rmempty = true
 o.default = "none"
@@ -113,6 +152,8 @@ o.rmempty = true
 o:depends("obfs", "tls")
 o:depends("obfs", "http")
 o:depends("obfs", "websocket")
+o:depends("obfs_snell", "tls")
+o:depends("obfs_snell", "http")
 
 o = s:option(Value, "custom", translate("ws-headers"))
 o.rmempty = true
@@ -152,8 +193,16 @@ o:depends("type", "socks5")
 o:depends("type", "http")
 o.rmempty = true
 
+-- [[ MUX ]]--
+o = s:option(ListValue, "mux", translate("mux"))
+o.rmempty = true
+o.default = "false"
+o:value("true")
+o:value("false")
+o:depends("obfs", "websocket")
+
 -- [[ skip-cert-verify ]]--
-o = s:option(ListValue, "skip_cert_verify", translate("Skip Cert Verify"))
+o = s:option(ListValue, "skip_cert_verify", translate("Skip-Cert-Verify"))
 o.rmempty = true
 o.default = "false"
 o:value("true")
@@ -175,9 +224,9 @@ o:depends("type", "socks5")
 o:depends("type", "http")
 
 o = s:option(DynamicList, "groups", translate("Proxy Group"))
-o.description = translate("No Need Set when Config Create, The added Proxy Groups Must Exist")
+o.description = font_red..bold_on..translate("No Need Set when Config Create, The added Proxy Groups Must Exist")..bold_off..font_off
 o.rmempty = true
-uci:foreach("openclash", "groups",
+m.uci:foreach("openclash", "groups",
 		function(s)
 			o:value(s.name)
 		end)
@@ -191,16 +240,17 @@ o = a:option(Button,"Commit")
 o.inputtitle = translate("Commit Configurations")
 o.inputstyle = "apply"
 o.write = function()
-   uci:commit(openclash, sid)
-   luci.http.redirect(luci.dispatcher.build_url("admin", "services", "openclash", "servers"))
+   m.uci:commit(openclash)
+   sys.call("sh /usr/share/openclash/cfg_servers_address_fake_block.sh &")
+   luci.http.redirect(m.redirect)
 end
 
 o = a:option(Button,"Back")
 o.inputtitle = translate("Back Configurations")
 o.inputstyle = "reset"
 o.write = function()
-   uci:revert(openclash, sid)
-   luci.http.redirect(luci.dispatcher.build_url("admin", "services", "openclash", "servers"))
+   m.uci:revert(openclash)
+   luci.http.redirect(m.redirect)
 end
 
 return m
