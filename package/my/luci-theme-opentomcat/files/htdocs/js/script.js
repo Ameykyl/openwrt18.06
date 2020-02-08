@@ -5,7 +5,7 @@
  *      Copyright 2015 Lutty Yang <lutty@wcan.in>
  *
  *  Have a bug? Please create an issue here on GitHub!
- *      https://github.com/LuttyYang/luci-theme-material/issues
+ *      https://github.com/LuttyYang/luci-theme-opentomcat/issues
  *
  *  luci-theme-bootstrap:
  *      Copyright 2008 Steven Barth <steven@midlink.org>
@@ -17,8 +17,6 @@
  *
  *  Licensed to the public under the Apache License 2.0
  */
- 
- 
 (function ($) {
     $(".main > .loading").fadeOut();
 
@@ -120,16 +118,7 @@
         window.location = $($(this).find("a")[0]).attr("href");
         return false;
     });
-	
-	/**
-     * fix submenu click
-     */
-    $("#maincontent > .container > .tabs > li").click(function () {
-		console.log("sub");
-        $(".main > .loading").fadeIn("fast");
-        window.location = $($(this).find("a")[0]).attr("href");
-        return false;
-    });
+
     /**
      * get current node and open it
      */
@@ -147,10 +136,6 @@
      */
     $("#maincontent > .container").find("a").each(function () {
         var that = $(this);
-		var href = that.attr("href");
-		if (href != undefined && href.indexOf("javascript") != -1) {
-			return true;
-		}
         var onclick = that.attr("onclick");
         if (onclick == undefined || onclick == "") {
             that.click(function () {
@@ -214,12 +199,13 @@
         that.after("<span class='panel-title'>" + that.text() + "</span>");
     });
 
-    /* $(".cbi-section-table-titles, .cbi-section-table-descr, .cbi-section-descr").each(function () {
+    /*fix vlan prot*/
+    /*$(".cbi-section-table-titles, .cbi-section-table-descr, .cbi-section-descr").each(function () {
         var that = $(this);
         if (that.text().trim() == ""){
             that.css("display", "none");
         }
-    }); */
+    });*/
 
 
     $(".main-right").focus();
