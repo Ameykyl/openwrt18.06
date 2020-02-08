@@ -1,0 +1,568 @@
+<%
+local api = require "luci.model.cbi.passwall.api.api"
+local dsp = require "luci.dispatcher"
+local ipkg = require "luci.model.ipkg"
+
+local function is_finded(e)
+	local result=luci.sys.exec("find /usr/*bin -iname "..e.." -type f")
+	if result~="" then
+		return true
+	end
+	return false
+end
+
+local tcp_node_num = api.uci_get_type("global_other", "tcp_node_num", 1)
+local udp_node_num = api.uci_get_type("global_other", "udp_node_num", 1)
+local socks5_node_num = api.uci_get_type("global_other", "socks5_node_num", 1)
+-%>
+<fieldset id="_ss_status_fieldset" class="cbi-section">
+
+<h2 name=''content''>科学上网  </h2>
+	 
+            <h2	
+<div class="cbi-map-descr">一个运行在OpenWrt上的科学上网客户端，兼容<a href="https://github.com/shadowsocks/shadowsocks-libev" target="_blank"><em><u>Shadowsocks</u></em></a>、<a href="https://github.com/shadowsocksrr/shadowsocksr-libev" target="_blank"><em><u>ShadowsocksR</u></em></a> 、<a href="https://github.com/v2ray/v2ray-core" target="_blank"><em><u>Vmess</u></em></a> 、<a href="https://github.com/Ameykyl/trojan" target="_blank"><em><u>Trojan</u></em></a> 、<a href="https://github.com/txthinking/brook" target="_blank"><em><u>Brook</u></em></a> 等协议的游戏加速工具。
+   </h2></div>
+  <style>
+/*!
+Pure v1.0.1
+Copyright 2013 Yahoo!
+Licensed under the BSD License.
+https://github.com/pure-css/pure/blob/master/LICENSE.md
+*/
+
+
+
+
+ .pure-g{letter-spacing:-.31em;text-rendering:optimizespeed;font-family:FreeSans,Arimo,"Droid Sans",Helvetica,Arial,sans-serif;display:-webkit-box;display:-webkit-flex;display:-ms-flexbox;display:flex;-webkit-flex-flow:row wrap;-ms-flex-flow:row wrap;flex-flow:row wrap;-webkit-align-content:flex-start;-ms-flex-line-pack:start;align-content:flex-start}@media all and (-ms-high-contrast:none),(-ms-high-contrast:active){table .pure-g{display:block}}.opera-only :-o-prefocus,.pure-g{word-spacing:-.43em}.pure-u,.pure-u-1,.pure-u-1-1,.pure-u-1-12,.pure-u-1-2,.pure-u-1-24,.pure-u-1-3,.pure-u-1-4,.pure-u-1-5,.pure-u-1-6,.pure-u-1-8,.pure-u-10-24,.pure-u-11-12,.pure-u-11-24,.pure-u-12-24,.pure-u-13-24,.pure-u-14-24,.pure-u-15-24,.pure-u-16-24,.pure-u-17-24,.pure-u-18-24,.pure-u-19-24,.pure-u-2-24,.pure-u-2-3,.pure-u-2-5,.pure-u-20-24,.pure-u-21-24,.pure-u-22-24,.pure-u-23-24,.pure-u-24-24,.pure-u-3-24,.pure-u-3-4,.pure-u-3-5,.pure-u-3-8,.pure-u-4-24,.pure-u-4-5,.pure-u-5-12,.pure-u-5-24,.pure-u-5-5,.pure-u-5-6,.pure-u-5-8,.pure-u-6-24,.pure-u-7-12,.pure-u-7-24,.pure-u-7-8,.pure-u-8-24,.pure-u-9-24{display:inline-block;zoom:1;letter-spacing:normal;word-spacing:normal;vertical-align:top;text-rendering:auto}.pure-g [class*=pure-u]{font-family:sans-serif}.pure-u-1-24{width:4.1667%}.pure-u-1-12,.pure-u-2-24{width:8.3333%}.pure-u-1-8,.pure-u-3-24{width:12.5%}.pure-u-1-6,.pure-u-4-24{width:16.6667%}.pure-u-1-5{width:20%}.pure-u-5-24{width:20.8333%}.pure-u-1-4,.pure-u-6-24{width:25%}.pure-u-7-24{width:29.1667%}.pure-u-1-3,.pure-u-8-24{width:33.3333%}.pure-u-3-8,.pure-u-9-24{width:37.5%}.pure-u-2-5{width:40%}.pure-u-10-24,.pure-u-5-12{width:41.6667%}.pure-u-11-24{width:45.8333%}.pure-u-1-2,.pure-u-12-24{width:50%}.pure-u-13-24{width:54.1667%}.pure-u-14-24,.pure-u-7-12{width:58.3333%}.pure-u-3-5{width:60%}.pure-u-15-24,.pure-u-5-8{width:62.5%}.pure-u-16-24,.pure-u-2-3{width:66.6667%}.pure-u-17-24{width:70.8333%}.pure-u-18-24,.pure-u-3-4{width:75%}.pure-u-19-24{width:79.1667%}.pure-u-4-5{width:80%}.pure-u-20-24,.pure-u-5-6{width:83.3333%}.pure-u-21-24,.pure-u-7-8{width:87.5%}.pure-u-11-12,.pure-u-22-24{width:91.6667%}.pure-u-23-24{width:95.8333%}.pure-u-1,.pure-u-1-1,.pure-u-24-24,.pure-u-6-6{width:100%}
+    .status{
+        margin: 1.5rem -0.5rem 0 -0.5rem;
+    }
+    .block{
+        margin: 0.5rem 0.5rem;
+        padding: 0;
+        font-weight: normal;
+        font-style: normal;
+        line-height: 1;
+        font-family: inherit;
+        min-width: inherit;
+        overflow-x: auto;
+        overflow-y: hidden;
+        border: 1px solid rgba(0,0,0,.20);
+        border-radius: .375rem;
+        background-color: #4 ;
+        box-shadow: 0 0 2rem 0 rgba(136,152,170,.15);
+    }
+    .img-con{
+        margin: 1rem;
+
+    }
+    .green{
+        color: #2dce89;
+    }
+    .red{
+        color: #f5365c;
+    }
+    .block img{
+        max-width: 100%;
+        height: auto;
+    }
+    .pure-u-5-8{
+        display:flex;
+        align-items:center;
+
+    }
+
+    .block h4{
+        font-size: 1.3rem;
+        font-weight: bold;
+        margin: 0.75rem 0;
+
+        line-height: 1.8em;
+    }
+    @media screen and (max-width: 1920px) {
+        .block h4{
+            font-size: 1.2rem;
+
+        }
+    }
+    @media screen and (max-width: 1690px) {
+        .block h4{
+            font-size: 1rem;
+
+        }
+    }
+    @media screen and (max-width: 1290px) {
+        .block h4{
+            font-size: 0.8rem;
+        }
+        .pure-u-1-6{
+            width:33.333%;
+        }
+    }
+    @media screen and (max-width: 700px) {
+
+        .pure-u-1-6{
+            width:50%;
+        }
+        .img-con{
+            margin: 0.5rem;
+
+        }
+        .block h4{
+            font-size: 0.81rem;
+
+        }
+    }
+
+
+<style>.mar-10 {margin-left: 50px; margin-right: 10px;}</style>
+<fieldset id="_passwall_status_fieldset" class="cbi-section">
+	<legend>
+		<%:Running Status%>
+	</legend>
+<div class="pure-g status">
+    <div class="pure-u-1-6">
+        <div class="block pure-g" >
+            <div class="pure-u-3-8">
+                <div class="img-con">
+    <img src="https://i.imgur.com/wzbtvXp.png" >
+   </div>
+            </div>
+            <div class="pure-u-5-8">
+                <h4 id="status_tcp_node">科学上网<br><span class="red">未运行✘</span></h4>
+            </div>
+        </div>
+    </div>
+    <div class="pure-u-1-6">
+        <div class="block pure-g" >
+            <div class="pure-u-3-8">
+                <div class="img-con">
+                    <img src="data:image/png;base64,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">
+                </div>
+            </div>
+            <div class="pure-u-5-8">
+               <h4 id="status_google">国外网站<br /><span id="_youtube" class="red"><span id="ip-ipify"></h4>
+            </div>
+        </div>
+    </div>
+    <div class="pure-u-1-6">
+        <div class="block pure-g" >
+            <div class="pure-u-3-8">
+                <div class="img-con">
+                    <img src="data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiPz4NCjwhLS0gR2VuZXJhdG9yOiBBZG9iZSBJbGx1c3RyYXRvciAyMy4wLjEsIFNWRyBFeHBvcnQgUGx1Zy1JbiAuIFNWRyBWZXJzaW9uOiA2LjAwIEJ1aWxkIDApICAtLT4NCjxzdmcgdmVyc2lvbj0iMS4xIiBpZD0i5Zu+5bGCXzEiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeG1sbnM6eGxpbms9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkveGxpbmsiIHg9IjBweCIgeT0iMHB4Ig0KCSB2aWV3Qm94PSIwIDAgMTAwIDEwMCIgc3R5bGU9ImVuYWJsZS1iYWNrZ3JvdW5kOm5ldyAwIDAgMTAwIDEwMDsiIHhtbDpzcGFjZT0icHJlc2VydmUiPg0KPHN0eWxlIHR5cGU9InRleHQvY3NzIj4NCgkuc3Qwe2ZpbGw6IzMzODhGRjt9DQoJLnN0MXtmaWxsLXJ1bGU6ZXZlbm9kZDtjbGlwLXJ1bGU6ZXZlbm9kZDtmaWxsOiNGRkZGRkY7fQ0KPC9zdHlsZT4NCjxjaXJjbGUgY2xhc3M9InN0MCIgY3g9IjUwIiBjeT0iNTAiIHI9IjUwIi8+DQo8ZyBpZD0i5pCc57SiX+eGiuaOjF82Nmljb24iPg0KCTxnIGlkPSJsb2dvIiB0cmFuc2Zvcm09InRyYW5zbGF0ZSgxMjEuMjEyMTIxLCA5MC45MDkwOTEpIj4NCgkJPHBhdGggaWQ9IkZpbGwtMSIgY2xhc3M9InN0MSIgZD0iTS03OS43LTU1LjRjNC41LDAsOC41LTUuNCw4LjUtMTEuOWMwLTYuNS0zLjctMTEuOS04LjUtMTEuOWMtNC41LDAtOC41LDUuNC04LjUsMTEuOQ0KCQkJQy04Ny45LTYwLjctODQuMi01NS40LTc5LjctNTUuNCIvPg0KCQk8cGF0aCBpZD0iRmlsbC0zIiBjbGFzcz0ic3QxIiBkPSJNLTU5LjktNTQuNWM2LjIsMC44LDEwLjItNS43LDExLTEwLjhjMC44LTQuOC0zLjEtMTAuOC03LjYtMTEuNmMtNC4yLTEuMS05LjksNS45LTEwLjIsMTAuNQ0KCQkJQy02Ny4yLTYxLTY2LjEtNTUuNC01OS45LTU0LjUiLz4NCgkJPHBhdGggaWQ9IkZpbGwtNSIgY2xhc3M9InN0MSIgZD0iTS05NS4zLTM4LjZjOC41LTEuNyw3LjEtMTEuNiw3LjEtMTMuOWMtMC4zLTMuNC00LjItOS4zLTkuOS04LjhjLTYuOCwwLjYtNy42LDEwLjItNy42LDEwLjINCgkJCUMtMTA2LjktNDYuNi0xMDMuOC0zNi45LTk1LjMtMzguNiIvPg0KCQk8cGF0aCBpZD0iRmlsbC03IiBjbGFzcz0ic3QxIiBkPSJNLTM1LjItNDYuM2MwLTIuNS0yLTkuNi05LjMtOS42Yy03LjQsMC04LjUsNi44LTguNSwxMS42YzAsNC41LDAuMywxMSw5LjYsMTAuOA0KCQkJQy0zNC40LTMzLjgtMzUuMi00NC0zNS4yLTQ2LjMiLz4NCgkJPHBhdGggaWQ9IkZpbGwtOSIgY2xhc3M9InN0MSIgZD0iTS04Ni41LTIxLjRjLTAuMywwLjYtMC44LDIuNS0wLjMsNGMwLjgsMy40LDQsMy43LDQsMy43aDQuMnYtMTAuOGgtNC44DQoJCQlDLTg1LjEtMjMuNi04Ni4yLTIxLjktODYuNS0yMS40Ii8+DQoJCTxwYXRoIGlkPSJGaWxsLTExIiBjbGFzcz0ic3QxIiBkPSJNLTUzLjEtOS41aC0xMi43Yy00LjgtMS4xLTUuMS00LjgtNS4xLTQuOHYtMTMuOWg1LjF2MTIuNWMwLjMsMS40LDIsMS43LDIsMS43aDUuNHYtMTMuOWg1LjQNCgkJCVYtOS41eiBNLTczLjItOS4ySC04NGMtNC44LTAuOC02LjgtNC4yLTYuOC00LjhjLTAuMy0wLjYtMS43LTMuMS0wLjgtNy42YzItNi41LDcuOS03LjEsNy45LTcuMWg1Ljd2LTcuMWg0LjgNCgkJCUMtNzMuMi0zNS44LTczLjItOS4yLTczLjItOS4yeiBNLTQ0LjYtMjUuM2MwLDAtOS42LTcuNC0xNS4zLTE1LjNjLTcuNi0xMS42LTE4LjQtNy4xLTIxLjgtMS4xYy0zLjQsNS45LTkuMSw5LjktOS45LDEwLjgNCgkJCWMtMC44LDAuOC0xMS42LDYuOC05LjEsMTcuM0MtOTguMS0zLjItODkuOS0zLjUtODkuOS0zLjVzNi4yLDAuNiwxMy4zLTEuMWM3LjEtMS43LDEzLjMsMC4zLDEzLjMsMC4zUy00Ni42LDEuMy00Mi05LjcNCgkJCUMtMzcuNS0xOS43LTQ0LjYtMjUuMy00NC42LTI1LjNMLTQ0LjYtMjUuM3oiLz4NCgk8L2c+DQo8L2c+DQo8L3N2Zz4NCg==">
+                </div>
+            </div>
+            <div class="pure-u-5-8">
+           
+               <h4 id="status_baidu">国内网站<br /><span id="_baidu" class="red"></span></h4>
+            </div>
+        </div>
+    </div>
+    <div class="pure-u-1-6">
+        <div class="block pure-g" >
+            <div class="pure-u-3-8">
+                <div class="img-con">
+                    <img src="data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiPz4NCjwhLS0gR2VuZXJhdG9yOiBBZG9iZSBJbGx1c3RyYXRvciAyMy4wLjEsIFNWRyBFeHBvcnQgUGx1Zy1JbiAuIFNWRyBWZXJzaW9uOiA2LjAwIEJ1aWxkIDApICAtLT4NCjxzdmcgdmVyc2lvbj0iMS4xIiBpZD0i5Zu+5bGCXzEiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeG1sbnM6eGxpbms9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkveGxpbmsiIHg9IjBweCIgeT0iMHB4Ig0KCSB2aWV3Qm94PSIwIDAgMTAwIDEwMCIgc3R5bGU9ImVuYWJsZS1iYWNrZ3JvdW5kOm5ldyAwIDAgMTAwIDEwMDsiIHhtbDpzcGFjZT0icHJlc2VydmUiPg0KPHN0eWxlIHR5cGU9InRleHQvY3NzIj4NCgkuc3Qwe2ZpbGw6I0ZCQjE0MDt9DQoJLnN0MXtmaWxsOiNGRkZGRkY7fQ0KPC9zdHlsZT4NCjxjaXJjbGUgY2xhc3M9InN0MCIgY3g9IjUwIiBjeT0iNTAiIHI9IjUwIi8+DQo8cGF0aCBjbGFzcz0ic3QxIiBkPSJNODYuOCw0Ny42QzgzLjYsMzMsNzQuOCwyMi41LDY2LjUsMjNoLTAuM2MtMy4zLDAtNi41LDEuMi04LjksMy4zYy0xLjgsMi00LjQsMy4yLTcuMSwzLjINCgljLTIuNiwwLTUuMS0xLjEtNi45LTNjLTIuNS0yLjMtNS44LTMuNS05LjEtMy41aC0wLjRjLTguMi0wLjUtMTcuMSwxMC0yMC4zLDI0LjZjLTMuNSwxNS41LDAuOCwyOS44LDkuNSwzMS45DQoJYzYuMywxLjYsMTMuMy0zLjksMTcuOS0xM2gxOC43YzQuNyw5LjEsMTEuNiwxNC42LDE3LjksMTNDODYsNzcuNCw5MC4yLDYzLjEsODYuOCw0Ny42TDg2LjgsNDcuNnogTTQyLjksNDguNUgzNnY3LjJoLTUuNnYtNy4yDQoJaC02Ljl2LTUuOGg2Ljl2LTcuMkgzNnY3LjJoNi45TDQyLjksNDguNXogTTYyLjcsNDkuMmMtMiwwLjEtMy43LTEuNC0zLjgtMy40Yy0wLjEtMiwxLjQtMy43LDMuNC0zLjhjMi0wLjEsMy43LDEuNCwzLjgsMy40DQoJYzAsMC4xLDAsMC4xLDAsMC4yQzY2LjIsNDcuNSw2NC43LDQ5LjEsNjIuNyw0OS4yQzYyLjcsNDkuMiw2Mi43LDQ5LjIsNjIuNyw0OS4yeiBNNzMuNyw0OS4yYy0yLDAuMS0zLjctMS40LTMuOC0zLjQNCgljLTAuMS0yLDEuNC0zLjcsMy40LTMuOGMyLTAuMSwzLjcsMS40LDMuOCwzLjRjMCwwLjEsMCwwLjEsMCwwLjJjMC4xLDEuOS0xLjQsMy41LTMuMywzLjZINzMuN3oiLz4NCjwvc3ZnPg0K">
+                </div>
+            </div>
+            <div class="pure-u-5-8">
+                <h4 id="status_udp_node">游戏模式<br><span class="red">未运行✘</span></h4>
+   </div>
+        </div>
+    </div>
+    <div class="pure-u-1-6">
+        <div class="block pure-g" >
+            <div class="pure-u-3-8">
+                <div class="img-con">
+           <img src="https://i.imgur.com/bYz9YoR.png" >
+               </div>
+            </div>
+            <div class="pure-u-5-8">
+                <h4 id="status_socks5_node">𝙎𝙊𝘾𝙆𝙎⑤<br><span class="red">未运行✘</span></h4>
+            </div>
+        </div>
+    </div>
+    <div class="pure-u-1-6">
+        <div class="block pure-g" >
+            <div class="pure-u-3-8">
+                <div class="img-con">
+       <img src="https://i.imgur.com/3hkGjsK.png" >
+       </div>
+            </div>
+            <div class="pure-u-5-8">
+                <h4 id="status_dns">ChinaDNS<br><span class="red">未运行✘</span></h4>
+            </div>
+        </div>
+    </div>
+</div>
+
+</style>
+
+<script type="text/javascript">//<![CDATA[
+    XHR.poll(5, '<%=url([[admin]], [[vpn]], [[passwall1]], [[status]])%>', null,
+            function (x, data) {
+                var tb = document.getElementById('status_tcp_node');
+                var tb1 = document.getElementById('_youtube');
+                var tb2 = document.getElementById('_baidu');
+                var tb3 = document.getElementById('status_udp_node');
+                var tb4 = document.getElementById('status_dns');
+                var tb5 = document.getElementById('status_socks5_node');        
+                if (data && tb) {
+                    if (data.global) {
+                        tb.innerHTML = '科学上网<br><span class="green">运行正常✔</span>';
+                    } else {
+                        tb.innerHTML = '科学上网<br><span class="red">未运行✘</span>';
+                    }
+                    if (data.google) {
+                        tb1.innerHTML = '国外网站<br><span class="green">访问正常✔</span>';
+                    } else {
+                        tb1.innerHTML = '国外网站<br><span class="red">无法访问✘</span>';
+                    }
+                    if (data.baidu) {
+                        tb2.innerHTML = '国内网站<br><span class="green">访问正常✔</span>';
+                    } else {
+                        tb2.innerHTML = '国内网站<br><span class="red">无法访问✘</span>';
+                    }
+                    if (data.status_udp_node) {
+                        tb3.innerHTML = '游戏模式<br><span class="green">运行正常✔</span>';
+                    } else {
+                        tb3.innerHTML = '游戏模式<br><span class="red">未运行✘</span>';
+                    }
+                    if (data.status_dns) {
+                        tb4.innerHTML = 'ChinaDNS<br><span class="green">运行正常✔</span>';
+                    } else {
+                        tb4.innerHTML = 'ChinaDNS<br><span class="red">未运行✘</span>';
+                  }
+                    if (data.status_socks5_node ) {
+                        tb5.innerHTML = '𝙎𝙊𝘾𝙆𝙎⑤<br><span class="green">运行正常✔</span>';
+                    } else {
+                        tb5.innerHTML = '𝙎𝙊𝘾𝙆𝙎⑤<br><span class="red">未运行✘</span>';
+  
+
+                    }
+                }
+            }
+    );
+//]]>
+</script>
+<script type="text/javascript">//<![CDATA[
+
+
+let random = parseInt(Math.random() * 100000000);
+let IP = {
+            get: (url, type) =>
+                fetch(url, { method: 'GET' }).then((resp) => {
+                    if (type === 'text')
+                        return Promise.all([resp.ok, resp.status, resp.text(), resp.headers]);
+                    else {
+                        return Promise.all([resp.ok, resp.status, resp.json(), resp.headers]);
+                    }
+                }).then(([ok, status, data, headers]) => {
+                    if (ok) {
+                        let json = {
+                            ok,
+                            status,
+                            data,
+                            headers
+                        }
+                        return json;
+                    } else {
+                        throw new Error(JSON.stringify(json.error));
+                    }
+                }).catch(error => {
+                    throw error;
+                }),
+          parseIPIpip: (ip, elID) => {
+           IP.get(`https://api.skk.moe/network/parseIp/ipip/v3/${ip}`, 'json')
+                    .then(resp => {
+                        let x = '';
+                        for (let i of resp.data) {
+                            x += (i !== '') ? `${i} ` : '';
+                        }
+                        document.getElementById(elID).innerHTML = x;
+                        //$$.getElementById(elID).innerHTML = `${resp.data.country} ${resp.data.regionName} ${resp.data.city} ${resp.data.isp}`;
+                    })
+            },
+
+            getIpipnetIP: () => {
+                IP.get(`https://myip.ipip.net/?z=${random}`, 'text')
+                    .then((resp) => {
+                        let data = resp.data.replace('当前 IP：', '').split(' 来自于：');
+                        document.getElementById('d-ip').innerHTML = `${data[0]} ${data[1]}`;
+                    });
+            },
+	getIpifyIP: () => {
+                IP.get(`https://api.ipify.org/?format=json&z=${random}`, 'json')
+                .then(resp => {
+                document.getElementById('ip-ipify').innerHTML = resp.data.ip;
+                return resp.data.ip;
+                })
+                .then(ip => {
+                IP.parseIPIpip(ip, 'ip-ipify-ipip');
+                })
+            },
+
+	 /* IPSB: (data) => {
+                document.getElementById('ip-gb').innerHTML = data.address;
+				if ( "${data.province}" == " " || "${data.city}" == " " ){
+                document.getElementById('ip-geo').innerHTML = `${data.country} ${data.isp.name}`				
+				}else{
+				document.getElementById('ip-geo').innerHTML = `${data.country} ${data.province} ${data.city} ${data.isp.name}`
+				}
+         },*/
+				
+           
+}
+
+var HTTP = {
+	checker: (domain, cbElID) => {
+		let img = new Image;
+		let timeout = setTimeout(() => {
+			img.onerror = img.onload = null;
+			img = null;
+			document.getElementById(cbElID).innerHTML = '<b><font color=red>连接超时X</font></b>'
+		}, 1000);
+		img.onerror = () => {
+			clearTimeout(timeout);
+			document.getElementById(cbElID).innerHTML = '<b><font color=red>无法访问X</font></b>'
+		}
+		img.onload = () => {
+			clearTimeout(timeout);
+			document.getElementById(cbElID).innerHTML = '<b><font color=#58D68D  >连接正常✓</font></b>'
+		}
+		img.src = `https://${domain}/favicon.ico?${+(new Date)}`
+	}
+
+}
+			
+
+          function Load()
+	      {
+	         var tbip = document.getElementsByTagName('HEAD').item(0);
+	         var tbipScript= document.createElement("script");
+	         tbipScript.async = "async";
+	         tbipScript.src='https://myip.ipip.net/?z=${random}';
+	         tbip.appendChild( tbipScript);
+
+	         var sbip = document.getElementsByTagName('HEAD').item(0);
+	         var sbipScript= document.createElement("script");
+	         sbipScript.async = "async";
+	         sbipScript.src='https://api.skk.moe/network/parseIp/ipip';
+	         sbip.appendChild( sbipScript);
+
+
+
+	         const $$ = document;
+	         random = parseInt(Math.random() * 100000000);
+       	            setTimeout("Load()",1000*8);
+		   }
+	var ip = document.getElementById('_ip');
+	
+	XHR.poll(1, '<%=luci.dispatcher.build_url("admin", "vpn", "passwall", "status")%>', null, function(x, status) {
+		if ( x && x.status == 200 ) {
+			ip.innerHTML = status.localip ? '<b><font color=green>'+status.localip+'</font> </b>' : '<em><b><font color=red><%:NOT SET%></font></b></em>';	
+			IP.getIpifyIP();
+			IP.getIpipnetIP();
+
+		}
+	});
+
+
+	XHR.poll(3, '<%=luci.dispatcher.build_url("admin", "vpn", "passwall", "status")%>', null, function(x, status) {
+		if ( x && x.status == 200 ) {			
+			HTTP.checker('www.baidu.com', '_baidu');
+			HTTP.checker('www.google.com', '_google');
+			HTTP.checker('www.youtube.com', '_youtube');
+			HTTP.checker('www.taobao.com', '_taobao');
+			HTTP.checker('github.com', '_github');
+			HTTP.checker('s1.music.126.net/style', '_http-163');
+
+		}
+	});
+
+	IP.getIpifyIP();
+	IP.getIpipnetIP();
+	HTTP.checker('www.baidu.com', '_baidu');
+	HTTP.checker('www.google.com', '_google');
+	HTTP.checker('www.youtube.com', '_youtube');
+	HTTP.checker('www.taobao.com', '_taobao');
+	HTTP.checker('github.com', '_github');
+	HTTP.checker('s1.music.126.net/style', '_http-163');
+
+	XHR.get('<%=luci.dispatcher.build_url("admin", "vpn", "passwall", "status")%>', null, function(x, status) {
+		if ( x && x.status == 200 ) {
+			version.innerHTML = status.current_version ? '<b><font color=green><%:Current Version%>'+'&nbsp;:&nbsp;v'+status.current_version+'</font> </b>' : '<em><b><font color=red>NOT SET</font></b></em>';
+		
+		}
+	});
+
+
+
+//]]></script>
+
+    <script>
+
+		//<![CDATA[
+		var imgs = document.getElementsByTagName('img');
+		for (var i = 0 ; i < imgs.length; i++) {
+			document.getElementsByTagName('img')[i].setAttribute("oncontextmenu","return false;");
+			document.getElementsByTagName('img')[i].setAttribute("ondragstart","return false;");
+		}
+        XHR.poll(5, '<%=dsp.build_url("admin/vpn/passwall/status")%>', null,
+            function (x, data) {
+                var status_dns = document.getElementById('status_dns');
+                var status_haproxy = document.getElementById('status_haproxy');
+				var status_kcptun = document.getElementById('status_kcptun');
+				if (data) {
+					var tcp_node_num = <%=tcp_node_num%>;
+					if (tcp_node_num >= 1) {
+						var status_tcp_node = document.getElementById('status_tcp_node');
+						if (status_tcp_node) {
+							var text = '科学上网<br />';
+							if (tcp_node_num == 1) {
+								if (data["tcp_node1_status"])
+									text += '<span class="green"><%:RUNNING%>✓</span>';
+								else
+									text += '<span class="red"><%:NOT RUNNING%>X</span>';
+							} else {
+								for(var i = 0; i < tcp_node_num; i++) {
+									var k = i + 1;
+									if (data["tcp_node" + k + "_status"])
+										text += '<span class="green"><%:RUNNING%>✓</span>';
+									else
+										text += '<span class="red">未运行X</span>';
+								}
+							}
+							status_tcp_node.innerHTML = text;
+						}
+					}
+					
+					var udp_node_num = <%=udp_node_num%>;
+					if (udp_node_num >= 1) {
+						var status_udp_node = document.getElementById('status_udp_node');
+						if (status_udp_node) {
+							var text = '游戏模式<br />';
+							if (udp_node_num == 1) {
+								if (data["udp_node1_status"])
+									text += '<span class="green"><%:RUNNING%>✓</span>';
+									else
+									text += '<span class="red"><%:NOT RUNNING%>X</span>';
+							} else {
+								for(var i = 0; i < udp_node_num; i++) {
+									var k = i + 1;
+									if (data["udp_node" + k + "_status"])
+										text += '<span class="green"><%:RUNNING%>✓</span>';
+									else
+										text += '<span class="red"><%:NOT RUNNING%>X</span>';
+								}
+							}
+							status_udp_node.innerHTML = text;
+						}
+					}
+					
+					var socks5_node_num = <%=socks5_node_num%>;
+					if (socks5_node_num >= 1) {
+						var status_socks5_node = document.getElementById('status_socks5_node');
+						if (status_socks5_node) {
+							var text = 'SOCKS5<br />';
+							if (socks5_node_num == 1) {
+								if (data["socks5_node1_status"])
+									text += '<span class="green"><%:RUNNING%>✓</span>';
+								else
+									text += '<span class="red"><%:NOT RUNNING%>X</span>';
+							} else {
+								for(var i = 0; i < socks5_node_num; i++) {
+									var k = i + 1;
+									if (data["socks5_node" + k + "_status"])
+										text += '<span class="green"><%:RUNNING%>✓</span>';
+									else
+										text += '<span class="red"><%:NOT RUNNING%>X</span>';
+								}
+							}
+							status_socks5_node.innerHTML = text;
+						}
+					}
+					
+                    if (data.dns_mode_status) {
+                        status_dns.innerHTML = 'ChinaDNS<br><span class="green"><%:RUNNING%>✓</span>';
+                    } else {
+                        status_dns.innerHTML = 'ChinaDNS<br><span class="red"><%:NOT RUNNING%>X</span>';
+                    }
+					if (status_haproxy) {
+						if (data.haproxy_status) {
+							status_haproxy.innerHTML = '<%:Load Balancing%><br /><span class="green"><%:RUNNING%>✓</span>'
+						} else {
+							status_haproxy.innerHTML = '<%:Load Balancing%><br /><span class="red"><%:NOT RUNNING%>X</span>'
+						}
+					}
+                                                                             
+					if (status_kcptun) {
+						if (data.kcptun_status) {
+							status_kcptun.innerHTML = 'KcpTun<br /><span class="green"><%:RUNNING%></span>'
+						} else {
+							status_kcptun.innerHTML = 'KcpTun<br /><span class="red"><%:NOT RUNNING%></span>'
+						}
+					}
+				}
+			});
+			
+		function check_connect(type) {
+			var s = document.getElementById('_' + type + '_status');
+			if (s) {
+				var div = s.parentNode.parentNode.parentNode.parentNode;
+				div.removeAttribute('onclick');
+				s.innerHTML = '<%:Check...%>';
+				XHR.get('<%=dsp.build_url("admin/vpn/passwall/connect_status")%>', {
+						type: type
+					},
+					function(x, rv) {
+						if (rv.status) {
+							s.className="green";
+							s.innerHTML = '<%:Working...%>';
+						}
+						else {
+							s.className="red";
+							s.innerHTML = '<%:Problem detected!%>';
+						}
+						div.setAttribute('onclick','check_connect("' + type + '")');
+					}
+				);
+			}
+			return false;
+		}
+
+		function check_port(dom) {
+			var s = document.getElementById('_check_nodes_status');
+			if (s) {
+				dom.removeAttribute('onclick');
+				s.innerHTML = '<%:Check...%>';
+				XHR.get('<%=dsp.build_url("admin/vpn/passwall/check_port")%>', null,
+					function(x, rv) {
+						if (rv.ret) {
+							s.innerHTML = rv.ret;
+							var clear_btn = document.getElementById('clear_check_port_btn');
+							clear_btn.style.display = "inline-block";
+							clear_btn.onclick = function(event) {
+								clear_check_port(clear_btn);
+								if(event.stopPropagation)
+									event.stopPropagation();
+								else
+									event.cancelBubble = true;
+							}
+						}
+						dom.setAttribute('onclick','check_port(this)');
+					}
+				);
+			}
+			return false;
+		}
+
+		function clear_check_port(btn) {
+			btn.style.display = 'none';
+			var s = document.getElementById('_check_nodes_status');
+			s.innerHTML = "<%:Touch Check%>";
+			return false;
+		}
+//]]>
+    </script>
+</fieldset>

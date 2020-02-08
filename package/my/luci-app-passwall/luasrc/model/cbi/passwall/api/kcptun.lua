@@ -1,26 +1,14 @@
 module("luci.model.cbi.passwall.api.kcptun", package.seeall)
 local fs = require "nixio.fs"
 local sys = require "luci.sys"
-local uci = require"luci.model.uci".cursor()
 local util = require "luci.util"
 local i18n = require "luci.i18n"
 local api = require "luci.model.cbi.passwall.api.api"
 
 local kcptun_api = "https://api.github.com/repos/xtaci/kcptun/releases/latest"
 
-local wget = "/usr/bin/wget"
-local wget_args = {
-    "--no-check-certificate", "--quiet", "--timeout=100", "--tries=3"
-}
-local command_timeout = 300
-
-local LEDE_BOARD = nil
-local DISTRIB_TARGET = nil
-
 function get_kcptun_file_path()
-    return uci:get("passwall", "global_app", "kcptun_client_file") or
-               luci.sys.exec(
-                   "echo -n `uci get passwall.@global_app[0].kcptun_client_file`")
+    return api.uci_get_type("global_app", "kcptun_client_file")
 end
 
 function get_kcptun_version(file)
@@ -111,8 +99,9 @@ function to_download(url)
 
     local tmp_file = util.trim(util.exec("mktemp -u -t kcptun_download.XXXXXX"))
 
-    local result = api.exec(wget, {"-O", tmp_file, url, api._unpack(wget_args)},
-                            nil, command_timeout) == 0
+    local result = api.exec(api.wget,
+                            {"-O", tmp_file, url, api._unpack(api.wget_args)},
+                            nil, api.command_timeout) == 0
 
     if not result then
         api.exec("/bin/rm", {"-f", tmp_file})
@@ -194,7 +183,7 @@ function to_move(file)
     end
 
     local result = api.exec("/bin/mv", {"-f", file, client_file}, nil,
-                            command_timeout) == 0
+                            api.command_timeout) == 0
 
     if not result or not fs.access(client_file) then
         sys.call("/bin/rm -rf /tmp/kcptun_extract.*")

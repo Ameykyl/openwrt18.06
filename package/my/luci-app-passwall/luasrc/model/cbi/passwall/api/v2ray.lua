@@ -1,7 +1,6 @@
 module("luci.model.cbi.passwall.api.v2ray", package.seeall)
 local fs = require "nixio.fs"
 local sys = require "luci.sys"
-local uci = require"luci.model.uci".cursor()
 local util = require "luci.util"
 local i18n = require "luci.i18n"
 local ipkg = require("luci.model.ipkg")
@@ -9,20 +8,10 @@ local api = require "luci.model.cbi.passwall.api.api"
 
 local v2ray_api =
     "https://api.github.com/repos/v2ray/v2ray-core/releases/latest"
-local wget = "/usr/bin/wget"
-local wget_args = {
-    "--no-check-certificate", "--quiet", "--timeout=100", "--tries=3"
-}
-local command_timeout = 300
-
-local LEDE_BOARD = nil
-local DISTRIB_TARGET = nil
 local is_armv7 = false
 
 function get_v2ray_file_path()
-    return uci:get("passwall", "global_app", "v2ray_client_file") or
-               sys.exec(
-                   "echo -n `uci get passwall.@global_app[0].v2ray_client_file`")
+    return api.uci_get_type("global_app", "v2ray_file")
 end
 
 function get_v2ray_version()
@@ -106,8 +95,9 @@ function to_download(url)
 
     local tmp_file = util.trim(util.exec("mktemp -u -t v2ray_download.XXXXXX"))
 
-    local result = api.exec(wget, {"-O", tmp_file, url, api._unpack(wget_args)},
-                            nil, command_timeout) == 0
+    local result = api.exec(api.wget,
+                            {"-O", tmp_file, url, api._unpack(api.wget_args)},
+                            nil, api.command_timeout) == 0
 
     if not result then
         api.exec("/bin/rm", {"-f", tmp_file})
@@ -162,14 +152,14 @@ function to_move(file)
     if is_armv7 and is_armv7 == true then
         result = api.exec("/bin/mv", {
             "-f", file .. "/v2ray_armv7", file .. "/v2ctl_armv7", client_file
-        }, nil, command_timeout) == 0
+        }, nil, api.command_timeout) == 0
     else
         result = api.exec("/bin/mv", {
             "-f", file .. "/v2ray", file .. "/v2ctl", client_file
-        }, nil, command_timeout) == 0
+        }, nil, api.command_timeout) == 0
     end
+    sys.call("/bin/rm -rf /tmp/v2ray_extract.*")
     if not result or not fs.access(client_file) then
-        sys.call("/bin/rm -rf /tmp/v2ray_extract.*")
         return {
             code = 1,
             error = i18n.translatef("Can't move new file to path: %s",
@@ -178,8 +168,6 @@ function to_move(file)
     end
 
     api.exec("/bin/chmod", {"-R", "755", client_file})
-
-    sys.call("/bin/rm -rf /tmp/v2ray_extract.*")
 
     return {code = 0}
 end
