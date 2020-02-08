@@ -9,7 +9,7 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=ChinaDNS
-PKG_VERSION:=1.3.2
+PKG_VERSION:=1.3.3
 PKG_RELEASE:=9
 
 PKG_SOURCE_PROTO:=git
