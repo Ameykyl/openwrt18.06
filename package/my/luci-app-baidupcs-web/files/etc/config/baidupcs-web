@@ -2,5 +2,5 @@
 config baidupcs-web 'config'
 	option port '5299'
 	option enabled '0'
-	option edition 'auto_detected'
-	option dl_dir '/tmp/baidupcsweb-download'
+	option dl_dir '/etc/baidupcsweb-download'
+

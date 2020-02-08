@@ -7,7 +7,7 @@ local uci = require "luci.model.uci".cursor()
 
 local m, s
 
-local running=(luci.sys.call("pidof BaiduPCS-Go > /dev/null") == 0)
+local running=(luci.sys.call("pidof BaiduPCS-Web > /dev/null") == 0)
 
 local button = ""
 local state_msg = ""
@@ -32,19 +32,6 @@ s.anonymous = true
 enable = s:option(Flag, "enabled", translate("启用"))
 enable.rmempty = false
 
-o = s:option(ListValue, "edition", translate("选择版本"))
-o:value("auto_detected", "自动检测")
-o:value("3.6.7", "3.6.7")
-o:value("3.6.6", "3.6.6")
-o:value("3.6.5", "3.6.5")
-o.rmempty = false
-
-o = s:option(Button,"update_BaiduPCS",translate("手动下载BaiduPCS-Go"))
-o.inputstyle = "reload"
-o.write = function()
-  luci.sys.call("bash /usr/share/BaiduPCS-Go/BaiduPCS-Go.sh >>/tmp/BaiduPCS-Go.log 2>&1")
-end
-
 o = s:option(Value, "port", translate("监听端口"))
 o.placeholder = 5299
 o.default     = 5299
@@ -52,8 +39,8 @@ o.datatype    = "port"
 o.rmempty     = false
 
 o = s:option(Value, "dl_dir", translate("下载目录"))
-o.placeholder = "/tmp/baidupcsweb-download"
-o.default     = "/tmp/baidupcsweb-download"
+o.placeholder = "/etc/baidupcsweb-download"
+o.default     = "/etc/baidupcsweb-download"
 o.rmempty     = false
 
 return m
