@@ -9,8 +9,7 @@ local fs = require "nixio.fs"
 local sys = require "luci.sys"
 local sid = arg[1]
 local uuid = luci.sys.exec("cat /proc/sys/kernel/random/uuid")
-local http = luci.http	
-local ucursor = require "luci.model.uci".cursor()
+
 
 local function isKcptun(file)
     if not fs.access(file, "rwx", "rx", "rx") then
@@ -106,7 +105,7 @@ local securitys = {
 
 
 m = Map(shadowsocksr, translate("Edit ShadowSocksR Server"))
-m.redirect = luci.dispatcher.build_url("admin/services/shadowsocksr/servers")
+m.redirect = luci.dispatcher.build_url("admin/vpn/shadowsocksr/servers")
 if m.uci:get(shadowsocksr, sid) ~= "servers" then
 	luci.http.redirect(m.redirect) 
 	return
@@ -117,82 +116,37 @@ s = m:section(NamedSection, sid, "servers")
 s.anonymous = true
 s.addremove   = false
 
-o = s:option(DummyValue,"ssr_url","SSR URL") 
+o = s:option(DummyValue,"ssr_url","SS/SSR/V2RAY/TROJAN URL") 
 o.rawhtml  = true
 o.template = "shadowsocksr/ssrurl"
 o.value =sid
-o:depends("type", "ssr")
+
 
 o = s:option(ListValue, "type", translate("Server Node Type"))
-o:value("ssr", translate("ShadowsocksR"))
-if nixio.fs.access("/usr/bin/ss-redir") then
-o:value("ss", translate("Shadowsocks New Version"))
+if nixio.fs.access("/usr/sbin/trojan") then
+o:value("trojan", translate("Trojan"))
 end
 
+if nixio.fs.access("/usr/bin/v2ray/v2ray") then
 o:value("v2ray", translate("V2Ray"))
+end
+o:value("ssr", translate("ShadowsocksR"))
+if nixio.fs.access("/usr/bin/ss-redir") then
+o:value("ss", translate("Shadowsocks"))
+end
 o.description = translate("Using incorrect encryption mothod may causes service fail to start")
 
-use_conf_file = s:option(Flag, "use_conf_file", translate("Use Config File"), translate("Use Config File"))	
-use_conf_file:depends("type", "v2ray")	
-use_conf_file.rmempty = false	
-
- conf_file_path = s:option(Value, "conf_file_path", translate("Config File Path"),	
-	translate("Add the file name. JSON after the path."))	
-conf_file_path.default = "/etc/shadowsocksr/"	
-conf_file_path:depends("use_conf_file", 1)	
-
- upload_conf = s:option(FileUpload, "")	
+upload_conf = s:option(FileUpload, "")	
 upload_conf.template = "cbi/other_upload2"	
 upload_conf:depends("use_conf_file", 1)	
 
- um = s:option(DummyValue, "", nil)	
-um.template = "cbi/other_dvalue"	
-um:depends("use_conf_file", 1)	
-
- local conf_dir, fd	
-conf_dir = "/etc/shadowsocksr/"	
-nixio.fs.mkdir(conf_dir)	
-http.setfilehandler(	
-	function(meta, chunk, eof)	
-		if not fd then	
-			if not meta then return end	
-
- 			if	meta and chunk then fd = nixio.open(conf_dir .. meta.file, "w") end	
-
- 			if not fd then	
-				um.value = translate("Create upload file error.")	
-				return	
-			end	
-		end	
-		if chunk and fd then	
-			fd:write(chunk)	
-		end	
-		if eof and fd then	
-			fd:close()	
-			fd = nil	
-			um.value = translate("File saved to") .. ' "/etc/shadowsocksr/' .. meta.file .. '"'	
-			ucursor:set("v2ray","v2ray","conf_file_path","/etc/shadowsocksr/" .. meta.file)	
-			ucursor:commit("v2ray")	
-		end	
-	end	
-)	
-
- if luci.http.formvalue("upload") then	
-	local f = luci.http.formvalue("ulfile")	
-	if #f <= 0 then	
-		um.value = translate("No specify upload file.")	
-	end	
-end
-
 o = s:option(Value, "alias", translate("Alias(optional)"))
-o.default = "test"
 
 o = s:option(Value, "server", translate("Server Address"))
-o.default = "1.2.3.4"
+o.datatype = "host"
 o.rmempty = false
 
 o = s:option(Value, "server_port", translate("Server Port"))
-o.default = "1234"
 o.datatype = "port"
 o.rmempty = false
 
@@ -211,6 +165,9 @@ o.password = true
 o.rmempty = true
 o:depends("type", "ssr")
 o:depends("type", "ss")
+o:depends("type", "trojan")
+
+
 
 o = s:option(ListValue, "encrypt_method", translate("Encrypt Method"))
 for _, v in ipairs(encrypt_methods) do o:value(v) end
@@ -230,8 +187,8 @@ end
 if nixio.fs.access("/usr/bin/obfs-local") then
 o:value("/usr/bin/obfs-local", "obfs-local")
 end
-if nixio.fs.access("/usr/bin/gq-client") then
-o:value("/usr/bin/gq-client", "GoQuiet")
+if nixio.fs.access("/usr/bin/goquiet-client") then
+o:value("/usr/bin/goquiet-client", "GoQuiet")
 end
 o.rmempty = false
 o.default = "none"
@@ -241,7 +198,7 @@ o = s:option(Value, "plugin_opts", translate("Plugin Opts"))
 o.rmempty = true
 o:depends("plugin", "/usr/bin/v2ray-plugin")
 o:depends("plugin", "/usr/bin/obfs-local")
-o:depends("plugin", "/usr/bin/gq-client")
+o:depends("plugin", "/usr/bin/goquiet-client")
 
 
 o = s:option(ListValue, "protocol", translate("Protocol"))
@@ -272,13 +229,13 @@ o.rmempty = true
 o.default = uuid
 o:depends("type", "v2ray")
 
--- 加密方式
+-- 鍔犲瘑鏂瑰紡
 o = s:option(ListValue, "security", translate("Encrypt Method"))
 for _, v in ipairs(securitys) do o:value(v, v:upper()) end
 o.rmempty = true
 o:depends("type", "v2ray")
 
--- 传输协议
+-- 浼犺緭鍗忚
 o = s:option(ListValue, "transport", translate("Transport"))
 o:value("tcp", "TCP")
 o:value("kcp", "mKCP")
@@ -288,50 +245,50 @@ o:value("quic", "QUIC")
 o.rmempty = true
 o:depends("type", "v2ray")
 
--- [[ TCP部分 ]]--
+-- [[ TCP閮ㄥ垎 ]]--
 
--- TCP伪装
+-- TCP浼
 o = s:option(ListValue, "tcp_guise", translate("Camouflage Type"))
 o:depends("transport", "tcp")
 o:value("none", translate("None"))
 o:value("http", "HTTP")
 o.rmempty = true
 
--- HTTP域名
+-- HTTP鍩熷悕
 o = s:option(DynamicList, "http_host", translate("HTTP Host"))
 o:depends("tcp_guise", "http")
 o.rmempty = true
 
--- HTTP路径
+-- HTTP璺緞
 o = s:option(DynamicList, "http_path", translate("HTTP Path"))
 o:depends("tcp_guise", "http")
 o.rmempty = true
 
--- [[ WS部分 ]]--
+-- [[ WS閮ㄥ垎 ]]--
 
--- WS域名
+-- WS鍩熷悕
 o = s:option(Value, "ws_host", translate("WebSocket Host"))
 o:depends("transport", "ws")
 o.rmempty = true
 
--- WS路径
+-- WS璺緞
 o = s:option(Value, "ws_path", translate("WebSocket Path"))
 o:depends("transport", "ws")
 o.rmempty = true
 
--- [[ H2部分 ]]--
+-- [[ H2閮ㄥ垎 ]]--
 
--- H2域名
+-- H2鍩熷悕
 o = s:option(DynamicList, "h2_host", translate("HTTP/2 Host"))
 o:depends("transport", "h2")
 o.rmempty = true
 
--- H2路径
+-- H2璺緞
 o = s:option(Value, "h2_path", translate("HTTP/2 Path"))
 o:depends("transport", "h2")
 o.rmempty = true
 
--- [[ QUIC部分 ]]--
+-- [[ QUIC閮ㄥ垎 ]]--
 
 o = s:option(ListValue, "quic_security", translate("QUIC Security"))
 o:depends("transport", "quic")
@@ -354,7 +311,7 @@ o:value("wechat-video", translate("WechatVideo"))
 o:value("dtls", "DTLS 1.2")
 o:value("wireguard", "WireGuard")
 
--- [[ mKCP部分 ]]--
+-- [[ mKCP閮ㄥ垎 ]]--
 
 o = s:option(ListValue, "kcp_guise", translate("Camouflage Type"))
 o:depends("transport", "kcp")
@@ -410,12 +367,14 @@ o.rmempty = true
 o = s:option(Flag, "insecure", translate("allowInsecure"))
 o.rmempty = true
 o:depends("type", "v2ray")
+o:depends("type", "trojan")
 
 -- [[ TLS ]]--
 o = s:option(Flag, "tls", translate("TLS"))
 o.rmempty = true
 o.default = "0"
 o:depends("type", "v2ray")
+o:depends("type", "trojan")
 
 -- [[ Mux ]]--
 o = s:option(Flag, "mux", translate("Mux"))
@@ -434,6 +393,7 @@ o.rmempty = true
 o.default = "0"
 o:depends("type", "ssr")
 o:depends("type", "ss")
+o:depends("type", "trojan")
 
 o = s:option(Flag, "switch_enable", translate("Enable Auto Switch"))
 o.rmempty = false
@@ -484,3 +444,4 @@ o:depends("type", "ss")
 end
 
 return m
+

@@ -11,23 +11,19 @@ local uuid = luci.sys.exec("cat /proc/sys/kernel/random/uuid")
 local http = luci.http
 local ucursor = require "luci.model.uci".cursor()
 
+local server_table = {}
 local encrypt_methods = {
-	"rc4-md5",
-	"rc4-md5-6",
-	"rc4",
+	"none",
 	"table",
-	"aes-128-gcm",
-	"aes-192-gcm",
-	"aes-256-gcm",
+	"rc4",
+	"rc4-md5-6",
+	"rc4-md5",
 	"aes-128-cfb",
 	"aes-192-cfb",
 	"aes-256-cfb",
 	"aes-128-ctr",
 	"aes-192-ctr",
-	"aes-256-ctr",
-	"aes-128-gcm",
-	"aes-192-gcm",
-	"aes-256-gcm",	
+	"aes-256-ctr",	
 	"bf-cfb",
 	"camellia-128-cfb",
 	"camellia-192-cfb",
@@ -40,18 +36,60 @@ local encrypt_methods = {
 	"salsa20",
 	"chacha20",
 	"chacha20-ietf",
+}
+
+local encrypt_methods_ss = {
+	-- aead
+	"aes-128-gcm",
+	"aes-192-gcm",
+	"aes-256-gcm",
 	"chacha20-ietf-poly1305",
 	"xchacha20-ietf-poly1305",
+	-- stream
+	"table",
+	"rc4",
+	"rc4-md5",
+	"aes-128-cfb",
+	"aes-192-cfb",
+	"aes-256-cfb",
+	"aes-128-ctr",
+	"aes-192-ctr",
+	"aes-256-ctr",
+	"bf-cfb",
+	"camellia-128-cfb",
+	"camellia-192-cfb",
+	"camellia-256-cfb",
+	"salsa20",
+	"chacha20",
+	"chacha20-ietf",
 }
 
 local protocol = {
 	"origin",
+	"verify_deflate",
+	"auth_sha1_v4",
+	"auth_aes128_sha1",
+	"auth_aes128_md5",
+	"auth_chain_a",
+	"auth_chain_b",
+	"auth_chain_c",
+	"auth_chain_d",
+	"auth_chain_e",
+	"auth_chain_f",
 }
 
-local obfs = {
+obfs = {
 	"plain",
 	"http_simple",
 	"http_post",
+	"random_head",
+	"tls1.2_ticket_auth",
+}
+
+local obfs_opts = {
+	"none",
+	"http",
+	"tls",
 }
 
 local securitys = {
@@ -62,9 +100,10 @@ local securitys = {
 }
 
 
+
 m = Map(shadowsocksr, translate("Edit ShadowSocksR Server"))
 
-m.redirect = luci.dispatcher.build_url("admin/services/shadowsocksr/server")
+m.redirect = luci.dispatcher.build_url("admin/vpn/shadowsocksr/server")
 if m.uci:get(shadowsocksr, sid) ~= "server_config" then
 	luci.http.redirect(m.redirect) 
 	return
@@ -89,61 +128,12 @@ end
 if nixio.fs.access("/usr/bin/ss-server") then
 o:value("ss", translate("Shadowsocks New Version"))
 end
-
+if nixio.fs.access("/usr/bin/v2ray/v2ray") then
 o:value("v2ray", translate("V2Ray"))
+end
 o.description = translate("Using incorrect encryption mothod may causes service fail to start")
 
-use_conf_file = s:option(Flag, "use_conf_file", translate("Use Config File"), translate("Use Config File"))	
-use_conf_file:depends("type", "v2ray")	
-use_conf_file.rmempty = false	
 
-conf_file_path = s:option(Value, "conf_file_path", translate("Config File Path"),	
-	translate("Add the file name. JSON after the path."))	
-conf_file_path.default = "/etc/shadowsocksr/"	
-conf_file_path:depends("use_conf_file", 1)	
-
-upload_conf = s:option(FileUpload, "")	
-upload_conf.template = "cbi/other_upload2"	
-upload_conf:depends("use_conf_file", 1)	
-
-um = s:option(DummyValue, "", nil)	
-um.template = "cbi/other_dvalue"	
-um:depends("use_conf_file", 1)	
-
-local conf_dir, fd	
-conf_dir = "/etc/shadowsocksr/"	
-nixio.fs.mkdir(conf_dir)	
-http.setfilehandler(	
-	function(meta, chunk, eof)	
-		if not fd then	
-			if not meta then return end	
-
- 			if	meta and chunk then fd = nixio.open(conf_dir .. meta.file, "w") end	
-
- 			if not fd then	
-				um.value = translate("Create upload file error.")	
-				return	
-			end	
-		end	
-		if chunk and fd then	
-			fd:write(chunk)	
-		end	
-		if eof and fd then	
-			fd:close()	
-			fd = nil	
-			um.value = translate("File saved to") .. ' "/etc/shadowsocksr/' .. meta.file .. '"'	
-			ucursor:set("v2ray","v2ray","conf_file_path","/etc/shadowsocksr/" .. meta.file)	
-			ucursor:commit("v2ray")	
-		end	
-	end	
-)	
-
-if luci.http.formvalue("upload") then	
-	local f = luci.http.formvalue("ulfile")	
-	if #f <= 0 then	
-		um.value = translate("No specify upload file.")	
-	end	
-end
 
 o = s:option(Flag, "ipv4_ipv6", translate("Enabling IPv6 server"))
 o.default = 0
@@ -171,36 +161,22 @@ o.rmempty = true
 o:depends("type", "ssr")
 o:depends("type", "ss")
 
-o = s:option(ListValue, "plugin", translate("plugin"))
-o:value("none", "None")
-if nixio.fs.access("/usr/bin/v2ray-plugin") then
-o:value("/usr/bin/v2ray-plugin", "v2ray-plugin")
-end
-if nixio.fs.access("/usr/bin/obfs-server") then
-o:value("/usr/bin/obfs-server", "obfs-server")
-end
-if nixio.fs.access("/usr/bin/gq-server") then
-o:value("/usr/bin/gq-server", "GoQuiet")
-end
-o.rmempty = false
-o.default = "none"
-o:depends("type", "ss")
 
-o = s:option(Value, "plugin_opts", translate("Plugin Opts"))
-o.rmempty = true
-o:depends("plugin", "/usr/bin/v2ray-plugin")
-o:depends("plugin", "/usr/bin/obfs-server")
-o:depends("plugin", "/usr/bin/gq-server")
 
 o = s:option(ListValue, "protocol", translate("Protocol"))
 for _, v in ipairs(protocol) do o:value(v) end
 o.rmempty = true
 o:depends("type", "ssr")
 
+o = s:option(Value, "protocol_param", translate("Protocol param(optional)"))
+o:depends("type", "ssr")
+
 o = s:option(ListValue, "obfs", translate("Obfs"))
 for _, v in ipairs(obfs) do o:value(v) end
 o.rmempty = true
 o:depends("type", "ssr")
+
+
 
 o = s:option(Value, "obfs_param", translate("Obfs param(optional)"))
 o:depends("type", "ssr")
@@ -221,13 +197,13 @@ o.rmempty = true
 o.default = uuid
 o:depends("type", "v2ray")
 
--- 加密方式
+-- 鍔犲瘑鏂瑰紡
 o = s:option(ListValue, "security", translate("Encrypt Method"))
 for _, v in ipairs(securitys) do o:value(v, v:upper()) end
 o.rmempty = true
 o:depends("type", "v2ray")
 
--- 传输协议
+-- 浼犺緭鍗忚
 o = s:option(ListValue, "transport", translate("Transport"))
 o:value("tcp", "TCP")
 o:value("kcp", "mKCP")
@@ -237,50 +213,50 @@ o:value("quic", "QUIC")
 o.rmempty = true
 o:depends("type", "v2ray")
 
--- [[ TCP部分 ]]--
+-- [[ TCP閮ㄥ垎 ]]--
 
--- TCP伪装
+-- TCP浼
 o = s:option(ListValue, "tcp_guise", translate("Camouflage Type"))
 o:depends("transport", "tcp")
 o:value("none", translate("None"))
 o:value("http", "HTTP")
 o.rmempty = true
 
--- HTTP域名
+-- HTTP鍩熷悕
 o = s:option(DynamicList, "http_host", translate("HTTP Host"))
 o:depends("tcp_guise", "http")
 o.rmempty = true
 
--- HTTP路径
+-- HTTP璺緞
 o = s:option(DynamicList, "http_path", translate("HTTP Path"))
 o:depends("tcp_guise", "http")
 o.rmempty = true
 
--- [[ WS部分 ]]--
+-- [[ WS閮ㄥ垎 ]]--
 
--- WS域名
+-- WS鍩熷悕
 o = s:option(Value, "ws_host", translate("WebSocket Host"))
 o:depends("transport", "ws")
 o.rmempty = true
 
--- WS路径
+-- WS璺緞
 o = s:option(Value, "ws_path", translate("WebSocket Path"))
 o:depends("transport", "ws")
 o.rmempty = true
 
--- [[ H2部分 ]]--
+-- [[ H2閮ㄥ垎 ]]--
 
--- H2域名
+-- H2鍩熷悕
 o = s:option(DynamicList, "h2_host", translate("HTTP/2 Host"))
 o:depends("transport", "h2")
 o.rmempty = true
 
--- H2路径
+-- H2璺緞
 o = s:option(Value, "h2_path", translate("HTTP/2 Path"))
 o:depends("transport", "h2")
 o.rmempty = true
 
--- [[ QUIC部分 ]]--
+-- [[ QUIC閮ㄥ垎 ]]--
 
 o = s:option(ListValue, "quic_security", translate("QUIC Security"))
 o:depends("transport", "quic")
@@ -303,7 +279,7 @@ o:value("wechat-video", translate("WechatVideo"))
 o:value("dtls", "DTLS 1.2")
 o:value("wireguard", "WireGuard")
 
--- [[ mKCP部分 ]]--
+-- [[ mKCP閮ㄥ垎 ]]--
 
 o = s:option(ListValue, "kcp_guise", translate("Camouflage Type"))
 o:depends("transport", "kcp")
@@ -383,3 +359,4 @@ o.rmempty = true
 o:depends("type", "ssr")
 
 return m
+

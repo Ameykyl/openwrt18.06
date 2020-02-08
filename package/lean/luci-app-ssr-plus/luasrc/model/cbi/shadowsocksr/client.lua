@@ -4,11 +4,31 @@
 
 local m, s, sec, o, kcp_enable
 local shadowsocksr = "shadowsocksr"
+local gfw_count=0
+local ad_count=0
+local ip_count=0
+local gfwmode=0
+
+if nixio.fs.access("/etc/dnsmasq.ssr/gfw_list.conf") then
+gfwmode=1		
+end
+
 local uci = luci.model.uci.cursor()
 
 local sys = require "luci.sys"
 
-m = Map(shadowsocksr, translate("ShadowSocksR Plus+ Settings"))
+if gfwmode==1 then 
+ gfw_count = tonumber(sys.exec("cat /etc/dnsmasq.ssr/gfw_list.conf | wc -l"))/2
+ if nixio.fs.access("/etc/dnsmasq.ssr/ad.conf") then
+  ad_count=tonumber(sys.exec("cat /etc/dnsmasq.ssr/ad.conf | wc -l"))
+ end
+end
+ 
+if nixio.fs.access("/etc/china_ssr.txt") then 
+ ip_count = sys.exec("cat /etc/china_ssr.txt | wc -l")
+end
+
+m = Map(shadowsocksr)
 
 m:section(SimpleSection).template  = "shadowsocksr/status"
 
@@ -29,7 +49,7 @@ end
 table.sort(key_table)  
 
 -- [[ Global Setting ]]--
-s = m:section(TypedSection, "global")
+s = m:section(TypedSection, "global", translate("Server settings"))
 s.anonymous = true
 
 o = s:option(ListValue, "global_server", translate("Main Server"))
@@ -59,7 +79,6 @@ o = s:option(ListValue, "run_mode", translate("Running Mode"))
 o:value("gfw", translate("GFW List Mode"))
 o:value("router", translate("IP Route Mode"))
 o:value("routers", translate("Oversea IP Route Mode"))
-o:value("oversea", translate("Oversea GFW List Mode"))
 o:value("all", translate("Global Mode"))
 o.default = gfw
 
@@ -77,6 +96,7 @@ end
 if nixio.fs.access("/usr/bin/chinadns") then
 o:value("6", translate("Use chinadns query and cache"))
 end
+
 o.default = 1
 
 o = s:option(ListValue, "chinadns_enable", translate("Chiadns Resolve Dns Mode"))
@@ -89,6 +109,14 @@ o:value("4", translate("Use dnsforwarder udp query and cache"))
 end
 if nixio.fs.access("/usr/bin/dnscrypt-proxy") then
 o:value("5", translate("Use dnscrypt-proxy query and cache"))
+end
+
+if nixio.fs.access("/usr/sbin/smartdns") then
+o:value("6", translate("Use smartdns query and cache"))
+end
+
+if nixio.fs.access("/usr/sbin/https_dns_proxy") then
+o:value("7", translate("Use https_dns_proxy query and cache"))
 end
 o.default = 1
 o:depends("pdnsd_enable", "6")
@@ -125,5 +153,24 @@ o = s:option(Value, "bt_port", translate("BT Port"))
 o.default = "1236:65535"
 o.rmempty = true
 o:depends("bt", "1")
+
+o = s:option(Button,"gfw_data",translate("GFW List Data"))
+o.rawhtml  = true
+o.template = "shadowsocksr/refresh"
+o.value =tostring(math.ceil(gfw_count)) .. " " .. translate("Records")
+
+o = s:option(Button,"ad_data",translate("Advertising Data")) 
+o .rawhtml  = true
+o .template = "shadowsocksr/refresh"
+o .value =tostring(math.ceil(ad_count)) .. " " .. translate("Records")
+
+o = s:option(Button,"ip_data",translate("China IP Data"))
+o.rawhtml  = true
+o.template = "shadowsocksr/refresh"
+o.value =ip_count .. " " .. translate("Records")
+
+o = s:option(Button,"check_port",translate("Check Server Port"))
+o.template = "shadowsocksr/checkport"
+o.value =translate("No Check")
 
 return m

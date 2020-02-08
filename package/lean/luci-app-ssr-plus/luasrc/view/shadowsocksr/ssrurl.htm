@@ -88,7 +88,7 @@
         var s = document.getElementById(urlname + '-status');
         if (!s)
             return false;
-        var ssrurl = prompt("在这里黏贴配置链接 ssr:// | ss:// | vmess://", "");
+        var ssrurl = prompt("在这里黏贴配置链接 ssr:// | ss:// | vmess:// | trojan://", "");
         if (ssrurl == null || ssrurl == "") {
             s.innerHTML = "<font color='red'>用户取消</font>";
             return false;
@@ -169,6 +169,33 @@
             }
 
             s.innerHTML = "<font color='green'>导入Shadowsocks配置信息成功</font>";
+                 return false;
+        } else if (ssu[0] == "trojan") {
+            var ploc = ssu[1].indexOf("#");
+            if (ploc > 0) {
+                url0 = ssu[1].substr(0, ploc);
+                param = ssu[1].substr(ploc + 1);
+            } else {
+                url0 = ssu[1]
+            }
+            var sstr = b64decsafe(url0);
+
+
+            document.getElementById('cbid.shadowsocksr.' + sid + '.type').value = "trojan";
+
+            document.getElementById('cbid.shadowsocksr.' + sid + '.type').dispatchEvent(event);
+            var team = sstr.split('@');
+            console.log(param);
+            var part1 = team[0].split(':');
+            var part2 = team[1].split(':');
+            document.getElementById('cbid.shadowsocksr.' + sid + '.server').value = part2[0];
+            document.getElementById('cbid.shadowsocksr.' + sid + '.server_port').value = part2[1];
+            document.getElementById('cbid.shadowsocksr.' + sid + '.password').value = part1[1];
+            if (param != undefined) {
+                document.getElementById('cbid.shadowsocksr.' + sid + '.alias').value = decodeURI(param);
+            }
+
+            s.innerHTML = "<font color='green'>导入Trojan配置信息成功</font>";
             return false;
         } else if (ssu[0] == "vmess") {
             var sstr = b64DecodeUnicode(ssu[1]);
@@ -186,13 +213,35 @@
             document.getElementById('cbid.shadowsocksr.' + sid + '.server_port').value = ssm.port;
             document.getElementById('cbid.shadowsocksr.' + sid + '.alter_id').value = ssm.aid;
             document.getElementById('cbid.shadowsocksr.' + sid + '.vmess_id').value = ssm.id;
-            document.getElementById('cbid.shadowsocksr.' + sid + '.security').value = ssm.type;
             document.getElementById('cbid.shadowsocksr.' + sid + '.transport').value = ssm.net;
-			document.getElementById('cbid.shadowsocksr.' + sid + '.ws_host').value = ssm.host;
-			document.getElementById('cbid.shadowsocksr.' + sid + '.ws_path').value = ssm.path;
-            if (ssm.net = tls) {
-            document.getElementById('cbid.shadowsocksr.' + sid + '.tls').value = 1;
-            }
+			if(ssm.tls == "tls"){
+				document.getElementById('cbid.shadowsocksr.' + sid + '.tls').checked = true;
+				document.getElementById('cbid.shadowsocksr.' + sid + '.insecure').checked = true;
+			}
+			document.getElementById('cbid.shadowsocksr.' + sid + '.transport').dispatchEvent(event);
+			
+			switch(ssm.net){
+				case "tcp":
+				break;
+				
+				case "kcp":
+				break;
+				
+				case "ws":
+				document.getElementById('cbid.shadowsocksr.' + sid + '.ws_host').value = ssm.host;
+				document.getElementById('cbid.shadowsocksr.' + sid + '.ws_path').value = ssm.path;
+				break;
+				
+				case "h2":
+				break;
+				
+				case "quic":
+				break;
+				
+			}
+			
+			
+			
             s.innerHTML = "<font color='green'>导入V2ray配置信息成功</font>";
             return false;
         }
@@ -202,7 +251,7 @@
 
 <input type="button" class="cbi-button cbi-button-apply" value="导入配置信息" onclick="return import_ssr_url(this, '<%=self.option%>', '<%=self.value%>')" />
 <input type="button" class="cbi-button cbi-button-apply" value="<%:Export SSR%>" onclick="return export_ssr_url(this,'<%=self.option%>','<%=self.value%>')" /><span id="<%=self.option%>-status"></span>
-
 <span id="<%=self.option%>-status"></span>
 
 <%+cbi/valuefooter%>
+
