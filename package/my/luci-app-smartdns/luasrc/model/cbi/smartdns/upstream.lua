@@ -1,3 +1,19 @@
+--
+-- Copyright (C) 2018-2020 Ruilin Peng (Nick) <pymumu@gmail.com>.
+--
+-- smartdns is free software: you can redistribute it and/or modify
+-- it under the terms of the GNU General Public License as published by
+-- the Free Software Foundation, either version 3 of the License, or
+-- (at your option) any later version.
+--
+-- smartdns is distributed in the hope that it will be useful,
+-- but WITHOUT ANY WARRANTY; without even the implied warranty of
+-- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+-- GNU General Public License for more details.
+--
+-- You should have received a copy of the GNU General Public License
+-- along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
 local sid = arg[1]
 
 m = Map("smartdns", "%s - %s" %{translate("SmartDNS Server"), translate("Upstream DNS Server Configuration")})
@@ -39,8 +55,16 @@ o:value("https", translate("https"))
 o.default     = "udp"
 o.rempty      = false
 
+---- TLS host verify
+o = s:option(Value, "tls_host_verify", translate("TLS Hostname Verify"), translate("Set TLS hostname to verify."))
+o.default     = ""
+o.datatype    = "string"
+o.rempty      = true
+o:depends("type", "tls")
+o:depends("type", "https")
+
 ---- SNI host name
-o = s:option(Value, "host_name", translate("TLS SNI name"), translate("Sets the server name indication"))
+o = s:option(Value, "host_name", translate("TLS SNI name"), translate("Sets the server name indication for query."))
 o.default     = ""
 o.datatype    = "hostname"
 o.rempty      = true
@@ -55,7 +79,7 @@ o.rempty      = true
 o:depends("type", "https")
 
 ---- server group
-o = s:option(Value, "server_group", translate("Server Group"), translate("DNS Server group belongs to, used with nameserver, such as offlce, home."))
+o = s:option(Value, "server_group", translate("Server Group"), translate("DNS Server group belongs to, used with nameserver, such as office, home."))
 o.rmempty     = true
 o.placeholder = "default"
 o.datatype    = "hostname"
