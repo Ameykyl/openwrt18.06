@@ -50,5 +50,5 @@ Date:   Sun Feb 12 20:25:47 2012 +0000
 +#define LIBGCC_SPEC "%{!static:%{!static-libgcc:-lgcc_s}} -lgcc"
 +
  #undef  LINK_SHLIB_SPEC
- #define LINK_SHLIB_SPEC "%{shared:-shared} %{!shared: %{static:-static}}"
- 
+ #define LINK_SHLIB_SPEC "%{shared:-shared} %{!shared: %{static:-static}} \
+   %{static-pie:-static -pie --no-dynamic-linker -z text}"
