@@ -1,15 +1,15 @@
-# Copyright (C) 2016 Openwrt.org
+# Copyright (C) 2019 Openwrt.org
 #
 # This is free software, licensed under the Apache License, Version 2.0 .
 #
 
 include $(TOPDIR)/rules.mk
 
-LUCI_TITLE:=qbittorrent-nox for LuCI
-LUCI_DEPENDS:=+qBittorrent
+LUCI_TITLE:=LuCI support for qBittorrent
+LUCI_DEPENDS:=+qBittorrent +python
 LUCI_PKGARCH:=all
-PKG_VERSION:=1.0
-PKG_RELEASE:=5
+PKG_VERSION=1.0
+PKG_RELEASE:=18
 
 include $(TOPDIR)/feeds/luci/luci.mk
 
