@@ -80,9 +80,10 @@ config server_global
 config server_subscribe
 	option proxy '0'
 	option auto_update_time '2'
-	option auto_update '0'
-	option v2ray_update '0'
-	option edition '4.20.0'
+	option auto_update '1'
+	option edition 'auto_detected'		
+        option v2ray_path '/usr/bin/v2ray'
+
 
 config domain_white_list
 	option domain_names 'youdao.com'
