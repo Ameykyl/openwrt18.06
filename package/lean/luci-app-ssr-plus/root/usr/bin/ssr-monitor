@@ -63,7 +63,7 @@ else
 	server=`cat /etc/ssr_ip`
 fi
 
-while [ "1" = "1" ]  #ËÀÑ­»·
+while [ "1" = "1" ]  #æ­»å¾ªçŽ¯
 do 
 	sleep 30
 #redir tcp
@@ -101,7 +101,7 @@ do
 	if [ $server_process_count -gt 0 ] ;then
 		if [ $ssrserver_process -gt 0 ] ;then
 			icount=`ps -w  | grep ssr-server |grep -v grep| wc -l`
-			if [ $icount -lt $ssrserver_process ]  #Èç¹û½ø³Ì¹Òµô¾ÍÖØÆôËü
+			if [ $icount -lt $ssrserver_process ]  #å¦‚æžœè¿›ç¨‹æŒ‚æŽ‰å°±é‡å¯å®ƒ
 			then
 				logger -t "$NAME" "ssr server error.restart!"
 				echo "$(date "+%Y-%m-%d %H:%M:%S") ssr server error.restart!" >> ${logfile}
@@ -115,7 +115,7 @@ do
 #ss_server
 		if [ $ssserver_process -gt 0 ] ;then
 			icount=`ps -w  | grep ss-server |grep -v grep| wc -l`
-			if [ $icount -lt $ssserver_process ]  #Èç¹û½ø³Ì¹Òµô¾ÍÖØÆôËü
+			if [ $icount -lt $ssserver_process ]  #å¦‚æžœè¿›ç¨‹æŒ‚æŽ‰å°±é‡å¯å®ƒ
 			then
 				logger -t "$NAME" "ss server error.restart!"
 				echo "$(date "+%Y-%m-%d %H:%M:%S") ss server error.restart!" >> ${logfile}
@@ -129,7 +129,7 @@ do
 #v2ray_server
 		if [ v2rayserver_process -gt 0 ] ;then
 			icount=`ps -w  | grep ss-server |grep -v grep| wc -l`
-			if [ $icount -lt $v2rayserver_process ]  #Èç¹û½ø³Ì¹Òµô¾ÍÖØÆôËü
+			if [ $icount -lt $v2rayserver_process ]  #å¦‚æžœè¿›ç¨‹æŒ‚æŽ‰å°±é‡å¯å®ƒ
 			then
 				logger -t "$NAME" "v2ray server error.restart!"
 				echo "$(date "+%Y-%m-%d %H:%M:%S") v2ray server error.restart!" >> ${logfile}
@@ -144,7 +144,7 @@ do
 #kcptun
 	if [ $kcp_process -gt 0 ] ;then
 		icount=`ps -w  | grep kcptun-client |grep -v grep| wc -l`
-		if [ $icount -lt $kcp_process ]  #Èç¹û½ø³Ì¹Òµô¾ÍÖØÆôËü
+		if [ $icount -lt $kcp_process ]  #å¦‚æžœè¿›ç¨‹æŒ‚æŽ‰å°±é‡å¯å®ƒ
 		then
 			logger -t "$NAME" "ssr kcptun error.restart!"
 			echo "$(date "+%Y-%m-%d %H:%M:%S") ssr kcptun error.restart!" >> ${logfile}
@@ -156,7 +156,7 @@ do
 #local
 	if [ $local_process -eq 1 ] ;then
 		icount=`ps -w  | grep ssr-local |grep -v grep| wc -l`
-		if [ $icount -lt $local_process ]  #Èç¹û½ø³Ì¹Òµô¾ÍÖØÆôËü
+		if [ $icount -lt $local_process ]  #å¦‚æžœè¿›ç¨‹æŒ‚æŽ‰å°±é‡å¯å®ƒ
 		then
 			logger -t "$NAME" "ssr local error.restart!"
 			echo "$(date "+%Y-%m-%d %H:%M:%S") ssr local error.restart!" >> ${logfile}
@@ -169,7 +169,7 @@ do
 	if [ $local_process -eq 2 ] ;then
 		local_processs=1
 		icount=`ps -w  | grep ss-local |grep -v grep| wc -l`
-		if [ $icount -lt $local_processs ]  #Èç¹û½ø³Ì¹Òµô¾ÍÖØÆôËü
+		if [ $icount -lt $local_processs ]  #å¦‚æžœè¿›ç¨‹æŒ‚æŽ‰å°±é‡å¯å®ƒ
 		then
 			logger -t "$NAME" "ss local error.restart!"
 			echo "$(date "+%Y-%m-%d %H:%M:%S") ss local error.restart!" >> ${logfile}
@@ -182,7 +182,7 @@ do
 	if [ $local_process -eq 3 ] ;then
 		local_processs=1
 		icount=`ps -w  | grep v2-ssr-local |grep -v grep| wc -l`
-		if [ $icount -lt $local_processs ]  #Èç¹û½ø³Ì¹Òµô¾ÍÖØÆôËü
+		if [ $icount -lt $local_processs ]  #å¦‚æžœè¿›ç¨‹æŒ‚æŽ‰å°±é‡å¯å®ƒ
 		then
 			logger -t "$NAME" "v2ray local error.restart!"
 			echo "$(date "+%Y-%m-%d %H:%M:%S") v2ray local error.restart!" >> ${logfile}
@@ -216,7 +216,7 @@ do
 #pdnsd
 	if [ $pdnsd_process -gt 0 ] ;then
 		icount=`ps -w  | grep pdnsd |grep -v grep| wc -l`
-		if [ $icount -lt $pdnsd_process ]  #Èç¹û½ø³Ì¹Òµô¾ÍÖØÆôËü
+		if [ $icount -lt $pdnsd_process ]  #å¦‚æžœè¿›ç¨‹æŒ‚æŽ‰å°±é‡å¯å®ƒ
 		then
 			logger -t "$NAME" "pdnsd tunnel error.restart!"
 			echo "$(date "+%Y-%m-%d %H:%M:%S") pdnsd tunnel error.restart!" >> ${logfile}
@@ -243,11 +243,36 @@ do
 #haproxy
 	if [ $haproxy_process -gt 0 ] ;then
 		icount=`ps -w  | grep haproxy |grep -v grep| wc -l`
-		if [ $icount -lt $haproxy_process ]  #Èç¹û½ø³Ì¹Òµô¾ÍÖØÆôËü
+		if [ $icount -lt $haproxy_process ]  #å¦‚æžœè¿›ç¨‹æŒ‚æŽ‰å°±é‡å¯å®ƒ
 		then
 			logger -t "$NAME" "haproxy error.restart!"
 			echo "$(date "+%Y-%m-%d %H:%M:%S") haproxy error.restart!" >> ${logfile}
 			/etc/init.d/shadowsocksr restart
 		fi
 	fi
+#udp2raw
+	if [ $(uci_get_by_type udp2raw udp2raw_enable) = 1 ] ;then
+		ucount=`ps -w | grep udp2raw |grep -v grep| wc -l`
+		if [ $ucount = 0 ] ;then
+			/usr/bin/udp2raw --clear >/dev/null
+			/usr/bin/udp2raw --conf-file /var/etc/udp2raw.conf >/dev/null 2>&1 &
+		fi
+	fi
+#udpspeeder
+	if [ $(uci_get_by_type udpspeeder udpspeeder_enable) = 1 ] ;then
+		scount=`ps -w | grep udpspeeder |grep -v grep| wc -l`
+		if [ $scount = 0 ] ;then
+			/usr/bin/udpspeeder -c -l0.0.0.0:$(uci_get_by_type udpspeeder local_port) \
+				-r$(uci_get_by_type udpspeeder server):$(uci_get_by_type udpspeeder server_port) \
+				-k $(uci_get_by_type udpspeeder key) \
+				--mode $(uci_get_by_type udpspeeder speeder_mode) \
+				--mtu $(uci_get_by_type udpspeeder mtu) \
+				-f$(uci_get_by_type udpspeeder fec) \
+				-q$(uci_get_by_type udpspeeder queue_len) \
+				--timeout $(uci_get_by_type udpspeeder timeout) \
+				>/dev/null 2>&1 &
+		fi
+	fi
 done
+
+
