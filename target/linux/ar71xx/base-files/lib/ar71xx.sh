@@ -463,7 +463,7 @@ ar71xx_board_detect() {
 	*"AP143 reference board")
 		name="ap143"
 		;;
-	*"AP147-010 reference board")
+	*"Letv SuperRouter")
 		name="ap147-010"
 		;;
 	*"AP152 reference board")
@@ -813,9 +813,6 @@ ar71xx_board_detect() {
 		;;
 	*"JWAP230")
 		name="jwap230"
-		;;
-	*"CSAC")
-		name="csac"
 		;;
 	*"K2T A1/A2/A3 board")
 		#fixup: update the machine name

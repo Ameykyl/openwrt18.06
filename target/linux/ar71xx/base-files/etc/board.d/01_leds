@@ -448,11 +448,6 @@ hornet-ub-x2)
 	ucidef_set_led_wlan "wlan" "WLAN" "alfa:blue:wlan" "phy0tpt"
 	ucidef_set_led_usbdev "usb" "USB" "alfa:blue:usb" "1-1"
 	;;
-csac)
-	ucidef_set_led_switch "status" "status" "$board:green:status" "switch0" "0x10"
-	ucidef_set_led_wlan "wlan2g" "WLAN 2.4GHz" "$board:green:wlan2g" "phy1tpt"
-	ucidef_set_led_wlan "wlan5g" "WLAN 5GHz" "$board:green:wlan5g" "phy0tpt"
-	;;
 k2t)
 	ucidef_set_led_switch "blue" "WAN(blue)" "$board:blue:lan" "switch0" "0x10"
 	ucidef_set_led_default "yellow" "STATUS(yellow)" "$board:yellow:lan" "1"

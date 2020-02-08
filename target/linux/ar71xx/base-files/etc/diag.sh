@@ -268,9 +268,6 @@ get_status_led() {
 	jwap230)
 		status_led="$board:green:led1"
 		;;
-	csac)
-		status_led="$board:green:status"
-		;;
 	k2t)
 		status_led="$board:red:lan"
 		;;
@@ -587,6 +584,9 @@ set_state() {
 		status_led_blink_failsafe
 		;;
 	preinit_regular)
+		status_led_blink_preinit_regular
+		;;
+	upgrade)
 		status_led_blink_preinit_regular
 		;;
 	done)

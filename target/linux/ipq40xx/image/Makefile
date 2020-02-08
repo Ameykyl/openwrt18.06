@@ -106,7 +106,7 @@ define Device/asus_rt-acrh17
 	KERNEL_INITRAMFS := $$(KERNEL) | uImage none
 	KERNEL_INITRAMFS_SUFFIX := -factory.trx
 	IMAGES := sysupgrade.bin
-	DEVICE_PACKAGES := ipq-wifi-rt-acrh17 ath10k-firmware-qca9984 kmod-ath10k ath10k-firmware-qca4019
+	DEVICE_PACKAGES := ipq-wifi-rt-acrh17 ath10k-firmware-qca9984
 endef
 TARGET_DEVICES += asus_rt-acrh17
 
@@ -165,6 +165,19 @@ define Device/glinet_gl-b1300
 endef
 TARGET_DEVICES += glinet_gl-b1300
 
+define Device/hugo_ac1200
+	$(call Device/FitImage)
+	DEVICE_TITLE := Hugo AC1200
+	BOARD_NAME := hugo_ac1200
+	DEVICE_DTS := qcom-ipq4019-hugo-ac1200
+	KERNEL_SIZE := 4096k
+	IMAGE_SIZE := 31232k
+	IMAGES := sysupgrade.bin
+	IMAGE/sysupgrade.bin := append-kernel | append-rootfs | pad-rootfs | append-metadata
+	DEVICE_PACKAGES := ipq-wifi-hugo_ac1200
+endef
+TARGET_DEVICES += hugo_ac1200
+
 define Device/linksys_ea6350v3
 	# The Linksys EA6350v3 has a uboot bootloader that does not
 	# support either booting lzma kernel images nor booting UBI
@@ -210,16 +223,6 @@ define Device/meraki_mr33
 	DEVICE_PACKAGES := -swconfig ath10k-firmware-qca9887-ct
 endef
 TARGET_DEVICES += meraki_mr33
-
-define Device/qcom_cm520
-	$(call Device/FitImage)
-	$(call Device/UbiFit)
-	DEVICE_DTS := qcom-ipq4019-cm520
-	BLOCKSIZE := 128k
-	PAGESIZE := 2048
-	DEVICE_TITLE := Qualcomm CM520
-endef
-TARGET_DEVICES += qcom_cm520
 
 define Device/netgear_ex61x0v2
 	$(call Device/DniImage)
@@ -270,8 +273,36 @@ define Device/openmesh_a62
 	IMAGE/sysupgrade.bin/squashfs := append-rootfs | pad-rootfs | sysupgrade-tar rootfs=$$$$@ | append-metadata
 	DEVICE_PACKAGES := ath10k-firmware-qca9888-ct uboot-envtools
 endef
-
 TARGET_DEVICES += openmesh_a62
+
+define Device/p2w_r619ac
+	$(call Device/FitzImage)
+	$(call Device/UbiFit)
+	DEVICE_VENDOR := P&W
+	DEVICE_MODEL := R619AC
+	DEVICE_DTS := qcom-ipq4019-r619ac
+	DEVICE_DTS_CONFIG := config@10
+	BLOCKSIZE := 128k
+	PAGESIZE := 2048
+	IMAGES += nand-factory.bin
+	IMAGE/nand-factory.bin := append-ubi | qsdk-ipq-factory-nand
+	DEVICE_PACKAGES := ipq-wifi-p2w_r619ac
+endef
+TARGET_DEVICES += p2w_r619ac
+
+define Device/p2w_r619ac-128m
+	$(call Device/FitzImage)
+	$(call Device/UbiFit)
+	DEVICE_VENDOR := P&W
+	DEVICE_MODEL := R619AC
+	DEVICE_VARIANT := 128M
+	DEVICE_DTS := qcom-ipq4019-r619ac-128m
+	DEVICE_DTS_CONFIG := config@10
+	BLOCKSIZE := 128k
+	PAGESIZE := 2048
+	DEVICE_PACKAGES := ipq-wifi-p2w_r619ac
+endef
+TARGET_DEVICES += p2w_r619ac-128m
 
 define Device/qcom_ap-dk01.1-c1
 	DEVICE_TITLE := QCA AP-DK01.1-C1
@@ -298,18 +329,6 @@ define Device/qcom_ap-dk04.1-c1
 	DEVICE_TITLE := QCA AP-DK04.1-C1
 endef
 TARGET_DEVICES += qcom_ap-dk04.1-c1
-
-define Device/hugo_ac1200
-        $(call Device/FitImage)
-        DEVICE_TITLE :=  Hugo AC1200
-        BOARD_NAME := hugo_ac1200
-        DEVICE_DTS := qcom-ipq4019-hugo-ac1200
-        KERNEL_SIZE := 4096k
-        IMAGE_SIZE := 31232k
-        IMAGES := sysupgrade.bin
-        IMAGE/sysupgrade.bin := append-kernel | append-rootfs | pad-rootfs | append-metadata
-endef
-TARGET_DEVICES += hugo_ac1200
 
 define Device/zyxel_nbg6617
 	$(call Device/FitImageLzma)
