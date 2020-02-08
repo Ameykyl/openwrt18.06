@@ -25,7 +25,7 @@ libssl-dev texinfo libglib2.0-dev xmlto qemu-utils upx libelf-dev autoconf autom
 
 ##  默认登陆IP 192.168.1.1, 密码 无密码
 
- ----------------------------------------------------- ----------------------------------------------------- -----------------------------------------------------
+ ----------------------------------------------------- 
 This is the buildsystem for the OpenWrt Linux distribution.
 
 To build your own firmware you need a Linux, BSD or MacOSX system (case
