@@ -622,7 +622,10 @@ header > .container > a[class="brand"]:after {
     content: "\e00b";
    color: #F1C40F!important;
 }
-
+.main > .main-left > .nav > .slide > a[data-title="Docker"]:before {
+    content: "\e025";
+    color: #66CC00!important;
+}
 .main> .main-left> .nav> .slide > a[data-title=Statistics]:before {
     content: "\e00f";
    color: #1E90FF!important;
@@ -757,7 +760,7 @@ color: #e8c6c6;
 
 .main > .main-left > .nav > .slide > .slide-menu > .active > a {
   /* border-left: #ffffff 10px solid; */
-  color: 800080;
+  color:#FF9933;
 
 }
 
@@ -921,7 +924,7 @@ fieldset > .table > .tr:nth-of-type(odd) {
 #memcache > div > div,
 #memtotal > div > div {
     height: 1.4rem !important;
-    background-color: #009999 !important;
+    background-color: #44cef6 !important;
 
 }
 
@@ -1118,7 +1121,7 @@ form.inline + form.inline,
 	color: #525f7f;
 }
 .cbi-tabmenu > li[class~="cbi-tab"] {
-    background-color: #525f7f ;
+    background-color: #CCCCFF ;
 }
 
 

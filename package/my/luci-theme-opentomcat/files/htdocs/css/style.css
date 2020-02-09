@@ -532,10 +532,7 @@ color: #8965e0!important;
     content: "\e01b";
  color: #11cdef!important;
 }
-.main > .main-left > .nav > .slide > a[data-title="新春版客户端"]:before {
-    content: "\e01a";
- color: #00e09e!important;
-}
+
 .main > .main-left > .nav > .slide > a[data-title="NAS"]:before {
     content: "\e00b";
    color: #F1C40F!important;
@@ -553,7 +550,10 @@ color: #8965e0!important;
     content: "\e00a";
     color: #f3a4b5!important;
 }
-
+.main > .main-left > .nav > .slide > a[data-title="Docker"]:before {
+    content: "\e025";
+    color: #66CC00!important;
+}
 .main > .main-left > .nav > .slide > a[data-title="Bandwidth Monitor"]:before {
     content: "\e00f";
 color: #2dce89!important;
