@@ -55,7 +55,6 @@ jobs:
 
           
            git clone  https://github.com/Sweet-Fairy/openwrt-package
-           git clone  https://github.com/Flowers-in-thorns/luci-app-vssr-coexist
            git clone  https://github.com/lisaac/luci-lib-docker.git package/luci-lib-docker
            git clone  https://github.com/lisaac/luci-app-dockerman.git package/luci-app-dockerman
 
