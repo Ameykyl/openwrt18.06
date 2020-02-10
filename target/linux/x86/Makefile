@@ -13,7 +13,7 @@ FEATURES:=squashfs vdi vmdk pcmcia fpu
 SUBTARGETS:=64 generic core2 zen legacy geode 
 MAINTAINER:=Felix Fietkau <nbd@nbd.name>
 
-KERNEL_PATCHVER:=4.14
+KERNEL_PATCHVER:=4.19
 
 KERNELNAME:=bzImage
 
