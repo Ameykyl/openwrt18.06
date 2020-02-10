@@ -181,7 +181,8 @@ jobs:
            CONFIG_PACKAGE_luci-app-qos=y
            CONFIG_PACKAGE_luci-app-advancedsetting=y
            CONFIG_PACKAGE_luci-app-clash=y
-           CONFIG_PACKAGE_parted=y  
+           CONFIG_PACKAGE_parted=y
+           CONFIG_PACKAGE_open-vm-tools=y   
            CONFIG_PACKAGE_luci-app-qosv4=y
            CONFIG_PACKAGE_luci-app-samba=y
            CONFIG_PACKAGE_luci-app-smartdns=y
