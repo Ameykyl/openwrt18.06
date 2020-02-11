@@ -175,11 +175,10 @@ SOCKS5_NODE1_TYPE=""
 BROOK_SOCKS5_CMD=""
 BROOK_TCP_CMD=""
 BROOK_UDP_CMD=""
-AUTO_SWITCH_ENABLE=$(config_t_get auto_switch enable 0)
 TCP_REDIR_PORTS=$(config_t_get global_forwarding tcp_redir_ports '80,443')
 UDP_REDIR_PORTS=$(config_t_get global_forwarding udp_redir_ports '1:65535')
-KCPTUN_REDIR_PORT=$(config_t_get global_proxy kcptun_port 11183)
-PROXY_MODE=$(config_t_get global proxy_mode gfwlist)
+KCPTUN_REDIR_PORT=$(config_t_get global_forwarding kcptun_port 12948)
+PROXY_MODE=$(config_t_get global proxy_mode chnroute)
 
 load_config() {
 	[ "$ENABLED" != 1 ] && {
@@ -200,28 +199,29 @@ load_config() {
 		process=$(config_t_get global_forwarding process)
 	fi
 	LOCALHOST_PROXY_MODE=$(config_t_get global localhost_proxy_mode default)
-	UP_CHINA_DNS=$(config_t_get global up_china_dns 223.5.5.5,114.114.114.114)
-	[ ! -f "$RESOLVFILE" ] && RESOLVFILE=/tmp/resolv.conf.auto
-	[ "$UP_CHINA_DNS" == "dnsbyisp" ] && {
+	UP_CHINA_DNS=$(config_t_get global up_china_dns dnsbyisp)
+	[ "$UP_CHINA_DNS" == "default" ] && IS_DEFAULT_CHINA_DNS=1
+	[ ! -f "$RESOLVFILE" -o ! -s "$RESOLVFILE" ] && RESOLVFILE=/tmp/resolv.conf.auto
+	[ "$UP_CHINA_DNS" == "dnsbyisp" -o "$UP_CHINA_DNS" == "default" ] && {
 		local dns1=$(cat $RESOLVFILE 2>/dev/null | grep -E -o "[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+" | grep -v 0.0.0.0 | grep -v 127.0.0.1 | sed -n '1P')
 		if [ -n "$dns1" ]; then
 			UP_CHINA_DNS=$dns1
 		else
-			UP_CHINA_DNS="223.5.5.5,114.114.114.114"
+			UP_CHINA_DNS="223.5.5.5"
 		fi
 		local dns2=$(cat $RESOLVFILE 2>/dev/null | grep -E -o "[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+" | grep -v 0.0.0.0 | grep -v 127.0.0.1 | sed -n '2P')
 		[ -n "$dns1" -a -n "$dns2" ] && UP_CHINA_DNS="$dns1,$dns2"
 	}
-	TCP_REDIR_PORT1=$(config_t_get global_proxy tcp_redir_port 1041)
+	TCP_REDIR_PORT1=$(config_t_get global_forwarding tcp_redir_port 1041)
 	TCP_REDIR_PORT2=$(expr $TCP_REDIR_PORT1 + 1)
 	TCP_REDIR_PORT3=$(expr $TCP_REDIR_PORT2 + 1)
-	UDP_REDIR_PORT1=$(config_t_get global_proxy udp_redir_port 1051)
+	UDP_REDIR_PORT1=$(config_t_get global_forwarding udp_redir_port 1051)
 	UDP_REDIR_PORT2=$(expr $UDP_REDIR_PORT1 + 1)
 	UDP_REDIR_PORT3=$(expr $UDP_REDIR_PORT2 + 1)
-	SOCKS5_PROXY_PORT1=$(config_t_get global_proxy socks5_proxy_port 1061)
+	SOCKS5_PROXY_PORT1=$(config_t_get global_forwarding socks5_proxy_port 1081)
 	SOCKS5_PROXY_PORT2=$(expr $SOCKS5_PROXY_PORT1 + 1)
 	SOCKS5_PROXY_PORT3=$(expr $SOCKS5_PROXY_PORT2 + 1)
-	PROXY_IPV6=$(config_t_get global_proxy proxy_ipv6 0)
+	PROXY_IPV6=$(config_t_get global_forwarding proxy_ipv6 0)
 	mkdir -p /var/etc $CONFIG_PATH $RUN_PID_PATH $RUN_ID_PATH $RUN_IP_PATH $RUN_PORT_PATH
 	config_load $CONFIG
 	return 0
@@ -245,8 +245,8 @@ gen_ss_ssr_config_file() {
 	}
 	cat <<-EOF >$configfile
 		{
-			"server": "$server_host",
 			"_comment": "$server_ip",
+			"server": "$server_host",
 			"server_port": $port,
 			"local_address": "0.0.0.0",
 			"local_port": $local_port,
@@ -282,7 +282,7 @@ gen_start_config() {
 		network_type="ipv4"
 		[ "$use_ipv6" == "1" ] && network_type="ipv6"
 		server_ip=$(get_host_ip $network_type $server_host)
-		echolog "$redir_type节点：$remarks，节点地址端口：${server_ip}:${port}"
+		echolog "$redir_type节点：$remarks，节点：${server_ip}:${port}，监听端口：$local_port"
 	}
 
 	if [ "$redir_type" == "SOCKS5" ]; then
@@ -527,46 +527,30 @@ gen_start_config() {
 			kcptun_use=$(config_n_get $node use_kcp 0)
 			kcptun_server_host=$(config_n_get $node kcp_server)
 			kcptun_port=$(config_n_get $node kcp_port)
-			kcptun_config=$(config_n_get $node kcp_opts)
-			kcptun_path=""
+			kcptun_config="$(config_n_get $node kcp_opts)"
+			kcptun_bin=$(config_t_get global_app kcptun_client_file $(find_bin kcptun-client))
 			lbenabled=$(config_t_get global_haproxy balancing_enable 0)
+			if [ -z "$kcptun_bin" ]; then
+				echolog "【未安装Kcptun主程序，请到自动更新下载Kcptun】，跳过~"
+				force_stop
+			fi
 			if [ "$kcptun_use" == "1" ] && ([ -z "$kcptun_port" ] || [ -z "$kcptun_config" ]); then
-				echolog "【检测到启用KCP，但未配置KCP参数】，跳过~"
+				echolog "【未配置Kcptun参数】，跳过~"
+				force_stop
 			fi
-			if [ "$kcptun_use" == "1" -a -n "$kcptun_port" -a -n "$kcptun_config" -a "$lbenabled" == "1" ]; then
-				echolog "【检测到启用KCP，但KCP与负载均衡二者不能同时开启】，跳过~"
-			fi
-
-			if [ "$kcptun_use" == "1" ]; then
-				if [ -f "$(config_t_get global_kcptun kcptun_client_file)" ]; then
-					kcptun_path=$(config_t_get global_kcptun kcptun_client_file)
-				else
-					temp=$(find_bin kcptun_client)
-					[ -n "$temp" ] && kcptun_path=$temp
-				fi
-			fi
-
-			if [ "$kcptun_use" == "1" -a -z "$kcptun_path" ] && ([ -n "$kcptun_port" ] || [ -n "$kcptun_config" ]); then
-				echolog "【检测到启用KCP，但未安装KCP主程序，请自行到自动更新下载KCP】，跳过~"
-			fi
-
-			if [ "$kcptun_use" == "1" -a -n "$kcptun_port" -a -n "$kcptun_config" -a "$lbenabled" == "0" -a -n "$kcptun_path" ]; then
+			if [ "$kcptun_use" == "1" -a -n "$kcptun_port" -a -n "$kcptun_config" -a "$lbenabled" == "0" -a -f "$kcptun_bin" ]; then
 				local run_kcptun_ip=$server_ip
 				if [ -n "$kcptun_server_host" ]; then
 					kcptun_use_ipv6=$(config_n_get $node kcp_use_ipv6)
 					network_type="ipv4"
 					[ "$kcptun_use_ipv6" == "1" ] && network_type="ipv6"
 					kcptun_server_ip=$(get_host_ip $network_type $kcptun_server_host)
-					TCP_NODE1_IP=$kcptun_server_ip
+					eval TCP_NODE${5}_IP=$kcptun_server_ip
 					run_kcptun_ip=$kcptun_server_ip
-					echolog "KCP节点IP地址:$kcptun_server_ip"
+					echolog "Kcptun节点IP地址:$kcptun_server_ip"
 				fi
-				if [ -z "$kcptun_path" ]; then
-					echolog "找不到Kcptun客户端主程序，无法启用！"
-				else
-					$kcptun_bin --log $CONFIG_PATH/kcptun -l 0.0.0.0:$KCPTUN_REDIR_PORT -r $run_kcptun_ip:$kcptun_port "$kcptun_config" >/dev/null 2>&1 &
-					echolog "运行Kcptun..."
-				fi
+				KCPTUN_REDIR_PORT=$(get_not_exists_port_after $KCPTUN_REDIR_PORT udp)
+				$kcptun_bin --log $CONFIG_PATH/kcptun_${5}.log -l 0.0.0.0:$KCPTUN_REDIR_PORT -r $run_kcptun_ip:$kcptun_port $kcptun_config >/dev/null 2>&1 &
 			fi
 			
 			if [ "$type" == "ssr" ]; then
@@ -678,7 +662,7 @@ start_crontab() {
 		echolog "已启动守护进程。"
 	fi
 
-	auto_on=$(config_t_get global_delay auto_on)
+	auto_on=$(config_t_get global_delay auto_on 0)
 	if [ "$auto_on" = "1" ]; then
 		time_off=$(config_t_get global_delay time_off)
 		time_on=$(config_t_get global_delay time_on)
@@ -697,6 +681,7 @@ start_crontab() {
 		}
 	fi
 
+	AUTO_SWITCH_ENABLE=$(config_t_get auto_switch enable 0)
 	[ "$AUTO_SWITCH_ENABLE" = "1" ] && {
 		testing_time=$(config_t_get auto_switch testing_time)
 		[ -n "$testing_time" ] && {
@@ -710,7 +695,7 @@ start_crontab() {
 stop_crontab() {
 	sed -i "/$CONFIG/d" /etc/crontabs/root >/dev/null 2>&1 &
 	ps | grep "$APP_PATH/test.sh" | grep -v "grep" | awk '{print $1}' | xargs kill -9 >/dev/null 2>&1 &
-	rm -f /var/lock/passwall_test.lock >/dev/null 2>&1 &
+	rm -f /var/lock/${CONFIG}_test.lock >/dev/null 2>&1 &
 	/etc/init.d/cron restart
 	echolog "清除定时执行命令。"
 }
@@ -718,10 +703,10 @@ stop_crontab() {
 start_dns() {
 	case "$DNS_MODE" in
 	nonuse)
-		echolog "不使用任何DNS转发模式，将会直接将WAN口DNS给dnsmasq上游！"
+		echolog "DNS：不使用，将会直接使用上级DNS！"
 	;;
 	local_7913)
-		echolog "运行DNS转发模式：使用本机7913端口DNS服务器解析域名..."
+		echolog "DNS：使用本机7913端口DNS服务器解析域名..."
 	;;
 	dns2socks)
 		if [ -n "$SOCKS5_NODE1" -a "$SOCKS5_NODE1" != "nil" ]; then
@@ -729,20 +714,21 @@ start_dns() {
 			[ -n "$dns2socks_bin" ] && {
 				DNS2SOCKS_FORWARD=$(config_t_get global dns2socks_forward 8.8.4.4)
 				nohup $dns2socks_bin 127.0.0.1:$SOCKS5_PROXY_PORT1 $DNS2SOCKS_FORWARD 127.0.0.1:$DNS_PORT >/dev/null 2>&1 &
-				echolog "运行DNS转发模式：dns2socks..."
+				echolog "DNS：dns2socks..."
 			}
 		else
-			echolog "dns2socks模式需要使用Socks5代理节点，请开启！"
+			echolog "DNS：dns2socks模式需要使用Socks5代理节点，请开启！"
 			force_stop
 		fi
 	;;
 	pdnsd)
 		pdnsd_bin=$(find_bin pdnsd)
 		[ -n "$pdnsd_bin" ] && {
+			use_tcp_node_resolve_dns=1
 			gen_pdnsd_config $DNS_PORT "cache"
 			DNS_FORWARD=$(echo $DNS_FORWARD | sed 's/,/ /g')
 			nohup $pdnsd_bin --daemon -c $pdnsd_dir/pdnsd.conf -d >/dev/null 2>&1 &
-			echolog "运行DNS转发模式：pdnsd..."
+			echolog "DNS：pdnsd..."
 		}
 	;;
 	chinadns-ng)
@@ -756,7 +742,7 @@ start_dns() {
 			up_trust_chinadns_ng_dns=$(config_t_get global up_trust_chinadns_ng_dns "pdnsd")
 			if [ "$up_trust_chinadns_ng_dns" == "pdnsd" ]; then
 				if [ -z "$TCP_NODE1" -o "$TCP_NODE1" == "nil" ]; then
-					echolog "ChinaDNS-NG + pdnsd 模式需要启用TCP节点！"
+					echolog "DNS：ChinaDNS-NG + pdnsd 模式需要启用TCP节点！"
 					force_stop
 				else
 					use_tcp_node_resolve_dns=1
@@ -766,7 +752,7 @@ start_dns() {
 						DNS_FORWARD=$(echo $DNS_FORWARD | sed 's/,/ /g')
 						nohup $pdnsd_bin --daemon -c $pdnsd_dir/pdnsd.conf -d >/dev/null 2>&1 &
 						nohup $chinadns_ng_bin -l $DNS_PORT -c $UP_CHINA_DNS -t 127.0.0.1#$other_port $gfwlist_param $chnlist_param >/dev/null 2>&1 &
-						echolog "运行DNS转发模式：ChinaDNS-NG + pdnsd($DNS_FORWARD)，国内DNS：$UP_CHINA_DNS"
+						echolog "DNS：ChinaDNS-NG + pdnsd($DNS_FORWARD)，国内DNS：$UP_CHINA_DNS"
 					}
 				fi
 			elif [ "$up_trust_chinadns_ng_dns" == "dns2socks" ]; then
@@ -776,22 +762,17 @@ start_dns() {
 						DNS2SOCKS_FORWARD=$(config_t_get global dns2socks_forward 8.8.4.4)
 						nohup $dns2socks_bin 127.0.0.1:$SOCKS5_PROXY_PORT1 $DNS2SOCKS_FORWARD 127.0.0.1:$other_port >/dev/null 2>&1 &
 						nohup $chinadns_ng_bin -l $DNS_PORT -c $UP_CHINA_DNS -t 127.0.0.1#$other_port $gfwlist_param $chnlist_param >/dev/null 2>&1 &
-						echolog "运行DNS转发模式：ChinaDNS-NG + dns2socks($DNS2SOCKS_FORWARD)，国内DNS：$UP_CHINA_DNS"
+						echolog "DNS：ChinaDNS-NG + dns2socks($DNS2SOCKS_FORWARD)，国内DNS：$UP_CHINA_DNS"
 					}
 				else
-					echolog "dns2socks模式需要使用Socks5代理节点，请开启！"
+					echolog "DNS：dns2socks模式需要使用Socks5代理节点，请开启！"
 					force_stop
 				fi
 			else
-				if [ -z "$UDP_NODE1" -o "$UDP_NODE1" == "nil" ]; then
-					nohup $chinadns_ng_bin -l $DNS_PORT -c $UP_CHINA_DNS -t 208.67.222.222#443,208.67.222.222#5353 $gfwlist_param $chnlist_param >/dev/null 2>&1 &
-					echolog "运行DNS转发模式：ChinaDNS-NG，国内DNS：$UP_CHINA_DNS，因为你没有使用UDP节点，将使用OpenDNS 443端口或5353端口作为可信DNS。"
-				else
-					use_udp_node_resolve_dns=1
-					DNS_FORWARD=$(echo $up_trust_chinadns_ng_dns | sed 's/,/ /g')
-					nohup $chinadns_ng_bin -l $DNS_PORT -c $UP_CHINA_DNS -t $up_trust_chinadns_ng_dns $gfwlist_param $chnlist_param >/dev/null 2>&1 &
-					echolog "运行DNS转发模式：ChinaDNS-NG，国内DNS：$UP_CHINA_DNS，可信DNS：$up_trust_chinadns_ng_dns"
-				fi
+				use_udp_node_resolve_dns=1
+				DNS_FORWARD=$(echo $up_trust_chinadns_ng_dns | sed 's/,/ /g')
+				nohup $chinadns_ng_bin -l $DNS_PORT -c $UP_CHINA_DNS -t $up_trust_chinadns_ng_dns $gfwlist_param $chnlist_param >/dev/null 2>&1 &
+				echolog "DNS：ChinaDNS-NG，国内DNS：$UP_CHINA_DNS，可信DNS：$up_trust_chinadns_ng_dns，如果不能使用，请确保UDP节点已打开并且支持UDP转发。"
 			fi
 		}
 	;;
@@ -830,35 +811,28 @@ add_dnsmasq() {
 		cat $RULE_PATH/router | awk '{print "server=/."$1"/127.0.0.1#'$DNS_PORT'\nipset=/."$1"/router"}' >>$TMP_DNSMASQ_PATH/router.conf
 	fi
 
-	userconf=$(grep -c "" $RULE_PATH/user.conf)
-	if [ "$userconf" -gt 0 ]; then
-		ln -s $RULE_PATH/user.conf $TMP_DNSMASQ_PATH/user.conf
-	fi
-
-	backhome=$(config_t_get global proxy_mode gfwlist)
-	if [ "$backhome" == "returnhome" ]; then
-		rm -rf $TMP_DNSMASQ_PATH/gfwlist.conf
-		rm -rf $TMP_DNSMASQ_PATH/blacklist_host.conf
-		rm -rf $TMP_DNSMASQ_PATH/whitelist_host.conf
-	fi
-
-	server="server=127.0.0.1#$DNS_PORT"
-	[ "$DNS_MODE" != "chinadns-ng" ] && {
-		local china_dns1=$(echo $UP_CHINA_DNS | awk -F "," '{print $1}')
-		local china_dns2=$(echo $UP_CHINA_DNS | awk -F "," '{print $2}')
-		[ -n "$china_dns1" ] && server="server=$china_dns1"
-		[ -n "$china_dns2" ] && server="${server}\n${server_2}"
-		server="${server}\nno-resolv"
-	}
-	cat <<-EOF > /var/dnsmasq.d/dnsmasq-$CONFIG.conf
+	if [ -z "$IS_DEFAULT_CHINA_DNS" -o "$IS_DEFAULT_CHINA_DNS" == 0 ]; then
+		server="server=127.0.0.1#$DNS_PORT"
+		[ "$DNS_MODE" != "chinadns-ng" ] && {
+			local china_dns1=$(echo $UP_CHINA_DNS | awk -F "," '{print $1}')
+			local china_dns2=$(echo $UP_CHINA_DNS | awk -F "," '{print $2}')
+			[ -n "$china_dns1" ] && server="server=$china_dns1"
+			[ -n "$china_dns2" ] && server="${server}\n${server_2}"
+			server="${server}\nno-resolv"
+		}
+		cat <<-EOF > /var/dnsmasq.d/dnsmasq-$CONFIG.conf
 			$(echo -e $server)
 			all-servers
 			no-poll
-			conf-dir=$TMP_DNSMASQ_PATH
+		EOF
+	fi
+	
+	cat <<-EOF >> /var/dnsmasq.d/dnsmasq-$CONFIG.conf
+		conf-dir=$TMP_DNSMASQ_PATH
 	EOF
 	cp -rf /var/dnsmasq.d/dnsmasq-$CONFIG.conf $DNSMASQ_PATH/dnsmasq-$CONFIG.conf
-	echolog "dnsmasq：生成配置文件并重启服务。"
 	/etc/init.d/dnsmasq restart >/dev/null 2>&1 &
+	echolog "dnsmasq：生成配置文件并重启服务。"
 }
 
 gen_redsocks_config() {
@@ -929,7 +903,6 @@ gen_redsocks_config() {
 gen_pdnsd_config() {
 	pdnsd_dir=$CONFIG_PATH/pdnsd
 	mkdir -p $pdnsd_dir
-	touch $pdnsd_dir/pdnsd.cache
 	chown -R root.nogroup $pdnsd_dir
 	[ "$2" == "cache" ] && cache_param="perm_cache = 1024;\ncache_dir = \"$pdnsd_dir\";"
 	cat > $pdnsd_dir/pdnsd.conf <<-EOF
@@ -1123,12 +1096,10 @@ force_stop() {
 }
 
 boot() {
-	local delay=$(config_t_get global_delay start_delay 0)
+	local delay=$(config_t_get global_delay start_delay 1)
 	if [ "$delay" -gt 0 ]; then
-		[ "$TCP_NODE1" != "nil" -o "$UDP_NODE1" != "nil" ] && {
-			echolog "执行启动延时 $delay 秒后再启动!"
-			sleep $delay && start >/dev/null 2>&1 &
-		}
+		echolog "执行启动延时 $delay 秒后再启动!"
+		sleep $delay && start >/dev/null 2>&1 &
 	else
 		start
 	fi
@@ -1154,18 +1125,22 @@ start() {
 }
 
 stop() {
-	while [ -f "$LOCK_FILE" ]; do
-		sleep 1s
+	failcount=1
+	while [ "$failcount" -le 10 ]; do
+		if [ -f "$LOCK_FILE" ]; then
+			let "failcount++"
+			sleep 1s
+			[ "$failcount" -ge 10 ] && rm -f "$LOCK_FILE"
+		else
+			break
+		fi
 	done
 	clean_log
 	source $APP_PATH/iptables.sh stop
 	kill_all brook dns2socks haproxy chinadns-ng ipt2socks v2ray-plugin
 	ps -w | grep -E "$CONFIG_TCP_FILE|$CONFIG_UDP_FILE|$CONFIG_SOCKS5_FILE" | grep -v "grep" | awk '{print $1}' | xargs kill -9 >/dev/null 2>&1 &
 	ps -w | grep -E "$CONFIG_PATH" | grep -v "grep" | awk '{print $1}' | xargs kill -9 >/dev/null 2>&1 &
-	ps -w | grep "kcptun_client" | grep "$KCPTUN_REDIR_PORT" | grep -v "grep" | awk '{print $1}' | xargs kill -9 >/dev/null 2>&1 &
-	rm -rf /var/pdnsd/pdnsd.cache
-	rm -rf $TMP_DNSMASQ_PATH
-	rm -rf $CONFIG_PATH
+	rm -rf $TMP_DNSMASQ_PATH $CONFIG_PATH
 	stop_dnsmasq
 	stop_crontab
 	echolog "关闭相关程序，清理相关文件和缓存完成。"
