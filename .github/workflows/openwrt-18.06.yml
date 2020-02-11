@@ -54,6 +54,7 @@ jobs:
            cd package/diy
            tar  xvJf    luci-app-docker.tar.xz
            tar  xvJf    luci-app-rclone.tar.xz
+           tar  xvJf    luci-app-koolddns.tar.xz
            git clone  https://github.com/Leo-Jo-My/luci-app-vssr-coexist
            git clone  https://github.com/Sweet-Fairy/openwrt-package
            git clone  https://github.com/lisaac/luci-lib-docker.git package/luci-lib-docker
