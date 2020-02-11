@@ -66,9 +66,9 @@ start(){
 	fi
 
 	#获取FORWARD ACCEPT规则行号
-	FA_INDEX=`iptables -t filter -L FORWARD|tail -n +3|sed -n -e '/^ACCEPT/='`
+	FA_INDEX=`iptables -t filter -L FORWARD --line-numbers | tail -n +3 | grep -E ACCEPT | grep ctstate | grep fw3 | awk '{print $1}'`
 	if [ -n "$FA_INDEX" ]; then
-			let FA_INDEX+=1
+		let FA_INDEX+=1
 	fi
 	#确保添加到FORWARD ACCEPT规则之后
 	iptables -t filter -I FORWARD $FA_INDEX -m comment --comment "Rule For Control" -j WEB_RESTRICTION
