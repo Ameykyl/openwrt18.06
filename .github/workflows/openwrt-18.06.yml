@@ -176,6 +176,7 @@ jobs:
            CONFIG_PACKAGE_luci-app-unblockmusic=y
            CONFIG_PACKAGE_UnblockNeteaseMusic=y
            CONFIG_PACKAGE_luci-app-qos=y
+           CONFIG_PACKAGE_luci-app-onliner=y
            CONFIG_PACKAGE_luci-app-advancedsetting=y
            CONFIG_PACKAGE_luci-app-clash=y
            CONFIG_PACKAGE_parted=y
