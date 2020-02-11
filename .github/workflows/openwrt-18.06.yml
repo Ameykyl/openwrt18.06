@@ -183,7 +183,7 @@ jobs:
            CONFIG_PACKAGE_parted=y
            CONFIG_PACKAGE_open-vm-tools=y   
            CONFIG_PACKAGE_luci-app-qosv4=y
-           CONFIG_PACKAGE_luci-app-samba=y
+          # CONFIG_PACKAGE_luci-app-samba=y
            CONFIG_PACKAGE_luci-app-smartdns=y
            CONFIG_PACKAGE_kmod-tcp-bbr-mod=y
            CONFIG_PACKAGE_kmod-tcp-bbr-nanqinlang=y
@@ -194,8 +194,8 @@ jobs:
           # CONFIG_PACKAGE_luci-app-adblock=y
           # CONFIG_PACKAGE_luci-app-cd8021x=y
             CONFIG_PACKAGE_luci-app-chinadns=y
-          # CONFIG_PACKAGE_luci-app-cifs=y
-          # CONFIG_PACKAGE_luci-app-cifsd=y
+            CONFIG_PACKAGE_luci-app-cifs=y
+            CONFIG_PACKAGE_luci-app-cifsd=y
           # CONFIG_PACKAGE_luci-app-banip=y
             CONFIG_PACKAGE_luci-app-brook-server=y
           # CONFIG_PACKAGE_luci-app-commands=y
@@ -210,10 +210,10 @@ jobs:
           # CONFIG_PACKAGE_luci-app-mentohust=y
           # CONFIG_PACKAGE_luci-app-mjpg-streamer=y
           # CONFIG_PACKAGE_luci-app-n2n_v2=y
-          # CONFIG_PACKAGE_luci-app-nfs=y
+            CONFIG_PACKAGE_luci-app-nfs=y
           # CONFIG_PACKAGE_luci-app-ocserv=y
           # CONFIG_PACKAGE_luci-app-oscam=y
-          # CONFIG_PACKAGE_luci-app-samba4=y
+            CONFIG_PACKAGE_luci-app-samba4=y
           # CONFIG_PACKAGE_luci-app-softethervpn5=y
           # CONFIG_PACKAGE_luci-app-speederv2=y
             CONFIG_PACKAGE_luci-app-ssr-libev-server=y
