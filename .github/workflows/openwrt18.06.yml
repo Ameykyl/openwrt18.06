@@ -111,14 +111,14 @@ jobs:
           #  CONFIG_TARGET_IMAGES_GZIP=y
           #  EOF
           # 编译UEFI固件:
-          #  cat >> .config <<EOF
-          #  CONFIG_EFI_IMAGES=y
-          #  EOF
+            cat >> .config <<EOF
+            CONFIG_EFI_IMAGES=y
+            EOF
           # IPv6支持:
-          # cat >> .config <<EOF
-          # CONFIG_PACKAGE_dnsmasq_full_dhcpv6=y
-          # CONFIG_PACKAGE_ipv6helper=y
-          # EOF
+           cat >> .config <<EOF
+           CONFIG_PACKAGE_dnsmasq_full_dhcpv6=y
+           CONFIG_PACKAGE_ipv6helper=y
+           EOF
           # 多文件系统支持:
           # cat >> .config <<EOF
           # CONFIG_PACKAGE_kmod-fs-nfs=y
@@ -139,8 +139,8 @@ jobs:
           # 常用LuCI插件选择:
            cat >> .config <<EOF
            CONFIG_PACKAGE_luci-app-adbyby-plus=y
-           CONFIG_PACKAGE_luci-app-aria2=y
-           CONFIG_PACKAGE_luci-app-baidupcs-web=y
+          # CONFIG_PACKAGE_luci-app-aria2=y
+          # CONFIG_PACKAGE_luci-app-baidupcs-web=y
           # CONFIG_PACKAGE_luci-app-docker=y
           # CONFIG_PACKAGE_luci-lib-docker=y
           # CONFIG_PACKAGE_luci-app-dockerman=y
@@ -149,31 +149,31 @@ jobs:
            CONFIG_PACKAGE_luci-app-rclone=y
            CONFIG_PACKAGE_luci-app-frpc=y
            CONFIG_PACKAGE_luci-app-koolddns=y
-           CONFIG_PACKAGE_luci-app-kodexplorer=y
+          # CONFIG_PACKAGE_luci-app-kodexplorer=y
            CONFIG_PACKAGE_luci-app-minidlna=y
            CONFIG_PACKAGE_luci-app-openvpn=y
            CONFIG_PACKAGE_luci-app-openvpn-server=y
           # CONFIG_PACKAGE_luci-app-qbittorrent=y
           # CONFIG_PACKAGE_luci-app-trojan-server=y
            CONFIG_PACKAGE_luci-app-familycloud=y
-           CONFIG_PACKAGE_luci-app-smartinfo=y
+          # CONFIG_PACKAGE_luci-app-smartinfo=y
            CONFIG_PACKAGE_luci-app-passwall=y
-           CONFIG_PACKAGE_luci-app-syncthing=y
+          # CONFIG_PACKAGE_luci-app-syncthing=y
            CONFIG_PACKAGE_luci-app-passwall_INCLUDE_dns2socks=y
            CONFIG_PACKAGE_luci-app-passwall_INCLUDE_haproxy is not set
-           CONFIG_PACKAGE_luci-app-syncdial=y
+          # CONFIG_PACKAGE_luci-app-syncdial=y
            CONFIG_PACKAGE_luci-app-ttyd=y
            CONFIG_PACKAGE_luci-app-mwan3=y
            CONFIG_PACKAGE_luci-app-mwan3helper=y
            CONFIG_PACKAGE_luci-app-openclash=y
            CONFIG_PACKAGE_luci-app-v2ray-server=y
-           CONFIG_PACKAGE_luci-app-verysync=y
+          # CONFIG_PACKAGE_luci-app-verysync=y
            CONFIG_PACKAGE_luci-app-webadmin=y
            CONFIG_PACKAGE_luci-app-udpxy=y
            CONFIG_PACKAGE_luci-app-serverchan=y
            CONFIG_PACKAGE_luci-app-usb-printer=y
            CONFIG_PACKAGE_luci-app-nps=y
-           CONFIG_PACKAGE_luci-app-cpulimit=y
+          # CONFIG_PACKAGE_luci-app-cpulimit=y
            CONFIG_PACKAGE_luci-app-netdata=y
            CONFIG_PACKAGE_luci-app-cupsd=y
           # CONFIG_PACKAGE_luci-app-unblockmusic=y
@@ -185,8 +185,8 @@ jobs:
            CONFIG_PACKAGE_luci-app-qosv4=y
            CONFIG_PACKAGE_luci-app-samba=y
            CONFIG_PACKAGE_luci-app-smartdns=y
-          # CONFIG_PACKAGE_kmod-tcp-bbr-mod=y
-          # CONFIG_PACKAGE_kmod-tcp-bbr-nanqinlang=y
+           CONFIG_PACKAGE_kmod-tcp-bbr-mod=y
+           CONFIG_PACKAGE_kmod-tcp-bbr-nanqinlang=y
            CONFIG_PACKAGE_luci-app-vssr-coexist=y
            CONFIG_PACKAGE_luci-app-advanced-reboot=y
           # CONFIG_PACKAGE_luci-app-amule=y
@@ -197,7 +197,7 @@ jobs:
           # CONFIG_PACKAGE_luci-app-cifs=y
           # CONFIG_PACKAGE_luci-app-cifsd=y
           # CONFIG_PACKAGE_luci-app-banip=y
-          #  CONFIG_PACKAGE_luci-app-brook-server=y
+          # CONFIG_PACKAGE_luci-app-brook-server=y
           # CONFIG_PACKAGE_luci-app-commands=y
           # CONFIG_PACKAGE_luci-app-control-mia=y
           # CONFIG_PACKAGE_luci-app-control-timewol=y
@@ -206,7 +206,7 @@ jobs:
             CONFIG_PACKAGE_luci-app-dnspod=y
           # CONFIG_PACKAGE_luci-app-filebrowser=y
           # CONFIG_PACKAGE_luci-app-fileassistant=y
-          # CONFIG_PACKAGE_luci-app-haproxy-tcp=y
+           CONFIG_PACKAGE_luci-app-haproxy-tcp=y
           # CONFIG_PACKAGE_luci-app-mentohust=y
           # CONFIG_PACKAGE_luci-app-mjpg-streamer=y
           # CONFIG_PACKAGE_luci-app-n2n_v2=y
@@ -214,11 +214,11 @@ jobs:
           # CONFIG_PACKAGE_luci-app-ocserv=y
           # CONFIG_PACKAGE_luci-app-oscam=y
           #  CONFIG_PACKAGE_luci-app-samba4=y
-          # CONFIG_PACKAGE_luci-app-softethervpn5=y
+           CONFIG_PACKAGE_luci-app-softethervpn5=y
           # CONFIG_PACKAGE_luci-app-speederv2=y
             CONFIG_PACKAGE_luci-app-ssr-libev-server=y
             CONFIG_PACKAGE_luci-app-ssr-python-pro-server=y
-           CONFIG_PACKAGE_luci-app-transmission=y
+          # CONFIG_PACKAGE_luci-app-transmission=y
            CONFIG_LUCI_LANG_en=y
            CONFIG_LUCI_LANG_zh-tw=y
            EOF
@@ -257,7 +257,7 @@ jobs:
           df -h
       - name: Compile firmware
         run: |
-          make -j$(nproc) || make -j20 V=s
+          make -j$(nproc) || make  v=S
           echo "======================="
           echo "Space usage:"
           echo "======================="
