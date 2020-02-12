@@ -52,27 +52,15 @@ jobs:
       - name: 自定义插件
         run: |
            cd package/diy
-           tar   xvJf  luci-app-smartdns.tar.xz
-           tar   xvJf  smartdns.tar.xz
-           tar   xvJf  luci-app-docker.tar.xz
-           tar   xvJf  luci-app-koolddns.tar.xz
-           tar   xvJf  luci-app-rclone.tar.xz
-           tar   xvJf  rclone-webui-react.tar.xz
-           tar   xvJf  rclone.tar.xz
-           tar   xvJf  luci-app-diskman.tar.xz
-           tar   xvJf  parted.tar.xz
-           git clone  https://github.com/Flowers-in-thorns/luci-app-vssr-coexist
-           git clone  https://github.com/Sweet-Fairy/openwrt-package
-           git clone  https://github.com/vernesong/OpenClash
-           git clone  https://github.com/Leo-Jo-My/luci-app-clash
-           git clone https://github.com/lisaac/luci-lib-docker.git package/luci-lib-docker
-           git clone https://github.com/lisaac/luci-app-dockerman.git package/luci-app-dockerman
-           cd ../..
-           cd target/linux/x86/image
-           chmod u+x  gen_image_efi.sh
-           
-           
+           tar  xvJf  luci-app-docker.tar.xz
+           tar  xvJf  luci-app-koolddns.tar.xz
+           tar  xvJf  luci-app-rclone.tar.xz
 
+           git clone  https://github.com/Sweet-Fairy/openwrt-package
+           git clone  https://github.com/Flowers-in-thorns/luci-app-vssr-coexist
+           git clone  https://github.com/lisaac/luci-lib-docker.git package/luci-lib-docker
+           git clone  https://github.com/lisaac/luci-app-dockerman.git package/luci-app-dockerman
+           
       - name: Update feeds
         run: |
           ./scripts/feeds update -a
@@ -120,23 +108,23 @@ jobs:
           #  CONFIG_TARGET_IMAGES_GZIP=y
           #  EOF
           # 编译UEFI固件:
-           cat >> .config <<EOF
-           CONFIG_EFI_IMAGES=y
-           EOF
+          #  cat >> .config <<EOF
+          #  CONFIG_EFI_IMAGES=y
+          #  EOF
           # IPv6支持:
-           cat >> .config <<EOF
-           CONFIG_PACKAGE_dnsmasq_full_dhcpv6=y
-           CONFIG_PACKAGE_ipv6helper=y
-           EOF
+          # cat >> .config <<EOF
+          # CONFIG_PACKAGE_dnsmasq_full_dhcpv6=y
+          # CONFIG_PACKAGE_ipv6helper=y
+          # EOF
           # 多文件系统支持:
-           cat >> .config <<EOF
-           CONFIG_PACKAGE_kmod-fs-nfs=y
-           CONFIG_PACKAGE_kmod-fs-nfs-common=y
-           CONFIG_PACKAGE_kmod-fs-nfs-v3=y
-           CONFIG_PACKAGE_kmod-fs-nfs-v4=y
-           CONFIG_PACKAGE_kmod-fs-ntfs=y
-           CONFIG_PACKAGE_kmod-fs-squashfs=y
-           EOF
+          # cat >> .config <<EOF
+          # CONFIG_PACKAGE_kmod-fs-nfs=y
+          # CONFIG_PACKAGE_kmod-fs-nfs-common=y
+          # CONFIG_PACKAGE_kmod-fs-nfs-v3=y
+          # CONFIG_PACKAGE_kmod-fs-nfs-v4=y
+          # CONFIG_PACKAGE_kmod-fs-ntfs=y
+          # CONFIG_PACKAGE_kmod-fs-squashfs=y
+          # EOF
           # USB3.0支持:
            cat >> .config <<EOF
            CONFIG_PACKAGE_kmod-usb-ohci=y
@@ -144,7 +132,7 @@ jobs:
            CONFIG_PACKAGE_kmod-usb2=y
            CONFIG_PACKAGE_kmod-usb2-pci=y
            CONFIG_PACKAGE_kmod-usb3=y
-           EOF
+          EOF
           # 常用LuCI插件选择:
            cat >> .config <<EOF
            CONFIG_PACKAGE_luci-app-adbyby-plus=y
@@ -153,7 +141,7 @@ jobs:
           # CONFIG_PACKAGE_luci-app-docker=y
           # CONFIG_PACKAGE_luci-lib-docker=y
           # CONFIG_PACKAGE_luci-app-dockerman=y
-          # CONFIG_PACKAGE_luci-app-diskman=y
+           CONFIG_PACKAGE_luci-app-diskman=y
            CONFIG_PACKAGE_luci-app-aliddns=y
            CONFIG_PACKAGE_luci-app-rclone=y
            CONFIG_PACKAGE_luci-app-frpc=y
@@ -206,36 +194,38 @@ jobs:
           # CONFIG_PACKAGE_luci-app-cifs=y
           # CONFIG_PACKAGE_luci-app-cifsd=y
           # CONFIG_PACKAGE_luci-app-banip=y
-          # CONFIG_PACKAGE_luci-app-brook-server=y
+            CONFIG_PACKAGE_luci-app-brook-server=y
           # CONFIG_PACKAGE_luci-app-commands=y
           # CONFIG_PACKAGE_luci-app-control-mia=y
-           CONFIG_PACKAGE_luci-app-control-timewol=y
+          # CONFIG_PACKAGE_luci-app-control-timewol=y
           # CONFIG_PACKAGE_luci-app-control-webrestriction=y
           # CONFIG_PACKAGE_luci-app-control-weburl=y
             CONFIG_PACKAGE_luci-app-dnspod=y
           # CONFIG_PACKAGE_luci-app-filebrowser=y
           # CONFIG_PACKAGE_luci-app-fileassistant=y
-            CONFIG_PACKAGE_luci-app-haproxy-tcp=y
+          # CONFIG_PACKAGE_luci-app-haproxy-tcp=y
           # CONFIG_PACKAGE_luci-app-mentohust=y
           # CONFIG_PACKAGE_luci-app-mjpg-streamer=y
           # CONFIG_PACKAGE_luci-app-n2n_v2=y
-          # CONFIG_PACKAGE_luci-app-nfs=y
-           CONFIG_PACKAGE_luci-app-ocserv=y
+            CONFIG_PACKAGE_luci-app-nfs=y
+          # CONFIG_PACKAGE_luci-app-ocserv=y
           # CONFIG_PACKAGE_luci-app-oscam=y
           # CONFIG_PACKAGE_luci-app-samba4=y
            CONFIG_PACKAGE_luci-app-softethervpn5=y
           # CONFIG_PACKAGE_luci-app-speederv2=y
-           CONFIG_PACKAGE_luci-app-ssr-libev-server=y
-           CONFIG_PACKAGE_luci-app-ssr-python-pro-server=y
+            CONFIG_PACKAGE_luci-app-ssr-libev-server=y
+            CONFIG_PACKAGE_luci-app-ssr-python-pro-server=y
           # CONFIG_PACKAGE_luci-app-transmission=y
            CONFIG_LUCI_LANG_en=y
            CONFIG_LUCI_LANG_zh-tw=y
            EOF
           # LuCI主题:
            cat >> .config <<EOF
-           CONFIG_PACKAGE_luci-theme-opentomcat=y
-           CONFIG_PACKAGE_luci-theme-opentomato=y
-           CONFIG_PACKAGE_luci-theme-argon-mod=y
+            CONFIG_PACKAGE_luci-theme-Butterfly=y
+            CONFIG_PACKAGE_luci-theme-opentomcat=y
+            CONFIG_PACKAGE_luci-theme-opentomato=y
+            CONFIG_PACKAGE_luci-theme-argon-mod=y
+            
            EOF
           # 常用软件包:
            cat >> .config <<EOF
@@ -246,7 +236,6 @@ jobs:
            CONFIG_PACKAGE_tree=y
            CONFIG_PACKAGE_vim-fuller=y
            CONFIG_PACKAGE_wget=y
-           CONFIG_PACKAGE_open-vm-tools=y
            EOF
           # 取消编译VMware镜像以及镜像填充 (不要删除被缩进的注释符号):
            cat >> .config <<EOF
@@ -265,7 +254,7 @@ jobs:
           df -h
       - name: Compile firmware
         run: |
-          make -j$(nproc) || make  V=s
+          make -j$(nproc) || make v=S
           echo "======================="
           echo "Space usage:"
           echo "======================="
@@ -280,12 +269,15 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-artifact@master
         with:
-          name: OpenWrt firmware
+          name: OpenWrt18.06 firmware
           path: ./bin/targets/
-          
+
+       
       - name: Upload artifact
         uses: actions/upload-artifact@master
         with:
           name: OpenWrt18.06 IPK
           path: ./bin/packages/
+          
 
+          
