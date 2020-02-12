@@ -1,5 +1,5 @@
 msgid "Pass Wall"
-msgstr "科学上网"
+msgstr "PassWall"
 
 msgid "Auto"
 msgstr "自动"
@@ -24,6 +24,12 @@ msgstr "好"
 
 msgid "general"
 msgstr "一般般"
+
+msgid "Status"
+msgstr "状态"
+
+msgid "Subscription"
+msgstr "订阅管理"
 
 msgid "bad"
 msgstr "差"
@@ -55,14 +61,8 @@ msgstr "全局设置"
 msgid "Basic Settings"
 msgstr "基本设置"
 
-msgid "Status"
-msgstr "状态"
-
 msgid "Node List"
 msgstr "节点列表"
-
-msgid "Subscription"
-msgstr "订阅管理"
 
 msgid "Other Settings"
 msgstr "高级设置"
