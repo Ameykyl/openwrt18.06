@@ -38,7 +38,7 @@ m = Map(appname)
 local status_use_big_icon = api.uci_get_type("global_other",
                                              "status_use_big_icon", 1)
 if status_use_big_icon and status_use_big_icon == "1" then
-    m:append(Template("cbi/status"))
+    m:append(Template("passwall/global/status"))
 else
     m:append(Template("passwall/global/status2"))
 end

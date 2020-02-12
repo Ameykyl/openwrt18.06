@@ -1,3 +1,8 @@
+<%#
+ Copyright (C) 2018-2019 Lienol
+ Licensed to the public under the Apache License 2.0.
+-%>
+
 <%
 local dsp = require "luci.dispatcher"
 -%>
@@ -6,15 +11,11 @@ local dsp = require "luci.dispatcher"
   var msgInfo;
 
   var tokenStr = '<%=token%>';
-  var clickToDownloadText = '<%:Click to update%>';
-  var inProgressText = '<%:Updating...%>';
-  var downloadInProgressNotice = '<%:Updating, are you sure to close?%>';
-  var downloadSuccessText = '<%:Update successful%>';
-  var unexpectedErrorText = '<%:Unexpected error%>';
-  var downloadingText = '<%:Downloading...%>';
-  var decompressioningText = '<%:Unpacking...%>';
-  var movingText = '<%:Moving...%>';
-  var latestVersionText = '<%:The latest version:%>';
+  var clickToDownloadText = '<%:点击下载%>';
+  var inProgressText = '<%:正在下载...%>';
+  var downloadInProgressNotice = '<%:正在下载，你确认要关闭吗？%>';
+  var downloadSuccessText = '<%:下载成功.%>';
+  var unexpectedErrorText = '<%:意外错误.%>';
 
   function addPageNotice() {
     window.onbeforeunload = function(e) {
@@ -96,7 +97,7 @@ local dsp = require "luci.dispatcher"
       if (ckeckDetailElm) {
         var urlNode = '';
         if (json.version) {
-          urlNode = '<em style="color:red;">' + latestVersionText + json.version + '</em>';
+          urlNode = '<em style="color:red;">最新版本号：' + json.version + '</em>';
           if (json.url && json.url.html) {
             urlNode = '<a href="' + json.url.html + '" target="_blank">' + urlNode + '</a>';
           }
@@ -109,7 +110,7 @@ local dsp = require "luci.dispatcher"
 
   function doDownload(btn) {
     btn.disabled = true;
-    btn.value = downloadingText;
+    btn.value = '<%:下载中...%>';
 
     addPageNotice();
 
@@ -123,7 +124,7 @@ local dsp = require "luci.dispatcher"
         removePageNotice();
         onRequestError(btn, json.error);
       } else {
-        btn.value = decompressioningText;
+        btn.value = '<%:解压中...%>';
 
         // Extract file
         doAjaxGet(UpdateUrl, {
@@ -135,7 +136,7 @@ local dsp = require "luci.dispatcher"
             removePageNotice();
             onRequestError(btn, json.error);
           } else {
-            btn.value = movingText;
+            btn.value = '<%:移动中...%>';
 
             // Move file to target dir
             doAjaxGet(UpdateUrl, {
