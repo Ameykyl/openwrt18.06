@@ -224,6 +224,7 @@ jobs:
            EOF
           # LuCI主题:
            cat >> .config <<EOF
+            CONFIG_PACKAGE_luci-theme-Butterfly=y
             CONFIG_PACKAGE_luci-theme-opentomcat=y
             CONFIG_PACKAGE_luci-theme-opentomato=y
             CONFIG_PACKAGE_luci-theme-argon-mod=y
@@ -267,14 +268,20 @@ jobs:
       - name: Prepare artifact
         run: find ./bin/targets/ -type d -name "packages" | xargs rm -rf {}
 
-      - name: Upload artifact
+      - name: Upload firmware
         uses: actions/upload-artifact@master
         with:
           name: OpenWrt18.06 firmware
           path: ./bin/targets/
           
-      - name: Upload artifact
+      - name: Upload  IPK
         uses: actions/upload-artifact@master
         with:
-          name: OpenWrt18.06 IPK
+          name: OpenWrt18.06 x86 IPK
           path: ./bin/packages/
+          
+      - name: Upload DL
+        uses: actions/upload-artifact@master
+        with:
+          name: OpenWrt18.06 x86 DL
+          path: ./dl
