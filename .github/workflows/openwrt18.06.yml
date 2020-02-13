@@ -192,7 +192,7 @@ jobs:
            CONFIG_PACKAGE_luci-app-amule=y
           # CONFIG_PACKAGE_luci-app-appfilter=y
           # CONFIG_PACKAGE_luci-app-adblock=y
-          # CONFIG_PACKAGE_luci-app-cd8021x=y
+           CONFIG_PACKAGE_luci-app-cd8021x=y
             CONFIG_PACKAGE_luci-app-chinadns=y
            CONFIG_PACKAGE_luci-app-cifs=y
            CONFIG_PACKAGE_luci-app-cifsd=y
