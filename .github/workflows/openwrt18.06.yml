@@ -57,10 +57,10 @@ jobs:
            tar   xvJf  luci-app-koolddns.tar.xz
            tar   xvJf  luci-app-rclone.tar.xz
 
-
+           git clone  https://github.com/Sweet-Fairy/openwrt-package
            git clone  https://github.com/Flowers-in-thorns/luci-app-vssr-coexist
-           git clone https://github.com/lisaac/luci-lib-docker.git package/luci-lib-docker
-           git clone https://github.com/lisaac/luci-app-dockerman.git package/luci-app-dockerman
+           git clone  https://github.com/lisaac/luci-lib-docker.git package/luci-lib-docker
+           git clone  https://github.com/lisaac/luci-app-dockerman.git package/luci-app-dockerman
 
            
            
@@ -140,22 +140,22 @@ jobs:
           # 常用LuCI插件选择:
            cat >> .config <<EOF
            CONFIG_PACKAGE_luci-app-adbyby-plus=y
-           # CONFIG_PACKAGE_luci-app-aria2=y
-           # CONFIG_PACKAGE_luci-app-baidupcs-web=y
-           #  CONFIG_PACKAGE_luci-app-docker=y
-           #  CONFIG_PACKAGE_luci-lib-docker=y
-           # CONFIG_PACKAGE_luci-app-dockerman=y
-           # CONFIG_PACKAGE_luci-app-diskman=y
+           CONFIG_PACKAGE_luci-app-aria2=y
+           CONFIG_PACKAGE_luci-app-baidupcs-web=y
+           CONFIG_PACKAGE_luci-app-docker=y
+           CONFIG_PACKAGE_luci-lib-docker=y
+           CONFIG_PACKAGE_luci-app-dockerman=y
+           CONFIG_PACKAGE_luci-app-diskman=y
            CONFIG_PACKAGE_luci-app-aliddns=y
-           # CONFIG_PACKAGE_luci-app-rclone=y
+           CONFIG_PACKAGE_luci-app-rclone=y
            CONFIG_PACKAGE_luci-app-frpc=y
-           # CONFIG_PACKAGE_luci-app-koolddns=y
-           # CONFIG_PACKAGE_luci-app-kodexplorer=y
+           CONFIG_PACKAGE_luci-app-koolddns=y
+           CONFIG_PACKAGE_luci-app-kodexplorer=y
            CONFIG_PACKAGE_luci-app-minidlna=y
-           # CONFIG_PACKAGE_luci-app-openvpn=y
-           # CONFIG_PACKAGE_luci-app-openvpn-server=y
+           CONFIG_PACKAGE_luci-app-openvpn=y
+           CONFIG_PACKAGE_luci-app-openvpn-server=y
             CONFIG_PACKAGE_luci-app-qbittorrent=y
-           # CONFIG_PACKAGE_luci-app-trojan-server=y
+           CONFIG_PACKAGE_luci-app-trojan-server=y
            CONFIG_PACKAGE_luci-app-familycloud=y
            CONFIG_PACKAGE_luci-app-smartinfo=y
            CONFIG_PACKAGE_luci-app-passwall=y
@@ -177,8 +177,8 @@ jobs:
            CONFIG_PACKAGE_luci-app-cpulimit=y
            CONFIG_PACKAGE_luci-app-netdata=y
            CONFIG_PACKAGE_luci-app-cupsd=y
-           # CONFIG_PACKAGE_luci-app-unblockmusic=y
-           # CONFIG_PACKAGE_UnblockNeteaseMusic=y
+           CONFIG_PACKAGE_luci-app-unblockmusic=y
+           CONFIG_PACKAGE_UnblockNeteaseMusic=y
            CONFIG_PACKAGE_luci-app-qos=y
            CONFIG_PACKAGE_luci-app-advancedsetting=y
            CONFIG_PACKAGE_luci-app-clash=y
@@ -194,23 +194,23 @@ jobs:
           # CONFIG_PACKAGE_luci-app-adblock=y
           # CONFIG_PACKAGE_luci-app-cd8021x=y
             CONFIG_PACKAGE_luci-app-chinadns=y
-          # CONFIG_PACKAGE_luci-app-cifs=y
-          # CONFIG_PACKAGE_luci-app-cifsd=y
+           CONFIG_PACKAGE_luci-app-cifs=y
+           CONFIG_PACKAGE_luci-app-cifsd=y
           # CONFIG_PACKAGE_luci-app-banip=y
-          # CONFIG_PACKAGE_luci-app-brook-server=y
+            CONFIG_PACKAGE_luci-app-brook-server=y
           # CONFIG_PACKAGE_luci-app-commands=y
-          # CONFIG_PACKAGE_luci-app-control-mia=y
-          # CONFIG_PACKAGE_luci-app-control-timewol=y
-          # CONFIG_PACKAGE_luci-app-control-webrestriction=y
-          # CONFIG_PACKAGE_luci-app-control-weburl=y
+            CONFIG_PACKAGE_luci-app-control-mia=y
+            CONFIG_PACKAGE_luci-app-control-timewol=y
+            CONFIG_PACKAGE_luci-app-control-webrestriction=y
+            CONFIG_PACKAGE_luci-app-control-weburl=y
             CONFIG_PACKAGE_luci-app-dnspod=y
-          # CONFIG_PACKAGE_luci-app-filebrowser=y
-          # CONFIG_PACKAGE_luci-app-fileassistant=y
+             CONFIG_PACKAGE_luci-app-filebrowser=y
+             CONFIG_PACKAGE_luci-app-fileassistant=y
           # CONFIG_PACKAGE_luci-app-haproxy-tcp=y
           # CONFIG_PACKAGE_luci-app-mentohust=y
           # CONFIG_PACKAGE_luci-app-mjpg-streamer=y
           # CONFIG_PACKAGE_luci-app-n2n_v2=y
-          # CONFIG_PACKAGE_luci-app-nfs=y
+             CONFIG_PACKAGE_luci-app-nfs=y
           # CONFIG_PACKAGE_luci-app-ocserv=y
           # CONFIG_PACKAGE_luci-app-oscam=y
             CONFIG_PACKAGE_luci-app-samba4=y
@@ -218,7 +218,7 @@ jobs:
           # CONFIG_PACKAGE_luci-app-speederv2=y
            #  CONFIG_PACKAGE_luci-app-ssr-libev-server=y
             # CONFIG_PACKAGE_luci-app-ssr-python-pro-server=y
-          # CONFIG_PACKAGE_luci-app-transmission=y
+           CONFIG_PACKAGE_luci-app-transmission=y
            CONFIG_LUCI_LANG_en=y
            CONFIG_LUCI_LANG_zh-tw=y
            EOF
