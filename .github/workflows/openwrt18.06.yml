@@ -183,7 +183,7 @@ jobs:
            CONFIG_PACKAGE_luci-app-advancedsetting=y
            CONFIG_PACKAGE_luci-app-clash=y
            CONFIG_PACKAGE_luci-app-qosv4=y
-           CONFIG_PACKAGE_luci-app-samba=y
+           #CONFIG_PACKAGE_luci-app-samba=y
            CONFIG_PACKAGE_luci-app-smartdns=y
            CONFIG_PACKAGE_kmod-tcp-bbr-mod=y
            CONFIG_PACKAGE_kmod-tcp-bbr-nanqinlang=y
@@ -213,7 +213,7 @@ jobs:
           # CONFIG_PACKAGE_luci-app-nfs=y
           # CONFIG_PACKAGE_luci-app-ocserv=y
           # CONFIG_PACKAGE_luci-app-oscam=y
-          # CONFIG_PACKAGE_luci-app-samba4=y
+            CONFIG_PACKAGE_luci-app-samba4=y
           # CONFIG_PACKAGE_luci-app-softethervpn5=y
           # CONFIG_PACKAGE_luci-app-speederv2=y
            #  CONFIG_PACKAGE_luci-app-ssr-libev-server=y
