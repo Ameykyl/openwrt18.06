@@ -5,7 +5,7 @@ msgid "SyncThing Synchronization Tool"
 msgstr "syncthing同步工具"
 
 
-msgid "<%:Open syncthing page%>"
+msgid "Open syncthing page"
 msgstr "打开储存同步页面"
 
 
