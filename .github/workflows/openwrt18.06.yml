@@ -209,7 +209,7 @@ jobs:
             CONFIG_PACKAGE_luci-app-haproxy-tcp=y
            CONFIG_PACKAGE_luci-app-mentohust=y
           # CONFIG_PACKAGE_luci-app-mjpg-streamer=y
-          # CONFIG_PACKAGE_luci-app-n2n_v2=y
+            CONFIG_PACKAGE_luci-app-n2n_v2=y
              CONFIG_PACKAGE_luci-app-nfs=y
           # CONFIG_PACKAGE_luci-app-ocserv=y
            CONFIG_PACKAGE_luci-app-oscam=y
