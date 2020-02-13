@@ -24,7 +24,8 @@ uci:foreach(appname, "nodes", function(e)
             n[e[".name"]] = "%s+%s：[%s] %s" %
                                 {translate(type), "Kcptun", e.remarks, address}
         else
-            n[e[".name"]] = "%s：[%s] %s" % {translate(type), e.remarks, address}
+            n[e[".name"]] = "%s：[%s] %s" %
+                                {translate(type), e.remarks, address}
         end
     end
 end)
@@ -74,7 +75,7 @@ for i = 1, udp_node_num, 1 do
                      translate("For Game Mode or DNS resolution and more.") ..
                          translate("The selected server will not use Kcptun."))
         o:value("nil", translate("Close"))
-        o:value("default", translate("Same as the tcp node"))
+        o:value("tcp", translate("Same as the tcp node"))
     else
         o = s:option(ListValue, "udp_node" .. i,
                      translate("UDP Node") .. " " .. i)
@@ -89,19 +90,22 @@ for i = 1, socks5_node_num, 1 do
     if i == 1 then
         o = s:option(ListValue, "socks5_node" .. i, translate("Socks5 Node"),
                      translate("The client can use the router's Socks5 proxy."))
+        o:value("nil", translate("Close"))
+        o:value("tcp", translate("Same as the tcp node"))
     else
         o = s:option(ListValue, "socks5_node" .. i,
                      translate("Socks5 Node") .. " " .. i)
+        o:value("nil", translate("Close"))
     end
-    o:value("nil", translate("Close"))
     for _, key in pairs(key_table) do o:value(key, n[key]) end
 end
 
 ---- China DNS Server
 o = s:option(Value, "up_china_dns", translate("China DNS Server") .. "(UDP)",
              translate(
-                 "Example: 127.0.0.1#6053 ,Represents DNS on using 127.0.0.1 the 6053 port. such as smartdns,AdGuard Home...<br />Only use two at most, english comma separation, If you do not fill in the # and the following port, you are using port 53.<br />If you use custom, unless you know what you're doing, setting it up incorrectly can cause your stuck to crash!"))
-o.default = "223.5.5.5"
+                 "If you want to work with other DNS acceleration services, use the default.<br />Example: 127.0.0.1#6053 ,Represents DNS on using 127.0.0.1 the 6053 port. such as SmartDNS, AdGuard Home...<br />Only use two at most, english comma separation, If you do not fill in the # and the following port, you are using port 53.<br />If you use custom, unless you know what you're doing, setting it up incorrectly can cause your stuck to crash !"))
+o.default = "default"
+o:value("default", translate("default"))
 o:value("dnsbyisp", translate("dnsbyisp"))
 o:value("223.5.5.5", "223.5.5.5 (" .. translate("Ali") .. "DNS)")
 o:value("223.6.6.6", "223.6.6.6 (" .. translate("Ali") .. "DNS)")
@@ -133,7 +137,7 @@ o:value("nonuse", translate("No patterns are used"))
 o = s:option(Value, "up_trust_chinadns_ng_dns",
              translate("Upstream trust DNS Server for ChinaDNS-NG") .. "(UDP)",
              translate(
-                 "Example: 127.0.0.1#5353 ,such as dns2socks,dns-forwarder...<br />Only use two at most, english comma separation, If you do not fill in the # and the following port, you are using port 53."))
+                 "You can use other resolving DNS services as trusted DNS, Example: dns2socks, dns-forwarder... 127.0.0.1#5353<br />Only use two at most, english comma separation, If you do not fill in the # and the following port, you are using port 53."))
 o.default = "pdnsd"
 if is_installed("pdnsd") or is_installed("pdnsd-alt") or is_finded("pdnsd") then
     o:value("pdnsd", "pdnsd + " .. translate("Use TCP Node Resolve DNS"))
@@ -148,13 +152,14 @@ o:value("208.67.222.222,208.67.220.220",
 o:depends("dns_mode", "chinadns-ng")
 
 ---- Use TCP Node Resolve DNS
-if is_installed("pdnsd") or is_installed("pdnsd-alt") or is_finded("pdnsd") then
+--[[ if is_installed("pdnsd") or is_installed("pdnsd-alt") or is_finded("pdnsd") then
     o = s:option(Flag, "use_tcp_node_resolve_dns",
                  translate("Use TCP Node Resolve DNS"),
                  translate("If checked, DNS is resolved using the TCP node."))
     o.default = 1
     o:depends("dns_mode", "pdnsd")
 end
+--]]
 
 o = s:option(Value, "dns2socks_forward", translate("DNS Address"))
 o.default = "8.8.4.4"
@@ -189,7 +194,7 @@ o:value("disable", translate("No Proxy"))
 o:value("global", translate("Global Proxy"))
 o:value("gfwlist", translate("GFW List"))
 o:value("chnroute", translate("China WhiteList"))
-o:value("gamemode", translate("Game Mode"))
+--o:value("gamemode", translate("Game Mode"))
 o:value("returnhome", translate("Return Home"))
 
 ---- Localhost Proxy Mode

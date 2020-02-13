@@ -1,6 +1,6 @@
-diff -urN a/open-vm-tools/configure.ac b/open-vm-tools/configure.ac
---- a/open-vm-tools/configure.ac
-+++ b/open-vm-tools/configure.ac
+diff -urN a/configure.ac b/configure.ac
+--- a/configure.ac
++++ b/configure.ac
 @@ -897,6 +897,7 @@
  
  AC_CHECK_FUNCS([ecvt])
@@ -23,9 +23,9 @@ diff -urN a/open-vm-tools/configure.ac b/open-vm-tools/configure.ac
  AC_CHECK_HEADERS([sys/inttypes.h])
  AC_CHECK_HEADERS([sys/io.h])
  AC_CHECK_HEADERS([sys/param.h]) # Required to make the sys/user.h check work correctly on FreeBSD
-diff -urN a/open-vm-tools/lib/misc/idLinux.c b/open-vm-tools/lib/misc/idLinux.c
---- a/open-vm-tools/lib/misc/idLinux.c
-+++ b/open-vm-tools/lib/misc/idLinux.c
+diff -urN a/lib/misc/idLinux.c b/lib/misc/idLinux.c
+--- a/lib/misc/idLinux.c
++++ b/lib/misc/idLinux.c
 @@ -27,12 +27,9 @@
  #include <sys/syscall.h>
  #include <string.h>
@@ -85,13 +85,13 @@ diff -urN a/open-vm-tools/lib/misc/idLinux.c b/open-vm-tools/lib/misc/idLinux.c
  #endif
  }
  #endif
-diff -urN a/open-vm-tools/lib/nicInfo/nicInfoPosix.c b/open-vm-tools/lib/nicInfo/nicInfoPosix.c
---- a/open-vm-tools/lib/nicInfo/nicInfoPosix.c
-+++ b/open-vm-tools/lib/nicInfo/nicInfoPosix.c
-@@ -34,9 +34,13 @@
- #include <sys/socket.h>
+diff -urN a/lib/nicInfo/nicInfoPosix.c b/lib/nicInfo/nicInfoPosix.c
+--- a/lib/nicInfo/nicInfoPosix.c
++++ b/lib/nicInfo/nicInfoPosix.c
+@@ -35,9 +35,13 @@
  #include <sys/stat.h>
  #include <errno.h>
+ #include <limits.h>
 -#if defined(__FreeBSD__) || defined(__APPLE__)
 +#if HAVE_SYS_SYSCTL_H
  # include <sys/sysctl.h>

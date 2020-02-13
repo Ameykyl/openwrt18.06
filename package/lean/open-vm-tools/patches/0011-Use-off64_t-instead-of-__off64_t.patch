@@ -1,6 +1,6 @@
-diff -urN a/open-vm-tools/lib/file/fileIOPosix.c b/open-vm-tools/lib/file/fileIOPosix.c
---- a/open-vm-tools/lib/file/fileIOPosix.c
-+++ b/open-vm-tools/lib/file/fileIOPosix.c
+diff -urN a/lib/file/fileIOPosix.c b/lib/file/fileIOPosix.c
+--- a/lib/file/fileIOPosix.c
++++ b/lib/file/fileIOPosix.c
 @@ -206,10 +206,10 @@
         * the symbols (and anyone building XOPEN<700 gets nothing).
         */

@@ -155,7 +155,18 @@ get_remote_config(){
 		ss_encrypt_method=$(echo "$decode_link" | awk -F ':' '{print $1}')
 		password=$(echo "$decode_link" | awk -F ':' '{print $2}' | awk -F '@' '{print $1}')
 		node_address=$(echo "$decode_link" | awk -F ':' '{print $2}' | awk -F '@' '{print $2}')
-		node_port=$(echo "$decode_link" | awk -F '@' '{print $2}' | awk -F '#' '{print $1}' | awk -F ':' '{print $2}')
+		
+		plugin_tmp=$(echo "$decode_link" | awk -F '\\/\\?' '{print $2}' | awk -F '#' '{print $1}')
+		if [ "$plugin_tmp" != "" ]; then 
+			plugin_tmp=$(urldecode $plugin_tmp)
+			plugin=$(echo "$plugin_tmp" | awk -F 'plugin=' '{print $2}' | awk -F ';' '{print $1}')
+			plugin_options=$(echo "$plugin_tmp" | awk -F "$plugin;" '{print $2}' | awk -F '&' '{print $1}')
+			node_port=$(echo "$decode_link" | awk -F '@' '{print $2}' | awk -F '\\/\\?' '{print $1}' | awk -F ':' '{print $2}')
+		else
+			node_port=$(echo "$decode_link" | awk -F '@' '{print $2}' | awk -F '#' '{print $1}' | awk -F ':' '{print $2}')
+		fi
+
+		[ -n "$plugin" -a "$plugin" == "simple-obfs" ] && plugin=obfs-local
 		remarks=$(urldecode $(echo "$decode_link" | awk -F '#' '{print $2}'))
 	elif [ "$1" == "ssr" ]; then
 		decode_link=$(decode_url_link $2 1)
@@ -227,7 +238,7 @@ get_remote_config(){
 		plugin=$json_plugin
 		plugin_options=$json_plugin_options
 		
-		[ -n "$plugin" -a "$plugin" == "simple-obfs" ] && echo "$Date: 不支持simple-obfs插件，导入失败！" >> $LOG_FILE && return
+		[ -n "$plugin" -a "$plugin" == "simple-obfs" ] && plugin=obfs-local
 
 		if json_get_type Type servers && [ "$Type" == array ]
 		then
@@ -253,6 +264,11 @@ get_remote_config(){
 				[ -z "$node_address" -o "$node_address" == "" ] && return
 				
 				[ -z "$remarks" -o "$remarks" == "" ] && remarks="${node_address}:${node_port}"
+				tmp=$(echo $remarks | grep -E "过期时间|剩余流量|QQ群|官网")
+				[ -n "$tmp" ] && {
+					echo "$Date: 丢弃无用节点：$tmp" >> $LOG_FILE
+					return
+				}
 				
 				# 把全部节点节点写入文件 /usr/share/${CONFIG}/sub/all_onlinenodes
 				if [ ! -f "/usr/share/${CONFIG}/sub/all_onlinenodes" ]; then
@@ -265,7 +281,6 @@ get_remote_config(){
 			done
 			return
 		fi
-	
 	fi
 	
 	node_address=$(echo -n $node_address | awk '{print gensub(/[^!-~]/,"","g",$0)}')
@@ -273,6 +288,11 @@ get_remote_config(){
 	[ -z "$node_address" -o "$node_address" == "" ] && return
 	
 	[ -z "$remarks" -o "$remarks" == "" ] && remarks="${node_address}:${node_port}"
+	tmp=$(echo $remarks | grep -E "过期时间|剩余流量|QQ群|官网")
+	[ -n "$tmp" ] && {
+		echo "$Date: 丢弃无用节点：$tmp" >> $LOG_FILE
+		return
+	}
 	
 	# 把全部节点节点写入文件 /usr/share/${CONFIG}/sub/all_onlinenodes
 	if [ ! -f "/usr/share/${CONFIG}/sub/all_onlinenodes" ]; then
@@ -305,7 +325,7 @@ add_nodes(){
 		${uci_set}timeout=300
 		${uci_set}tcp_fast_open=false
 		[ -n "$plugin" ] && ${uci_set}ss_plugin="$plugin"
-		[ -n "$plugin_options" ] && ${uci_set}ss_plugin_v2ray_opts="$plugin_options"
+		[ -n "$plugin_options" ] && ${uci_set}ss_plugin_opts="$plugin_options"
 		
 		if [ "$1" == "add" ]; then
 			let addnum_ss+=1
@@ -355,6 +375,7 @@ add_nodes(){
 		${uci_set}v2ray_ws_path="$json_path"
 		${uci_set}v2ray_h2_host="$json_host"
 		${uci_set}v2ray_h2_path="$json_path"
+		${uci_set}tls_allowInsecure=1
 		
 		if [ "$1" == "add" ]; then
 			let addnum_v2ray+=1
@@ -574,4 +595,3 @@ add)
 	start
 	;;
 esac
-

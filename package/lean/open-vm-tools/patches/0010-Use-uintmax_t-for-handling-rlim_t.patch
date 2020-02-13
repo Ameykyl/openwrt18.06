@@ -1,6 +1,6 @@
-diff -urN a/open-vm-tools/lib/hgfsServer/hgfsServerLinux.c b/open-vm-tools/lib/hgfsServer/hgfsServerLinux.c
---- a/open-vm-tools/lib/hgfsServer/hgfsServerLinux.c
-+++ b/open-vm-tools/lib/hgfsServer/hgfsServerLinux.c
+diff -urN a/lib/hgfsServer/hgfsServerLinux.c b/lib/hgfsServer/hgfsServerLinux.c
+--- a/lib/hgfsServer/hgfsServerLinux.c
++++ b/lib/hgfsServer/hgfsServerLinux.c
 @@ -5294,8 +5294,8 @@
        goto exit;
     }

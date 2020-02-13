@@ -12,7 +12,7 @@ s.addremove = false
 ---- Delay Start
 o = s:option(Value, "start_delay", translate("Delay Start"),
              translate("Units:seconds"))
-o.default = "0"
+o.default = "1"
 o.rmempty = true
 
 ---- Open and close Daemon
@@ -20,6 +20,7 @@ o = s:option(Flag, "start_daemon", translate("Open and close Daemon"))
 o.default = 1
 o.rmempty = false
 
+--[[
 ---- Open and close automatically
 o = s:option(Flag, "auto_on", translate("Open and close automatically"))
 o.default = 0
@@ -45,6 +46,7 @@ o.default = nil
 o:depends("auto_on", "1")
 o:value(nil, translate("Disable"))
 for e = 0, 23 do o:value(e, e .. translate("oclock")) end
+--]]
 
 -- [[ Forwarding Settings ]]--
 s = m:section(TypedSection, "global_forwarding",
@@ -55,6 +57,7 @@ s.addremove = false
 ---- TCP Redir Ports
 o = s:option(Value, "tcp_redir_ports", translate("TCP Redir Ports"))
 o.default = "80,443"
+o:value("disable", translate("No Proxy"))
 o:value("1:65535", translate("All"))
 o:value("80,443", "80,443")
 o:value("80:", "80 " .. translate("or more"))
@@ -63,6 +66,7 @@ o:value(":443", "443 " .. translate("or less"))
 ---- UDP Redir Ports
 o = s:option(Value, "udp_redir_ports", translate("UDP Redir Ports"))
 o.default = "1:65535"
+o:value("disable", translate("No Proxy"))
 o:value("1:65535", translate("All"))
 o:value("53", "53")
 
@@ -77,11 +81,18 @@ o:value("2", "2 " .. translate("Process"))
 o:value("3", "3 " .. translate("Process"))
 o:value("4", "4 " .. translate("Process"))
 
--- [[ Proxy Settings ]]--
-s = m:section(TypedSection, "global_proxy", translate("Proxy Settings"))
-s.anonymous = true
-s.addremove = false
+---- Socks5 Proxy Port
+o = s:option(Value, "socks5_proxy_port", translate("Socks5 Proxy Port"))
+o.datatype = "port"
+o.default = 1081
+o.rmempty = true
 
+---- Proxy IPv6
+o = s:option(Flag, "proxy_ipv6", translate("Proxy IPv6"),
+             translate("The IPv6 traffic can be proxyed when selected"))
+o.default = 0
+
+--[[
 ---- TCP Redir Port
 o = s:option(Value, "tcp_redir_port", translate("TCP Redir Port"))
 o.datatype = "port"
@@ -94,22 +105,12 @@ o.datatype = "port"
 o.default = 1051
 o.rmempty = true
 
----- Socks5 Proxy Port
-o = s:option(Value, "socks5_proxy_port", translate("Socks5 Proxy Port"))
-o.datatype = "port"
-o.default = 1061
-o.rmempty = true
-
 ---- Kcptun Port
 o = s:option(Value, "kcptun_port", translate("Kcptun Port"))
 o.datatype = "port"
-o.default = 11183
+o.default = 12948
 o.rmempty = true
-
----- Proxy IPv6
-o = s:option(Flag, "proxy_ipv6", translate("Proxy IPv6"),
-             translate("The IPv6 traffic can be proxyed when selected"))
-o.default = 0
+--]]
 
 -- [[ Other Settings ]]--
 s = m:section(TypedSection, "global_other", translate("Other Settings"),
@@ -160,8 +161,10 @@ o.default = "0"
 o.rmempty = false
 
 ---- Hide Menu
-o = s:option(Button, "hide", translate("Hide Menu"), translate(
-                 "After the hidden to the display, type in the address bar enter the admin/vpn/passwall/show.<br />such as: http://192.168.1.1/cgi-bin/luci/admin/vpn/passwall/show"))
+o = s:option(Button, "hide", translate("Hide Menu"),
+             translate(
+                 "After the hidden to the display, input example in the address bar: ") ..
+                 "http://192.168.1.1/cgi-bin/luci/admin/vpn/passwall/show")
 o.inputstyle = "remove"
 function o.write(e, e)
     luci.http.redirect(luci.dispatcher.build_url("admin", "vpn", "passwall",

@@ -1,6 +1,6 @@
-diff -urN a/open-vm-tools/lib/err/errPosix.c b/open-vm-tools/lib/err/errPosix.c
---- a/open-vm-tools/lib/err/errPosix.c
-+++ b/open-vm-tools/lib/err/errPosix.c
+diff -urN a/lib/err/errPosix.c b/lib/err/errPosix.c
+--- a/lib/err/errPosix.c
++++ b/lib/err/errPosix.c
 @@ -31,6 +31,7 @@
  #include <errno.h>
  #include <string.h>
