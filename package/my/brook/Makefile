@@ -32,7 +32,7 @@ ifeq ($(ARCH),aarch64)
 endif
 
 PKG_NAME:=brook
-PKG_VERSION:=20200102
+PKG_VERSION:=20200201
 PKG_RELEASE:=2
 PKG_BUILD_DIR:=$(BUILD_DIR)/$(PKG_NAME)-$(PKG_VERSION)
 PKG_SOURCE:=brook$(PKG_ARCH_BROOK)
@@ -54,7 +54,7 @@ define Package/$(PKG_NAME)/description
 endef
 
 define Build/Prepare
-	mv $(DL_DIR)/$(PKG_SOURCE) $(PKG_BUILD_DIR)
+	cp -f $(DL_DIR)/$(PKG_SOURCE) $(PKG_BUILD_DIR)
 endef
 
 define Build/Configure
@@ -69,4 +69,3 @@ define Package/$(PKG_NAME)/install
 endef
 
 $(eval $(call BuildPackage,$(PKG_NAME)))
-

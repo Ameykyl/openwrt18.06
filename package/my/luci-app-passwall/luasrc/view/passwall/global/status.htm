@@ -20,7 +20,7 @@ local status_show_ip111 = api.uci_get_type("global_other", "status_show_ip111", 
 -%>
 <fieldset id="_ss_status_fieldset" class="cbi-section">
 
-<h2 name=''content''>科学上网  </h2>
+<h2 name=''content''>PassWall  </h2>
 	 </p>
             <h2	
 <div class="cbi-map-descr">一个运行在OpenWrt上的科学上网客户端，兼容<a href="https://github.com/shadowsocks/shadowsocks-libev" target="_blank"><em><u>Shadowsocks</u></em></a>、<a href="https://github.com/shadowsocksrr/shadowsocksr-libev" target="_blank"><em><u>ShadowsocksR</u></em></a> 、<a href="https://github.com/v2ray/v2ray-core" target="_blank"><em><u>Vmess</u></em></a> 、<a href="https://github.com/Ameykyl/trojan" target="_blank"><em><u>Trojan</u></em></a> 、<a href="https://github.com/txthinking/brook" target="_blank"><em><u>Brook</u></em></a> 等协议的游戏加速工具。
@@ -113,7 +113,7 @@ https://github.com/pure-css/pure/blob/master/LICENSE.md
         <div class="pure-u-1-5">
             <div class="block pure-g">
                 <div class="pure-u-16-24">
-				<h4 id="status_tcp_node">科学上网<br /><span class="red"><%:NOT RUNNING%></span></h4>
+				<h4 id="status_tcp_node">客户端<br /><span class="red"><%:NOT RUNNING%></span></h4>
                 </div>
                 <div class="pure-u-8-24">
                     <div class="img-con">
@@ -432,7 +432,7 @@ var HTTP = {
 					if (tcp_node_num >= 1) {
 						var status_tcp_node = document.getElementById('status_tcp_node');
 						if (status_tcp_node) {
-							var text = '科学上网<br />';
+							var text = '客户端<br />';
 							if (tcp_node_num == 1) {
 								if (data["tcp_node1_status"])
 									text += '<span class="green"><%:RUNNING%>✓</span>';
