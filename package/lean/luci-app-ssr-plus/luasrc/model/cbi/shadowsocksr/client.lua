@@ -34,7 +34,7 @@ m:section(SimpleSection).template  = "shadowsocksr/status"
 
 local server_table = {}
 local v2ray_table = {}
-uci:foreach(greatwall, "servers", function(s)
+uci:foreach(shadowsocksr, "servers", function(s)
 	if s.alias then
 		server_table[s[".name"]] = "[%s]:%s" %{string.upper(s.type), s.alias}
 	elseif s.server and s.server_port then
