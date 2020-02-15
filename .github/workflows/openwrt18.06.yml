@@ -62,9 +62,7 @@ jobs:
            git clone  https://github.com/lisaac/luci-lib-docker.git package/luci-lib-docker
            git clone  https://github.com/lisaac/luci-app-dockerman.git package/luci-app-dockerman
 
-           
-           
-
+           # ==========以上是示范如何加入tar.xz解包和拉github源码编译==========
       - name: Update feeds
         run: |
           ./scripts/feeds update -a
