@@ -98,7 +98,12 @@ table.sort(key_table)
 
 m = Map(shadowsocksr)
 
+-- [[ adblock ]]--
+s = m:section(TypedSection, "global", translate("adblock settings"))
+s.anonymous = true
 
+o = s:option(Flag, "adblock", translate("Enable adblock"))
+o.rmempty = false
 
 -- [[ haProxy ]]--
 

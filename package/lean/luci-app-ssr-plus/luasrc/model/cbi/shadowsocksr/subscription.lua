@@ -45,12 +45,9 @@ o = s:option(Flag, "proxy", translate("Through proxy update"))
 o.rmempty = false
 o.description = translate("Through proxy update list, Not Recommended ")
 
-o = s:option(Button,"update",translate("Update All Subscribe Severs"))
-o.inputstyle = "apply"
-o.write = function() 
-  luci.sys.exec("bash /usr/share/shadowsocksr/subscribe.sh >>/tmp/ssrplus.log 2>&1")
-  luci.http.redirect(luci.dispatcher.build_url("admin", "vpn", "shadowsocksr", "servers"))
-end
+o = s:option(DummyValue, "", "")
+o.rawhtml = true
+o.template = "shadowsocksr/update_subscribe"
 
 o = s:option(Button,"update_v2ray",translate("Upgrade V2ray"))
 o.inputstyle = "reload"
@@ -60,6 +57,7 @@ end
 
 o = s:option(Button,"delete",translate("Delete all severs"))
 o.inputstyle = "reset"
+
 o.description = string.format(translate("Server Count") ..  ": %d", server_count)
 o.write = function()
   uci:delete_all("shadowsocksr", "servers", function(s) return true end)

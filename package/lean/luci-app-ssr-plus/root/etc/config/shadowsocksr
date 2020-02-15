@@ -1,7 +1,5 @@
 
 
-
-
 config server_config
 	option type 'ss'
 	option ipv4_ipv6 '0'
@@ -48,6 +46,8 @@ config global
 	option run_mode 'router'
 	option pdnsd_enable '1'
 	option tunnel_forward '8.8.4.4:53'
+        option switch_try_count '3'
+	option adblock '0'
 
 config socks5_proxy
 	option local_port '1080'
@@ -81,9 +81,9 @@ config server_subscribe
 	option proxy '0'
 	option auto_update_time '2'
 	option auto_update '1'
-	option edition 'auto_detected'		
-        option v2ray_path '/usr/bin/v2ray'
-
+        option edition 'auto_detected'
+	option v2ray_path '/usr/bin/v2ray/'
+	
 
 config domain_white_list
 	option domain_names 'youdao.com'
@@ -114,6 +114,4 @@ config udpspeeder
 	option queue_len '1'
 	option timeout '8'
 	option udpspeeder_enable '1'
-
-
 
