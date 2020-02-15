@@ -57,8 +57,7 @@ o.rmempty = false
 local tcp_node_num = api.uci_get_type("global_other", "tcp_node_num", 1)
 for i = 1, tcp_node_num, 1 do
     if i == 1 then
-        o = s:option(ListValue, "tcp_node" .. i, translate("TCP Node"),
-                     translate("For used to surf the Internet."))
+        o = s:option(ListValue, "tcp_node" .. i, translate("TCP Node"))
     else
         o = s:option(ListValue, "tcp_node" .. i,
                      translate("TCP Node") .. " " .. i)
@@ -71,9 +70,7 @@ end
 local udp_node_num = api.uci_get_type("global_other", "udp_node_num", 1)
 for i = 1, udp_node_num, 1 do
     if i == 1 then
-        o = s:option(ListValue, "udp_node" .. i, translate("UDP Node"),
-                     translate("For Game Mode or DNS resolution and more.") ..
-                         translate("The selected server will not use Kcptun."))
+        o = s:option(ListValue, "udp_node" .. i, translate("UDP Node"))
         o:value("nil", translate("Close"))
         o:value("tcp", translate("Same as the tcp node"))
     else
@@ -88,8 +85,7 @@ end
 local socks5_node_num = api.uci_get_type("global_other", "socks5_node_num", 1)
 for i = 1, socks5_node_num, 1 do
     if i == 1 then
-        o = s:option(ListValue, "socks5_node" .. i, translate("Socks5 Node"),
-                     translate("The client can use the router's Socks5 proxy."))
+        o = s:option(ListValue, "socks5_node" .. i, translate("Socks5 Node"))
         o:value("nil", translate("Close"))
         o:value("tcp", translate("Same as the tcp node"))
     else
@@ -101,9 +97,7 @@ for i = 1, socks5_node_num, 1 do
 end
 
 ---- China DNS Server
-o = s:option(Value, "up_china_dns", translate("China DNS Server") .. "(UDP)",
-             translate(
-                 "If you want to work with other DNS acceleration services, use the default.<br />Example: 127.0.0.1#6053 ,Represents DNS on using 127.0.0.1 the 6053 port. such as SmartDNS, AdGuard Home...<br />Only use two at most, english comma separation, If you do not fill in the # and the following port, you are using port 53.<br />If you use custom, unless you know what you're doing, setting it up incorrectly can cause your stuck to crash !"))
+o = s:option(Value, "up_china_dns", translate("China DNS Server") )
 o.default = "default"
 o:value("default", translate("default"))
 o:value("dnsbyisp", translate("dnsbyisp"))
@@ -118,14 +112,12 @@ o:value("210.2.4.8", "210.2.4.8 (CNNIC DNS)")
 o:value("180.76.76.76", "180.76.76.76 (" .. translate("Baidu") .. "DNS)")
 
 ---- DNS Forward Mode
-o = s:option(ListValue, "dns_mode", translate("DNS Mode"), translate(
-                 "if has problem, please try another mode.<br />if you use no patterns are used, DNS of wan will be used by default as upstream of dnsmasq."))
+o = s:option(ListValue, "dns_mode", translate("DNS Mode"))
 o.rmempty = false
 o:reset_values()
 if is_finded("chinadns-ng") then o:value("chinadns-ng", "ChinaDNS-NG") end
 if is_finded("dns2socks") then
-    o:value("dns2socks",
-            "dns2socks + " .. translate("Use Socks5 Node Resolve DNS"))
+    o:value("dns2socks")
 end
 if is_installed("pdnsd") or is_installed("pdnsd-alt") or is_finded("pdnsd") then
     o:value("pdnsd", "pdnsd")
@@ -135,12 +127,10 @@ o:value("nonuse", translate("No patterns are used"))
 
 ---- Upstream trust DNS Server for ChinaDNS-NG
 o = s:option(Value, "up_trust_chinadns_ng_dns",
-             translate("Upstream trust DNS Server for ChinaDNS-NG") .. "(UDP)",
-             translate(
-                 "You can use other resolving DNS services as trusted DNS, Example: dns2socks, dns-forwarder... 127.0.0.1#5353<br />Only use two at most, english comma separation, If you do not fill in the # and the following port, you are using port 53."))
+             translate("Upstream trust DNS Server for ChinaDNS-NG") )
 o.default = "pdnsd"
 if is_installed("pdnsd") or is_installed("pdnsd-alt") or is_finded("pdnsd") then
-    o:value("pdnsd", "pdnsd + " .. translate("Use TCP Node Resolve DNS"))
+    o:value("pdnsd")
 end
 if is_finded("dns2socks") then
     o:value("dns2socks",
@@ -186,8 +176,7 @@ o.rmempty = false
 
 ---- Default Proxy Mode
 o = s:option(ListValue, "proxy_mode",
-             translate("Default") .. translate("Proxy Mode"), translate(
-                 "If using GFW mode is not available, try clearing the native cache."))
+             translate("Default") .. translate("Proxy Mode"))
 o.default = "chnroute"
 o.rmempty = false
 o:value("disable", translate("No Proxy"))
@@ -199,8 +188,7 @@ o:value("returnhome", translate("Return Home"))
 
 ---- Localhost Proxy Mode
 o = s:option(ListValue, "localhost_proxy_mode",
-             translate("Localhost") .. translate("Proxy Mode"), translate(
-                 "The server client can also use this rule to scientifically surf the Internet.<br /> Global and continental whitelist are not recommended for non-special cases!"))
+             translate("Localhost") .. translate("Proxy Mode"))
 o:value("default", translate("Default"))
 o:value("global",
         translate("Global Proxy") .. "（" .. translate("Danger") .. "）")
@@ -209,8 +197,7 @@ o:value("chnroute", translate("China WhiteList"))
 o.default = "default"
 o.rmempty = false
 
----- Tips
-s:append(Template("passwall/global/tips"))
+
 
 --[[
 local apply = luci.http.formvalue("cbi.apply")
@@ -220,3 +207,4 @@ end
 --]]
 
 return m
+
