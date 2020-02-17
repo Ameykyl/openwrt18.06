@@ -24,7 +24,7 @@
 		buffered = 0,
 		shared = 0
 	}
-                   local mem_cached = luci.sys.exec("sed -e '/^Cached: /!d; s#Cached: *##; s# kB##g' /proc/meminfo")
+
 	local swapinfo = sysinfo.swap or {
 		total = 0,
 		free = 0
@@ -44,19 +44,13 @@
 			luci.sys.exec("sysctl net.nf_conntrack_max") or
 			luci.sys.exec("sysctl net.ipv4.netfilter.ip_conntrack_max") or
 			""):match("%d+")) or 4096
-                                    local cpu_info = luci.sys.exec("cpuinfo")
-
-		local eth_info = luci.sys.exec("ethinfo")
 
 		local rv = {
-                                                   cpuinfo    = cpu_info,
-			ethinfo    = eth_info,
 			uptime     = sysinfo.uptime or 0,
 			localtime  = os.date(),
 			cpuusage   = luci.sys.exec("echo $( echo $(cat /proc/stat | grep \"^cpu \" | awk '{print $1+$2+$3+$4+$5+$6+$7 \" \" $1+$2+$3+$6+$7}') $(sleep 1 && cat /proc/stat | grep \"^cpu \" | awk '{print $1+$2+$3+$4+$5+$6+$7 \" \" $1+$2+$3+$6+$7}') | awk '{print (($4-$2)/($3-$1))*100}' )"),
 			loadavg    = sysinfo.load or { 0, 0, 0 },
 			memory     = meminfo,
-                                                    memcached  = mem_cached,
 			swap       = swapinfo,
 			connmax    = conn_max,
 			conncount  = conn_count,
@@ -115,7 +109,7 @@
 
 <%+header%>
 
-<script type="text/javascript" src="<%=resource%>/cbi.js?v=git-git-19.167.54478-71e2af4"></script>
+<script type="text/javascript" src="<%=resource%>/cbi.js?v=git-17.220.55644-61295ca"></script>
 <script type="text/javascript">//<![CDATA[
 	function progressbar(v, m)
 	{
@@ -425,16 +419,15 @@
 						tr.className = 'cbi-section-table-row cbi-rowstyle-' + ((i % 2) + 1);
 
 					var host = hosts[duid2mac(info.leases6[i].duid)];
-					if (!info.leases6[i].hostname)
-						tr.insertCell(-1).innerHTML =
-							(host && (host.name || host.ipv4 || host.ipv6))
-								? '<div style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space: nowrap">? (%h)</div>'.format(host.name || host.ipv4 || host.ipv6)
-								: '?';
+					if (host)
+						tr.insertCell(-1).innerHTML = String.format(
+							'<div style="max-width:200px;overflow:hidden;text-overflow:ellipsis">%s</div>',
+							((host.name && (host.ipv4 || host.ipv6))
+								? '%h (%s)'.format(host.name, host.ipv4 || host.ipv6)
+								: '%h'.format(host.name || host.ipv4 || host.ipv6)).nobr()
+						);
 					else
-						tr.insertCell(-1).innerHTML =
-							(host && host.name && info.leases6[i].hostname != host.name)
-								? '<div style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space: nowrap">%h (%h)</div>'.format(info.leases6[i].hostname, host.name)
-								: info.leases6[i].hostname;
+						tr.insertCell(-1).innerHTML = info.leases6[i].hostname ? info.leases6[i].hostname : '?';
 
 					tr.insertCell(-1).innerHTML = info.leases6[i].ip6addr;
 					tr.insertCell(-1).innerHTML = info.leases6[i].duid;
@@ -632,28 +625,11 @@
 
 			var e;
 
-                                                  	if (e = document.getElementById('ethinfo'))			{
-				var ports = eval('(' + info.ethinfo + ')');
-				var tmp = "";
-				for (var i in ports)
-				{
-					tmp = tmp + String.format(
-							'<td style="text-align:center"><span style="line-height:25px">%s</span><br /><small><img src="<%=resource%>/icons/%s" /><br />%s<br />%s</small></td>',							ports[i].name,
-							ports[i].status ? 'port_up.png' : 'port_down.png',
-							ports[i].speed,
-							ports[i].duplex ? '<%:full-duplex%>' : '<%:half-duplex%>');
-				};
-				e.innerHTML = "<tr>" + tmp + "</tr>";
-			}
-
 			if (e = document.getElementById('localtime'))
 				e.innerHTML = info.localtime;
 
 			if (e = document.getElementById('uptime'))
 				e.innerHTML = String.format('%t', info.uptime);
-
-                                                     if (e = document.getElementById('cpuinfo'))
-				e.innerHTML = info.cpuinfo;
 
 			if (e = document.getElementById('loadavg'))
 				e.innerHTML = String.format(
@@ -711,30 +687,29 @@
 	<table width="100%" cellspacing="10">
 		<tr><td width="33%"><%:Hostname%></td><td><%=luci.sys.hostname() or "?"%></td></tr>
 		<tr><td width="33%"><%:Model%></td><td><%=pcdata(boardinfo.model or boardinfo.system or "?")%></td></tr>
+		
 		<tr><td width="33%"><%:CPU Info%></td><td><%=luci.sys.exec("grep 'MHz' /proc/cpuinfo | cut -c11- |sed -n '1p'")%> MHz <%=luci.sys.exec("cat /etc/bench.log") or " "%> <%=luci.sys.exec("sensors | grep 'Core 0' | cut -c10-24")%></td></tr>
+        
 		<tr><td width="33%"><%:Firmware Version%></td><td>
 			<%=pcdata(ver.distname)%> <%=pcdata(ver.distversion)%> /
 			<%=pcdata(ver.luciname)%> (<%=pcdata(ver.luciversion)%>)
 		</td></tr>
+                                  
 		<tr><td width="33%"><%:Kernel Version%></td><td><%=unameinfo.release or "?"%></td></tr>
+                
 		<tr><td width="33%"><%:Local Time%></td><td id="localtime">-</td></tr>
 		<tr><td width="33%"><%:Uptime%></td><td id="uptime">-</td></tr>
 		<tr><td width="33%"><%:Load Average%></td><td id="loadavg">-</td></tr>
-		<tr><td width="33%"><%:CPU usage (%)%></td><td id="cpuusage">-</td></tr>
-                                   <tr><td width="33%"><%:help%></td>
-			<td id="cpr">
-				<input type="button" class="cbi-button cbi-button-apply" value="<%:Firmware-Update%>" onclick="window.open('https://github.com/Ameykyl/openwrt18.06/actions')" />
-                                                                    <input type="button" class="cbi-button cbi-button-apply" value="<%:Problem feedback%>" onclick="window.open('https://github.com/Ameykyl/openwrt18.06/issues')" />
-				<input type="button" class="cbi-button cbi-button-apply" value="<%:TG_investigation%>" onclick="window.open('https://t.me/joinchat/IBxysRUIgFq7pujqqZLc6Q')" />
-				
+		<tr><td width="33%">&#67;&#80;&#85;&#32;&#20351;&#29992;&#29575; (%)</td><td id="cpuusage">-</td></tr>
+		
 				</td>
 			</tr>
 	</table>
 </fieldset>
 <fieldset class="cbi-section">
-	<legend><%:Memory%></legend>
+	
+
 	<table width="100%" cellspacing="10">
-		<tr><td width="33%"><%:Free Memory%></td><td ><input type="button" class="cbi-button cbi-button-apply" name="Free_Memory" value="<%:Free Memory%>" onclick="location.href='<%=luci.dispatcher.build_url("admin/status/release_ram")%>'" /></td></tr>
 		<tr><td width="33%"><%:Total Available%></td><td id="memtotal">-</td></tr>
 		<tr><td width="33%"><%:Free%></td><td id="memfree">-</td></tr>
 		<tr><td width="33%"><%:Buffered%></td><td id="membuff">-</td></tr>
@@ -751,12 +726,7 @@
 	</table>
 </fieldset>
 <% end %>
-<fieldset class="cbi-section">
-	<legend><%:Interfaces%></legend>
 
-	<table width="100%" cellspacing="10" id="ethinfo">
-	</table>
-</fieldset>
 <fieldset class="cbi-section">
 	<legend><%:Network%></legend>
 
@@ -854,8 +824,6 @@
 	</table>
 </fieldset>
 <% end %>
-
-
 
 <%-
 	local incdir = util.libpath() .. "/view/admin_status/index/"
