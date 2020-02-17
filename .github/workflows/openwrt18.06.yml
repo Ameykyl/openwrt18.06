@@ -59,7 +59,7 @@ jobs:
          
 
            git clone  https://github.com/Sweet-Fairy/openwrt-package
-           git clone  https://github.com/Flowers-in-thorns/luci-app-vssr-coexist
+           git clone  https://github.com/Leo-Jo-My/luci-app-vssr
            git clone  https://github.com/lisaac/luci-lib-docker.git package/luci-lib-docker
            git clone  https://github.com/lisaac/luci-app-dockerman.git package/luci-app-dockerman
 
@@ -186,7 +186,7 @@ jobs:
            CONFIG_PACKAGE_luci-app-smartdns=y
            CONFIG_PACKAGE_kmod-tcp-bbr-mod=y
            CONFIG_PACKAGE_kmod-tcp-bbr-nanqinlang=y
-           CONFIG_PACKAGE_luci-app-vssr-coexist=y
+           CONFIG_PACKAGE_luci-app-vssr=y
            CONFIG_PACKAGE_luci-app-advanced-reboot=y
            CONFIG_PACKAGE_luci-app-amule=y
            CONFIG_PACKAGE_luci-app-oaf=y
