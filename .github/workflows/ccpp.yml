@@ -184,8 +184,8 @@ jobs:
            CONFIG_PACKAGE_luci-app-qosv4=y
           #CONFIG_PACKAGE_luci-app-samba=y
            CONFIG_PACKAGE_luci-app-smartdns=y
-           CONFIG_PACKAGE_kmod-tcp-bbr-mod=y
-           CONFIG_PACKAGE_kmod-tcp-bbr-nanqinlang=y
+           CONFIG_PACKAGE_tcp-bbr-mod=y
+           CONFIG_PACKAGE_tcp-bbr-nanqinlang=y
            CONFIG_PACKAGE_luci-app-vssr=y
            CONFIG_PACKAGE_luci-app-advanced-reboot=y
           # CONFIG_PACKAGE_luci-app-amule=y
