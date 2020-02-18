@@ -56,12 +56,14 @@ jobs:
            tar   xvJf  luci-app-docker.tar.xz
            tar   xvJf  luci-app-koolddns.tar.xz
            tar   xvJf  luci-app-rclone.tar.xz
+           tar   xvJf  autocore.tar.xz
          
 
            git clone  https://github.com/Sweet-Fairy/openwrt-package
            git clone  https://github.com/Leo-Jo-My/luci-app-vssr
            git clone  https://github.com/lisaac/luci-lib-docker.git package/luci-lib-docker
            git clone  https://github.com/lisaac/luci-app-dockerman.git package/luci-app-dockerman
+           rm -rfv package/lean/autocore
 
            # ==========以上是示范如何加入tar.xz解包和拉github源码编译==========
       - name: Update feeds
