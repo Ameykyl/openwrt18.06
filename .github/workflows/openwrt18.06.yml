@@ -53,7 +53,7 @@ jobs:
         run: |
            cd package/diy
  
-          tar   xvJf  luci-app-docker.tar.xz
+           tar   xvJf  luci-app-docker.tar.xz
            tar   xvJf  luci-app-koolddns.tar.xz
            tar   xvJf  luci-app-rclone.tar.xz
            git clone  https://github.com/Sweet-Fairy/openwrt-package
