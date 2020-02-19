@@ -60,7 +60,7 @@ jobs:
            git clone  https://github.com/Leo-Jo-My/luci-app-vssr
            git clone  https://github.com/lisaac/luci-lib-docker.git package/luci-lib-docker
            git clone  https://github.com/lisaac/luci-app-dockerman.git package/luci-app-dockerman
-             
+           rm -rf package/diy/openwrt-package/lienol/luci-app-v2ray-server
            # ==========以上是示范如何加入tar.xz解包和拉github源码编译==========
       - name: Update feeds
         run: |
