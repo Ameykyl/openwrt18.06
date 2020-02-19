@@ -277,9 +277,4 @@ jobs:
           name: OpenWrt18.06 x86 IPK
           path: ./bin/packages/
           
-      - name: Upload DL
-        uses: actions/upload-artifact@master
-        with:
-          name: OpenWrt18.06 x86 DL
-          path: ./dl
-
+      
