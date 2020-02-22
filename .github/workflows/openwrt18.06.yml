@@ -155,7 +155,7 @@ jobs:
             CONFIG_PACKAGE_luci-app-openvpn=y
             CONFIG_PACKAGE_luci-app-openvpn-server=y
             CONFIG_PACKAGE_luci-app-qbittorrent=y
-          # CONFIG_PACKAGE_luci-app-trojan-server=y
+            CONFIG_PACKAGE_luci-app-trojan-server=y
           # CONFIG_PACKAGE_luci-app-familycloud=y
              CONFIG_PACKAGE_luci-app-smartinfo=y
            # CONFIG_PACKAGE_luci-app-passwall=y
