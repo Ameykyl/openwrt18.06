@@ -150,7 +150,7 @@ jobs:
             CONFIG_PACKAGE_luci-app-rclone=y
             CONFIG_PACKAGE_luci-app-frpc=y
             CONFIG_PACKAGE_luci-app-koolddns=y
-          # CONFIG_PACKAGE_luci-app-kodexplorer=y
+            CONFIG_PACKAGE_luci-app-kodexplorer=y
              CONFIG_PACKAGE_luci-app-minidlna=y
           # CONFIG_PACKAGE_luci-app-openvpn=y
           # CONFIG_PACKAGE_luci-app-openvpn-server=y
