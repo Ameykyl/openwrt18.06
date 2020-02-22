@@ -58,7 +58,7 @@ config PACKAGE_$(PKG_NAME)_INCLUDE_haproxy
 	
 config PACKAGE_$(PKG_NAME)_INCLUDE_ChinaDNS_NG
 	bool "Include ChinaDNS-NG"
-	default y
+	default n
 	
 config PACKAGE_$(PKG_NAME)_INCLUDE_pdnsd
 	bool "Include pdnsd"
@@ -85,7 +85,7 @@ define Package/$(PKG_NAME)
   TITLE:=LuCI support for PassWall By Lienol
   PKGARCH:=all
   DEPENDS:=+libmbedtls +iptables-mod-tproxy +kmod-ipt-tproxy +iptables-mod-ipopt +kmod-ipt-ipopt +ip +ipset +coreutils +coreutils-base64 +coreutils-nohup +luci-lib-jsonc \
-  +bash +wget +resolveip +unzip +dnsmasq-full +tcping \
+  +bash +wget +resolveip +unzip +dnsmasq-full \
   +PACKAGE_$(PKG_NAME)_INCLUDE_ipt2socks:ipt2socks \
   +PACKAGE_$(PKG_NAME)_INCLUDE_Shadowsocks:shadowsocks-libev-ss-redir \
   +PACKAGE_$(PKG_NAME)_INCLUDE_ShadowsocksR:shadowsocksr-libev-alt \
