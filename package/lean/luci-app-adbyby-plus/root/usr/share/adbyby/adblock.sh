@@ -11,3 +11,4 @@ if [ -s "/tmp/dnsmasq.adblock" ];then
 fi
 
 rm -rf /tmp/adbyby.updated && /etc/init.d/adbyby restart
+
