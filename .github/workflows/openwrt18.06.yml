@@ -141,7 +141,7 @@ jobs:
            cat >> .config <<EOF
              CONFIG_PACKAGE_luci-app-adbyby-plus=y
             CONFIG_PACKAGE_luci-app-aria2=y
-          # CONFIG_PACKAGE_luci-app-baidupcs-web=y
+            CONFIG_PACKAGE_luci-app-baidupcs-web=y
           # CONFIG_PACKAGE_luci-app-docker=y
           # CONFIG_PACKAGE_luci-lib-docker=y
           # CONFIG_PACKAGE_luci-app-dockerman=y
