@@ -7,7 +7,7 @@ function index()
 		return
 	end
 	entry({"admin","vpn"}, firstchild(), "VPN", 45).dependent = false
-	entry({"admin","vpn","v2ray_server"},cbi("v2ray_server/index"),_("V2ray Server"),11).dependent=true
+	entry({"admin","vpn","v2ray_server"},cbi("v2ray_server/index"),_("V2ray Server"),3).dependent=true
 	entry({"admin","vpn","v2ray_server","config"},cbi("v2ray_server/config")).leaf=true
 	
 	entry({"admin","vpn","v2ray_server","users_status"},call("v2ray_users_status")).leaf=true
