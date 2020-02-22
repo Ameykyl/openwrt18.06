@@ -190,11 +190,11 @@ jobs:
             CONFIG_PACKAGE_luci-app-oaf=y
           # CONFIG_PACKAGE_luci-app-adblock=y
           # CONFIG_PACKAGE_luci-app-cd8021x=y
-          # CONFIG_PACKAGE_luci-app-chinadns=y
+            CONFIG_PACKAGE_luci-app-chinadns=y
             CONFIG_PACKAGE_luci-app-cifs=y
           # CONFIG_PACKAGE_luci-app-cifsd=y
           # CONFIG_PACKAGE_luci-app-banip=y
-          # CONFIG_PACKAGE_luci-app-brook-server=y
+            CONFIG_PACKAGE_luci-app-brook-server=y
           # CONFIG_PACKAGE_luci-app-commands=y
           # CONFIG_PACKAGE_luci-app-control-mia=y
           # CONFIG_PACKAGE_luci-app-control-timewol=y
