@@ -181,12 +181,12 @@ jobs:
              CONFIG_PACKAGE_luci-app-clash=y
              CONFIG_PACKAGE_luci-app-qosv4=y
             CONFIG_PACKAGE_luci-app-samba=y
-          # CONFIG_PACKAGE_luci-app-smartdns=y
+            CONFIG_PACKAGE_luci-app-smartdns=y
           # CONFIG_PACKAGE_tcp-bbr-mod=y
              CONFIG_PACKAGE_tcp-bbr-nanqinlang=y
              CONFIG_PACKAGE_luci-app-vssr=y
              CONFIG_PACKAGE_luci-app-advanced-reboot=y
-          # CONFIG_PACKAGE_luci-app-amule=y
+            CONFIG_PACKAGE_luci-app-amule=y
           # CONFIG_PACKAGE_luci-app-oaf=y
           # CONFIG_PACKAGE_luci-app-adblock=y
           # CONFIG_PACKAGE_luci-app-cd8021x=y
