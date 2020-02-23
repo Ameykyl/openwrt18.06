@@ -53,13 +53,16 @@ jobs:
         run: |
            cd package/diy
  
-           # tar   xvJf  luci-app-docker.tar.xz
+           tar   xvJf  luci-app-docker.tar.xz
            tar   xvJf  luci-app-koolddns.tar.xz
            tar   xvJf  luci-app-rclone.tar.xz
+           tar   xvJf  autocore.tar.xz
            git clone  https://github.com/Sweet-Fairy/openwrt-package
            git clone  https://github.com/Leo-Jo-My/luci-app-vssr
-           # git clone  https://github.com/lisaac/luci-lib-docker.git package/luci-lib-docker
-           # git clone  https://github.com/lisaac/luci-app-dockerman.git package/luci-app-dockerman
+           git clone  https://github.com/lisaac/luci-lib-docker.git package/luci-lib-docker
+           git clone  https://github.com/lisaac/luci-app-dockerman.git package/luci-app-dockerman
+           cd ../..
+           rm -rfv   package/lean/autocore
              
            # ==========以上是示范如何加入tar.xz解包和拉github源码编译==========
       - name: Update feeds
@@ -109,9 +112,9 @@ jobs:
           #  CONFIG_TARGET_IMAGES_GZIP=y
           #  EOF
           # 编译UEFI固件:
-            cat >> .config <<EOF
-            CONFIG_EFI_IMAGES=y
-            EOF
+          # cat >> .config <<EOF
+          # CONFIG_EFI_IMAGES=y
+          # EOF
           # IPv6支持:
           # cat >> .config <<EOF
           # CONFIG_PACKAGE_dnsmasq_full_dhcpv6=y
@@ -161,8 +164,8 @@ jobs:
           # CONFIG_PACKAGE_luci-app-passwall_INCLUDE_haproxy is not set
             CONFIG_PACKAGE_luci-app-syncdial=y
             CONFIG_PACKAGE_luci-app-ttyd=y
-          #  CONFIG_PACKAGE_luci-app-mwan3=y
-          #  CONFIG_PACKAGE_luci-app-mwan3helper=y
+            CONFIG_PACKAGE_luci-app-mwan3=y
+            CONFIG_PACKAGE_luci-app-mwan3helper=y
             CONFIG_PACKAGE_luci-app-openclash=y
           # CONFIG_PACKAGE_luci-app-v2ray-server=y
             CONFIG_PACKAGE_luci-app-verysync=y
@@ -179,8 +182,8 @@ jobs:
           # CONFIG_PACKAGE_luci-app-qos=y
             CONFIG_PACKAGE_luci-app-advancedsetting=y
             CONFIG_PACKAGE_luci-app-clash=y
-            CONFIG_PACKAGE_luci-app-qosv4=y
-            CONFIG_PACKAGE_luci-app-samba=y
+          # CONFIG_PACKAGE_luci-app-qosv4=y
+          # CONFIG_PACKAGE_luci-app-samba=y
             CONFIG_PACKAGE_luci-app-smartdns=y
             CONFIG_PACKAGE_tcp-bbr-mod=y
             CONFIG_PACKAGE_tcp-bbr-nanqinlang=y
@@ -207,10 +210,10 @@ jobs:
           # CONFIG_PACKAGE_luci-app-mentohust=y
           # CONFIG_PACKAGE_luci-app-mjpg-streamer=y
           # CONFIG_PACKAGE_luci-app-n2n_v2=y
-           CONFIG_PACKAGE_luci-app-nfs=y
+          # CONFIG_PACKAGE_luci-app-nfs=y
           # CONFIG_PACKAGE_luci-app-ocserv=y
           # CONFIG_PACKAGE_luci-app-oscam=y
-           CONFIG_PACKAGE_luci-app-samba4=y
+          # CONFIG_PACKAGE_luci-app-samba4=y
           # CONFIG_PACKAGE_luci-app-softethervpn5=y
           # CONFIG_PACKAGE_luci-app-speederv2=y
           # CONFIG_PACKAGE_luci-app-ssr-libev-server=y
@@ -221,10 +224,10 @@ jobs:
            EOF
           # LuCI主题:
            cat >> .config <<EOF
-          # CONFIG_PACKAGE_luci-theme-Butterfly=y
+            CONFIG_PACKAGE_luci-theme-Butterfly=y
             CONFIG_PACKAGE_luci-theme-opentomcat=y
             CONFIG_PACKAGE_luci-theme-opentomato=y
-          # CONFIG_PACKAGE_luci-theme-argon-mod=y
+            CONFIG_PACKAGE_luci-theme-argon-mod=y
            EOF
           # 常用软件包:
            cat >> .config <<EOF
@@ -268,7 +271,7 @@ jobs:
       - name: Upload firmware
         uses: actions/upload-artifact@master
         with:
-          name: OpenWrt18.06 firmware
+          name: OpenWrt18.06 firmware new
           path: ./bin/targets/
           
       - name: Upload  IPK
