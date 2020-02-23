@@ -171,6 +171,7 @@ jobs:
              CONFIG_PACKAGE_luci-app-udpxy=y
              CONFIG_PACKAGE_luci-app-serverchan=y
             CONFIG_PACKAGE_luci-app-usb-printer=y
+            CONFIG_PACKAGE_luci-app-onliner=y
           # CONFIG_PACKAGE_luci-app-nps=y
             CONFIG_PACKAGE_luci-app-cpulimit=y
            CONFIG_PACKAGE_luci-app-netdata=y
