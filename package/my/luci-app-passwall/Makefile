@@ -26,7 +26,7 @@ config PACKAGE_$(PKG_NAME)_INCLUDE_Shadowsocks
 	
 config PACKAGE_$(PKG_NAME)_INCLUDE_ShadowsocksR
 	bool "Include ShadowsocksR Redir (ssr-redir)"
-	default y
+	default n
 
 config PACKAGE_$(PKG_NAME)_INCLUDE_Shadowsocks_socks
 	bool "Include Shadowsocks Socks (ss-local)"
