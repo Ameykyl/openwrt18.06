@@ -159,7 +159,6 @@ jobs:
             CONFIG_PACKAGE_luci-app-trojan-server=y
             CONFIG_PACKAGE_luci-app-familycloud=y
              CONFIG_PACKAGE_luci-app-smartinfo=y
-           # CONFIG_PACKAGE_luci-app-passwall=y
              CONFIG_PACKAGE_luci-app-syncthing=y
              CONFIG_PACKAGE_luci-app-syncdial=y
              CONFIG_PACKAGE_luci-app-ttyd=y
