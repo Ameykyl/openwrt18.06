@@ -140,7 +140,7 @@ jobs:
           # 常用LuCI插件选择:
            cat >> .config <<EOF
              CONFIG_PACKAGE_luci-app-adbyby-plus=y
-            CONFIG_PACKAGE_luci-app-aria2=y
+           # CONFIG_PACKAGE_luci-app-aria2=y
             CONFIG_PACKAGE_luci-app-baidupcs-web=y
             CONFIG_PACKAGE_luci-app-docker=y
             CONFIG_PACKAGE_luci-lib-docker=y
@@ -212,7 +212,7 @@ jobs:
           # CONFIG_PACKAGE_luci-app-ocserv=y
           # CONFIG_PACKAGE_luci-app-oscam=y
           # CONFIG_PACKAGE_luci-app-samba4=y
-          # CONFIG_PACKAGE_luci-app-softethervpn5=y
+            CONFIG_PACKAGE_luci-app-softethervpn5=y
           # CONFIG_PACKAGE_luci-app-speederv2=y
             CONFIG_PACKAGE_luci-app-ssr-libev-server=y
             CONFIG_PACKAGE_luci-app-ssr-python-pro-server=y
