@@ -138,9 +138,17 @@ jobs:
            CONFIG_PACKAGE_kmod-usb2-pci=y
            CONFIG_PACKAGE_kmod-usb3=y
           EOF
+           # 网卡支持:
+           cat >> .config <<EOF
+           CONFIG_PACKAGE_kmod-alx=y
+           CONFIG_PACKAGE_kmod-atl1=y
+           CONFIG_PACKAGE_kmod-atl1c=y
+           CONFIG_PACKAGE_kmod-atl1e=y
+           CONFIG_PACKAGE_kmod-atl2=y
+          EOF         
           # 常用LuCI插件选择:
            cat >> .config <<EOF
-             CONFIG_PACKAGE_luci-app-adbyby-plus=y
+            CONFIG_PACKAGE_luci-app-adbyby-plus=y
             CONFIG_PACKAGE_luci-app-aria2=y
             CONFIG_PACKAGE_luci-app-baidupcs-web=y
             CONFIG_PACKAGE_luci-app-docker=y
@@ -152,16 +160,16 @@ jobs:
             CONFIG_PACKAGE_luci-app-frpc=y
             CONFIG_PACKAGE_luci-app-koolddns=y
             CONFIG_PACKAGE_luci-app-kodexplorer=y
-             CONFIG_PACKAGE_luci-app-minidlna=y
+            CONFIG_PACKAGE_luci-app-minidlna=y
             CONFIG_PACKAGE_luci-app-openvpn=y
             CONFIG_PACKAGE_luci-app-openvpn-server=y
             CONFIG_PACKAGE_luci-app-qbittorrent=y
             CONFIG_PACKAGE_luci-app-trojan-server=y
             CONFIG_PACKAGE_luci-app-familycloud=y
-             CONFIG_PACKAGE_luci-app-smartinfo=y
-             CONFIG_PACKAGE_luci-app-syncthing=y
-             CONFIG_PACKAGE_luci-app-syncdial=y
-             CONFIG_PACKAGE_luci-app-ttyd=y
+            CONFIG_PACKAGE_luci-app-smartinfo=y
+            CONFIG_PACKAGE_luci-app-syncthing=y
+            CONFIG_PACKAGE_luci-app-syncdial=y
+            CONFIG_PACKAGE_luci-app-ttyd=y
              CONFIG_PACKAGE_luci-app-mwan3=y
              CONFIG_PACKAGE_luci-app-mwan3helper=y
             CONFIG_PACKAGE_luci-app-openclash=y
