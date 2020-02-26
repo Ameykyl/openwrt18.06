@@ -117,10 +117,10 @@ jobs:
             CONFIG_EFI_IMAGES=y
             EOF
           # IPv6支持:
-          # cat >> .config <<EOF
-          # CONFIG_PACKAGE_dnsmasq_full_dhcpv6=y
-          # CONFIG_PACKAGE_ipv6helper=y
-          # EOF
+            cat >> .config <<EOF
+            CONFIG_PACKAGE_dnsmasq_full_dhcpv6=y
+            CONFIG_PACKAGE_ipv6helper=y
+            EOF
           # 多文件系统支持:
           # cat >> .config <<EOF
           # CONFIG_PACKAGE_kmod-fs-nfs=y
@@ -141,7 +141,7 @@ jobs:
           # 常用LuCI插件选择:
            cat >> .config <<EOF
              CONFIG_PACKAGE_luci-app-adbyby-plus=y
-            CONFIG_PACKAGE_luci-app-aria2=y
+           # CONFIG_PACKAGE_luci-app-aria2=y
             CONFIG_PACKAGE_luci-app-baidupcs-web=y
             CONFIG_PACKAGE_luci-app-docker=y
             CONFIG_PACKAGE_luci-lib-docker=y
@@ -157,7 +157,7 @@ jobs:
             CONFIG_PACKAGE_luci-app-openvpn-server=y
             CONFIG_PACKAGE_luci-app-qbittorrent=y
             CONFIG_PACKAGE_luci-app-trojan-server=y
-            CONFIG_PACKAGE_luci-app-familycloud=y
+          # CONFIG_PACKAGE_luci-app-familycloud=y
              CONFIG_PACKAGE_luci-app-smartinfo=y
              CONFIG_PACKAGE_luci-app-syncthing=y
              CONFIG_PACKAGE_luci-app-syncdial=y
@@ -166,18 +166,18 @@ jobs:
              CONFIG_PACKAGE_luci-app-mwan3helper=y
             CONFIG_PACKAGE_luci-app-openclash=y
             CONFIG_PACKAGE_luci-app-v2ray-server=y
-             CONFIG_PACKAGE_luci-app-verysync=y
+          # CONFIG_PACKAGE_luci-app-verysync=y
              CONFIG_PACKAGE_luci-app-webadmin=y
              CONFIG_PACKAGE_luci-app-udpxy=y
              CONFIG_PACKAGE_luci-app-serverchan=y
-            CONFIG_PACKAGE_luci-app-usb-printer=y
+          # CONFIG_PACKAGE_luci-app-usb-printer=y
             CONFIG_PACKAGE_luci-app-onliner=y
           # CONFIG_PACKAGE_luci-app-nps=y
             CONFIG_PACKAGE_luci-app-cpulimit=y
            CONFIG_PACKAGE_luci-app-netdata=y
             CONFIG_PACKAGE_luci-app-cupsd=y
             CONFIG_PACKAGE_luci-app-unblockmusic=y
-            CONFIG_PACKAGE_luci-app-qos=y
+          # CONFIG_PACKAGE_luci-app-qos=y
              CONFIG_PACKAGE_luci-app-advancedsetting=y
              CONFIG_PACKAGE_luci-app-clash=y
              CONFIG_PACKAGE_luci-app-qosv4=y
@@ -187,7 +187,7 @@ jobs:
              CONFIG_PACKAGE_tcp-bbr-nanqinlang=y
              CONFIG_PACKAGE_luci-app-vssr=y
              CONFIG_PACKAGE_luci-app-advanced-reboot=y
-            CONFIG_PACKAGE_luci-app-amule=y
+          # CONFIG_PACKAGE_luci-app-amule=y
             CONFIG_PACKAGE_luci-app-oaf=y
           # CONFIG_PACKAGE_luci-app-adblock=y
           # CONFIG_PACKAGE_luci-app-cd8021x=y
@@ -212,11 +212,11 @@ jobs:
           # CONFIG_PACKAGE_luci-app-ocserv=y
           # CONFIG_PACKAGE_luci-app-oscam=y
           # CONFIG_PACKAGE_luci-app-samba4=y
-          # CONFIG_PACKAGE_luci-app-softethervpn5=y
+            CONFIG_PACKAGE_luci-app-softethervpn5=y
           # CONFIG_PACKAGE_luci-app-speederv2=y
             CONFIG_PACKAGE_luci-app-ssr-libev-server=y
             CONFIG_PACKAGE_luci-app-ssr-python-pro-server=y
-           CONFIG_PACKAGE_luci-app-transmission=y
+          # CONFIG_PACKAGE_luci-app-transmission=y
              CONFIG_LUCI_LANG_en=y
              CONFIG_LUCI_LANG_zh-tw=y
            EOF
