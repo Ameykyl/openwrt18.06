@@ -144,7 +144,8 @@ jobs:
            CONFIG_PACKAGE_kmod-atl1=y
            CONFIG_PACKAGE_kmod-atl1c=y
            CONFIG_PACKAGE_kmod-atl1e=y
-           CONFIG_PACKAGE_kmod-atl2=y
+           CONFIG_PACKAGE_kmod-rtl8180=y
+           CONFIG_PACKAGE_kmod-rtl8187=y
           EOF         
           # 常用LuCI插件选择:
            cat >> .config <<EOF
@@ -234,6 +235,9 @@ jobs:
             CONFIG_PACKAGE_luci-theme-opentomcat=y
             CONFIG_PACKAGE_luci-theme-opentomato=y
             CONFIG_PACKAGE_luci-theme-argon-mod=y
+            CONFIG_PACKAGE_luci-theme-material=y
+            CONFIG_PACKAGE_luci-theme-netgear=y
+            CONFIG_PACKAGE_luci-theme-netgear-mc=y
            EOF
           # 常用软件包:
            cat >> .config <<EOF
