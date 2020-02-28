@@ -15,13 +15,7 @@ local tcp_node_num = api.uci_get_type("global_other", "tcp_node_num", 1)
 local udp_node_num = api.uci_get_type("global_other", "udp_node_num", 1)
 local socks5_node_num = api.uci_get_type("global_other", "socks5_node_num", 1)
 -%>
-<fieldset id="_ss_status_fieldset" class="cbi-section">
 
-<h2 name=''content''>PassWall </h2>
-	 
-            <h2	
-<div class="cbi-map-descr">一个运行在OpenWrt上的科学上网客户端，兼容<a href="https://github.com/shadowsocks/shadowsocks-libev" target="_blank"><em><u>Shadowsocks</u></em></a>、<a href="https://github.com/shadowsocksrr/shadowsocksr-libev" target="_blank"><em><u>ShadowsocksR</u></em></a> 、<a href="https://github.com/v2ray/v2ray-core" target="_blank"><em><u>Vmess</u></em></a> 、<a href="https://github.com/Ameykyl/trojan" target="_blank"><em><u>Trojan</u></em></a> 、<a href="https://github.com/txthinking/brook" target="_blank"><em><u>Brook</u></em></a> 等协议的游戏加速工具。
-   </h2></div>
   <style>
 /*!
 Pure v1.0.1
@@ -49,7 +43,7 @@ https://github.com/pure-css/pure/blob/master/LICENSE.md
         overflow-y: hidden;
         border: 1px solid rgba(0,0,0,.20);
         border-radius: .375rem;
-        background-color: #4 ;
+        background-color: #fff ;
         box-shadow: 0 0 2rem 0 rgba(136,152,170,.15);
     }
     .img-con{
@@ -116,10 +110,7 @@ https://github.com/pure-css/pure/blob/master/LICENSE.md
 
 
 <style>.mar-10 {margin-left: 50px; margin-right: 10px;}</style>
-<fieldset id="_passwall_status_fieldset" class="cbi-section">
-	<legend>
-		<%:Running Status%>
-	</legend>
+
 <div class="pure-g status">
     <div class="pure-u-1-6">
         <div class="block pure-g" >
