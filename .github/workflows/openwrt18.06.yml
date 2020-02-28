@@ -192,8 +192,6 @@ jobs:
              CONFIG_PACKAGE_luci-app-advancedsetting=y
              CONFIG_PACKAGE_luci-app-clash=y
              CONFIG_PACKAGE_luci-app-qosv4=y
-             CONFIG_PACKAGE_luci-app-samba=y
-             CONFIG_PACKAGE_luci-app-smartdns=y
           # CONFIG_PACKAGE_tcp-bbr-mod=y
              CONFIG_PACKAGE_tcp-bbr-nanqinlang=y
              CONFIG_PACKAGE_luci-app-vssr=y
