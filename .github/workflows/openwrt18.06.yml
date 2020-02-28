@@ -62,6 +62,8 @@ jobs:
            git clone  https://github.com/Leo-Jo-My/luci-app-vssr
            git clone  https://github.com/lisaac/luci-lib-docker.git package/luci-lib-docker
            git clone  https://github.com/lisaac/luci-app-dockerman.git package/luci-app-dockerman
+           git clone https://github.com/hong0980/luci-app-passwall.git package/luci-app-passwall
+           git clone https://github.com/Leo-Jo-My/luci-app-ssr-plus-Jo package/luci-app-ssr-plus-Jo
            cd ../..
            rm -rfv   package/lean/autocore
              
@@ -190,11 +192,13 @@ jobs:
              CONFIG_PACKAGE_luci-app-advancedsetting=y
              CONFIG_PACKAGE_luci-app-clash=y
              CONFIG_PACKAGE_luci-app-qosv4=y
-            CONFIG_PACKAGE_luci-app-samba=y
-            CONFIG_PACKAGE_luci-app-smartdns=y
+             CONFIG_PACKAGE_luci-app-samba=y
+             CONFIG_PACKAGE_luci-app-smartdns=y
           # CONFIG_PACKAGE_tcp-bbr-mod=y
              CONFIG_PACKAGE_tcp-bbr-nanqinlang=y
              CONFIG_PACKAGE_luci-app-vssr=y
+             CONFIG_PACKAGE_luci-app-ssr-plus-Jo=y
+             CONFIG_PACKAGE_luci-app-passwall=y
              CONFIG_PACKAGE_luci-app-advanced-reboot=y
             CONFIG_PACKAGE_luci-app-amule=y
             CONFIG_PACKAGE_luci-app-oaf=y
@@ -225,9 +229,9 @@ jobs:
           # CONFIG_PACKAGE_luci-app-speederv2=y
             CONFIG_PACKAGE_luci-app-ssr-libev-server=y
             CONFIG_PACKAGE_luci-app-ssr-python-pro-server=y
-           CONFIG_PACKAGE_luci-app-transmission=y
-             CONFIG_LUCI_LANG_en=y
-             CONFIG_LUCI_LANG_zh-tw=y
+            CONFIG_PACKAGE_luci-app-transmission=y
+            CONFIG_LUCI_LANG_en=y
+            CONFIG_LUCI_LANG_zh-tw=y
            EOF
           # LuCI主题:
            cat >> .config <<EOF
