@@ -230,8 +230,8 @@ jobs:
             CONFIG_PACKAGE_luci-app-ssr-libev-server=y
             CONFIG_PACKAGE_luci-app-ssr-python-pro-server=y
             CONFIG_PACKAGE_luci-app-transmission=y
-            CONFIG_LUCI_LANG_en=y
-            CONFIG_LUCI_LANG_zh-tw=y
+             CONFIG_LUCI_LANG_en=y
+             CONFIG_LUCI_LANG_zh-tw=y
            EOF
           # LuCI主题:
            cat >> .config <<EOF
