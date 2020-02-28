@@ -1,10 +1,9 @@
 <%+cbi/valueheader%>
 <link rel="stylesheet" href="/luci-static/shadowsocksr/css/shadowsocksr.css?v=72883"> 
-<label class="cbi-value-title" ><%= translate("Update") %></label>
+<label class="cbi-value-title"><%= translate("Update") %></label>
 <div class="cbi-value-field">
-
-	<button class="cbi-button cbi-button-reload" id="update_subscribe" size="0" ><%= translate("Save And Start Subscribe") %></button>
-
+	<input class="cbi-button cbi-button-reload" id="update_subscribe" type="button"
+		size="0" value="<%= translate("Save And Start Subscribe") %>">
 </div>
 
 <script type="text/javascript">
