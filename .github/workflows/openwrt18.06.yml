@@ -141,8 +141,8 @@ jobs:
             CONFIG_PACKAGE_luci-app-adbyby-plus=y
             CONFIG_PACKAGE_luci-app-aria2=y
             CONFIG_PACKAGE_luci-app-baidupcs-web=y
-            CONFIG_PACKAGE_luci-app-docker=y
-            CONFIG_PACKAGE_luci-lib-docker=y
+          # CONFIG_PACKAGE_luci-app-docker=y
+          # CONFIG_PACKAGE_luci-lib-docker=y
             CONFIG_PACKAGE_luci-app-dockerman=y
             CONFIG_PACKAGE_luci-app-diskman=y
             CONFIG_PACKAGE_luci-app-aliddns=y
@@ -201,8 +201,8 @@ jobs:
             CONFIG_PACKAGE_luci-app-control-webrestriction=y
             CONFIG_PACKAGE_luci-app-control-weburl=y
             CONFIG_PACKAGE_luci-app-dnspod=y
-          # CONFIG_PACKAGE_luci-app-filebrowser=y
-          # CONFIG_PACKAGE_luci-app-fileassistant=y
+            CONFIG_PACKAGE_luci-app-filebrowser=y
+            CONFIG_PACKAGE_luci-app-fileassistant=y
             CONFIG_PACKAGE_luci-app-haproxy-tcp=y
           # CONFIG_PACKAGE_luci-app-mentohust=y
             CONFIG_PACKAGE_luci-app-mjpg-streamer=y
