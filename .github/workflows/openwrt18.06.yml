@@ -114,6 +114,14 @@ jobs:
             cat >> .config <<EOF
             CONFIG_EFI_IMAGES=y
             EOF
+          # 多网卡支持:
+            cat >> .config <<EOF
+            CONFIG_PACKAGE_kmod-alx=y
+            CONFIG_PACKAGE_kmod-atl1=y
+            CONFIG_PACKAGE_kmod-atl1c=y
+            CONFIG_PACKAGE_kmod-atl1e=y
+            CONFIG_PACKAGE_kmod-atl2=y
+            EOF            
           # IPv6支持:
           # cat >> .config <<EOF
           # CONFIG_PACKAGE_dnsmasq_full_dhcpv6=y
