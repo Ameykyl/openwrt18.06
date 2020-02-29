@@ -61,6 +61,8 @@ jobs:
 
            git clone  https://github.com/Sweet-Fairy/openwrt-package
            git clone  https://github.com/Leo-Jo-My/luci-app-vssr
+           git clone  https://github.com/hong0980/luci-app-passwall.git package/luci-app-passwall
+           git clone  https://github.com/Sweet-Fairy/luci-app-ssr-plus-Jo           
            git clone  https://github.com/lisaac/luci-lib-docker.git package/luci-lib-docker
            git clone  https://github.com/lisaac/luci-app-dockerman.git package/luci-app-dockerman
            rm -rfv package/lean/autocore
@@ -198,6 +200,7 @@ jobs:
            CONFIG_PACKAGE_tcp-bbr-mod=y
            CONFIG_PACKAGE_tcp-bbr-nanqinlang=y
            CONFIG_PACKAGE_luci-app-vssr=y
+           CONFIG_PACKAGE_luci-app-ssr-plus-Jo=y
            CONFIG_PACKAGE_luci-app-advanced-reboot=y
            CONFIG_PACKAGE_luci-app-amule=y
            CONFIG_PACKAGE_luci-app-oaf=y
