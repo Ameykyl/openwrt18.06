@@ -237,7 +237,7 @@ msgstr ""
 msgid "Rules Setting"
 msgstr "规则设置（访问控制）"
 
-msgid "Server Config"
+msgid "Config Manage"
 msgstr "配置文件管理"
 
 msgid "Upload File Type"
@@ -273,6 +273,18 @@ msgstr "更新订阅配置"
 
 msgid "Update time (every day)"
 msgstr "更新时间(每天)"
+
+msgid "Update Interval(min)"
+msgstr "更新间隔(分钟)"
+
+msgid "Update Mode"
+msgstr "更新模式"
+
+msgid "Appointment Mode"
+msgstr "预约"
+
+msgid "Loop Mode"
+msgstr "循环"
 
 msgid "Auto Update"
 msgstr "自动更新"
@@ -399,6 +411,15 @@ msgstr "必须代理的流量"
 
 msgid "Apple"
 msgstr "苹果服务流量"
+
+msgid "Netflix"
+msgstr "Netflix流量"
+
+msgid "Spotify"
+msgstr "Spotify流量"
+
+msgid "Steam"
+msgstr "Steam流量（非下载流量）"
 
 msgid "Netease Music"
 msgstr "网易云音乐流量"
