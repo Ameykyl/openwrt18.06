@@ -81,4 +81,3 @@ config addtype
 	option type 'DST-PORT'
 	option pgroup 'DIRECT'
 	option ipaaddr '443'
-
