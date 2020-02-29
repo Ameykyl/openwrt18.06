@@ -141,9 +141,9 @@ jobs:
             CONFIG_PACKAGE_luci-app-adbyby-plus=y
             CONFIG_PACKAGE_luci-app-aria2=y
             CONFIG_PACKAGE_luci-app-baidupcs-web=y
-            CONFIG_PACKAGE_luci-app-docker=y
-            CONFIG_PACKAGE_luci-lib-docker=y
-            CONFIG_PACKAGE_luci-app-dockerman=y
+          # CONFIG_PACKAGE_luci-app-docker=y
+          # CONFIG_PACKAGE_luci-lib-docker=y
+          # CONFIG_PACKAGE_luci-app-dockerman=y
             CONFIG_PACKAGE_luci-app-diskman=y
             CONFIG_PACKAGE_luci-app-aliddns=y
             CONFIG_PACKAGE_luci-app-rclone=y
