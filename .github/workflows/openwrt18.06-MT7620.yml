@@ -102,9 +102,9 @@ jobs:
           # 
           # 编译x64固件:
            cat >> .config <<EOF
-           CONFIG_TARGET_ramips=y
-           CONFIG_TARGET_ramips_mt7620=y
-           CONFIG_TARGET_ramips_mt7620_DEVICE_hiwifi_hc5661=y
+            CONFIG_TARGET_ramips=y
+            CONFIG_TARGET_ramips_mt7620=y
+            CONFIG_TARGET_ramips_mt7620_DEVICE_hiwifi_hc5661=y
            EOF
              # USB3.0支持:
            cat >> .config <<EOF
