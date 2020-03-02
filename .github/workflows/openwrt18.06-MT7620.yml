@@ -102,9 +102,9 @@ jobs:
           # 
           # 编译x64固件:
            cat >> .config <<EOF
-            CONFIG_TARGET_ramips=y
-            CONFIG_TARGET_ramips_mt7620=y
-            CONFIG_TARGET_ramips_mt7620_DEVICE_hiwifi_hc5661=y
+           CONFIG_TARGET_ramips=y
+           CONFIG_TARGET_ramips_mt7620=y
+           CONFIG_TARGET_ramips_mt7620_DEVICE_hiwifi_hc5661=y
            EOF
              # USB3.0支持:
            cat >> .config <<EOF
@@ -113,23 +113,24 @@ jobs:
            CONFIG_PACKAGE_kmod-usb2=y
            CONFIG_PACKAGE_kmod-usb2-pci=y
            CONFIG_PACKAGE_kmod-usb3=y
-          EOF
+           EOF
             # 常用LuCI插件选择:
            cat >> .config <<EOF
-            CONFIG_PACKAGE_luci-app-adbyby-plus=y
-            CONFIG_PACKAGE_luci-app-mwan3=y
-            CONFIG_PACKAGE_luci-app-mwan3helper=y
-            CONFIG_PACKAGE_luci-app-openclash=y       
-            CONFIG_PACKAGE_luci-app-vssr=y
-            CONFIG_PACKAGE_luci-app-ssr-plus-Jo=y
-            CONFIG_PACKAGE_luci-app-ssr-libev-server=y
-            CONFIG_PACKAGE_luci-app-ssr-python-pro-server=y
+           CONFIG_PACKAGE_luci-app-adbyby-plus=y
+           CONFIG_PACKAGE_luci-app-mwan3=y
+           CONFIG_PACKAGE_luci-app-mwan3helper=y
+           CONFIG_PACKAGE_luci-app-openclash=y       
+           CONFIG_PACKAGE_luci-app-vssr=y
+           CONFIG_PACKAGE_luci-app-ssr-plus-Jo=y
+           CONFIG_PACKAGE_luci-app-ssr-libev-server=y
+           CONFIG_PACKAGE_luci-app-ssr-python-pro-server=y
+           EOF
           # LuCI主题:
            cat >> .config <<EOF
-            CONFIG_PACKAGE_luci-theme-Butterfly=y
-            CONFIG_PACKAGE_luci-theme-opentomcat=y
-            CONFIG_PACKAGE_luci-theme-opentomato=y
-            CONFIG_PACKAGE_luci-theme-argon-mod=y
+           CONFIG_PACKAGE_luci-theme-Butterfly=y
+           CONFIG_PACKAGE_luci-theme-opentomcat=y
+           CONFIG_PACKAGE_luci-theme-opentomato=y
+           CONFIG_PACKAGE_luci-theme-argon-mod=y
            EOF
           # 常用软件包:
            cat >> .config <<EOF
@@ -145,7 +146,7 @@ jobs:
            cat >> .config <<EOF
           # CONFIG_TARGET_IMAGES_PAD is not set
           # CONFIG_VMDK_IMAGES is not set
-          EOF
+           EOF
           # 
           # ========================固件定制部分结束========================
           # 
