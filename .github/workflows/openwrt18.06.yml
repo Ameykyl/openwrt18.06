@@ -60,9 +60,11 @@ jobs:
            tar   xvJf  luci-app-nps.tar.xz
            git clone  https://github.com/Sweet-Fairy/openwrt-package
            git clone  https://github.com/Sweet-Fairy/luci-app-ssr-plus-Jo
+            git clone -b lean  https://github.com/Sweet-Fairy/luci-app-ssr-plus-Jo package/luci-app-ssr-plus-lean    
            git clone  https://github.com/Leo-Jo-My/luci-app-vssr
            git clone  https://github.com/lisaac/luci-lib-docker.git package/luci-lib-docker
-           git clone  https://github.com/lisaac/luci-app-dockerman.git package/luci-app-dockerman             
+           git clone  https://github.com/lisaac/luci-app-dockerman.git package/luci-app-dockerman  
+           # ==========ssr-plus-Jo   ssr-plus-lean不要一起编译  +vssr   ==========
            # ==========以上是示范如何加入tar.xz解包和拉github源码编译==========
       - name: Update feeds
         run: |
@@ -184,7 +186,8 @@ jobs:
           # CONFIG_PACKAGE_kmod-tcp-bbr-mod=y
             CONFIG_PACKAGE_kmod-tcp-bbr-nanqinlang=y
             CONFIG_PACKAGE_luci-app-vssr=y
-            CONFIG_PACKAGE_luci-app-ssr-plus-Jo=y
+          # CONFIG_PACKAGE_luci-app-ssr-plus-Jo=y
+            CONFIG_PACKAGE_luci-app-ssr-plus-lean=y
             CONFIG_PACKAGE_luci-app-advanced-reboot=y
             CONFIG_PACKAGE_luci-app-amule=y
             CONFIG_PACKAGE_luci-app-oaf=y
