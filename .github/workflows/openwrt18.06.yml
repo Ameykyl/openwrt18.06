@@ -13,7 +13,7 @@ on:
     branches: 
       - master
   # schedule:
-  #   - cron: 0 20 * * *
+  #   - cron: 1 20 * * *
   # release:
   #   types: [published]
 
