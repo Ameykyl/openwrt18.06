@@ -178,7 +178,6 @@ jobs:
             CONFIG_PACKAGE_luci-app-nps=y
             CONFIG_PACKAGE_luci-app-cpulimit=y
             CONFIG_PACKAGE_luci-app-netdata=y
-            CONFIG_PACKAGE_luci-i18n-netdata-zh-cn=y
             CONFIG_PACKAGE_luci-app-cupsd=y
             CONFIG_PACKAGE_luci-app-unblockmusic=y
             CONFIG_PACKAGE_luci-app-qos=y
