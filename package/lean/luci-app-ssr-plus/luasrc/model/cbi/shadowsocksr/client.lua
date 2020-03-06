@@ -179,4 +179,8 @@ o.rawhtml  = true
 o.template = "shadowsocksr/refresh"
 o.value =ip_count .. " " .. translate("Records")
 
+o = s:option(Button,"check_port",translate("Check Server Port"))
+o.template = "shadowsocksr/checkport"
+o.value =translate("No Check")
+
 return m
