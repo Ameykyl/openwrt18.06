@@ -17,8 +17,7 @@ local name = ""
 uci:foreach("shadowsocksr", "global", function(s) name = s[".name"] end)
 
 m = Map(shadowsocksr)
-
-m:section(SimpleSection).template = "shadowsocksr/status"
+m:append(Template("shadowsocksr/status"))
 
 -- [[ Servers List ]]--
 s = m:section(TypedSection, "servers")
@@ -28,8 +27,8 @@ s.sortable = false
 
 s.des = server_count
 s.current = uci:get("shadowsocksr", name, "global_server")
-s.template = "cbi/add"
-s.extedit = luci.dispatcher.build_url("admin/vpn/shadowsocksr/servers/%s")
+s.template = "shadowsocksr/add"
+s.extedit = luci.dispatcher.build_url("admin/services/shadowsocksr/servers/%s")
 function s.create(...)
 	local sid = TypedSection.create(...)
     if sid then
