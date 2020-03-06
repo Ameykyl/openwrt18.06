@@ -7,7 +7,7 @@
 # <https://github.com/KFERMercer/OpenWrt-CI>
 #
 
-name: OpenWrt-加强版
+name: OpenWrt-Lean加强版
 on:
    push:
     branches: 
