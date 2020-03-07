@@ -12,7 +12,6 @@ local gfwmode=0
 if nixio.fs.access("/etc/dnsmasq.ssr/gfw_list.conf") then
 gfwmode=1		
 end
-
 local uci = luci.model.uci.cursor()
 
 local sys = require "luci.sys"
@@ -27,7 +26,6 @@ end
 if nixio.fs.access("/etc/china_ssr.txt") then 
  ip_count = sys.exec("cat /etc/china_ssr.txt | wc -l")
 end
-
 m = Map(shadowsocksr)
 
 m:section(SimpleSection).template  = "shadowsocksr/status"
@@ -69,9 +67,6 @@ s.anonymous = true
 
 o = s:option(ListValue, "global_server", translate("Main Server"))
 o:value("nil", translate("Disable"))
-if nixio.fs.access("/usr/sbin/haproxy")then
-    o:value("__haproxy__", translate("Load Balancing"))
-end
 for _,key in pairs(key_table) do o:value(key,server_table[key]) end
 o.default = "nil"
 o.rmempty = false
@@ -120,65 +115,38 @@ for _,key in pairs(key_table_v2) do o:value(key,v2ray_table[key]) end
 o:depends("v2ray_flow", "1")
 o.default = "nil"
 
-
 o = s:option(ListValue, "threads", translate("Multi Threads Option"))
 o:value("0", translate("Auto Threads"))
 o:value("1", translate("1 Thread"))
 o:value("2", translate("2 Threads"))
 o:value("4", translate("4 Threads"))
 o:value("8", translate("8 Threads"))
+o:value("16", translate("16 Threads"))
+o:value("32", translate("32 Threads"))
+o:value("64", translate("64 Threads"))
+o:value("128", translate("128 Threads"))
 o.default = "0"
 o.rmempty = false
 
 o = s:option(ListValue, "run_mode", translate("Running Mode"))
 o:value("gfw", translate("GFW List Mode"))
 o:value("router", translate("IP Route Mode"))
-o:value("routers", translate("Oversea IP Route Mode"))
 o:value("all", translate("Global Mode"))
+o:value("oversea", translate("Oversea Mode"))
 o.default = gfw
 
+o = s:option(ListValue, "dports", translate("Proxy Ports"))
+o:value("1", translate("All Ports"))
+o:value("2", translate("Only Common Ports"))
+o.default = 1
+
 o = s:option(ListValue, "pdnsd_enable", translate("Resolve Dns Mode"))
+o:value("1", translate("Use Pdnsd tcp query and cache"))
+o:value("2", translate("Use DNS2SOCKS query and cache"))
 o:value("0", translate("Use Local DNS Service listen port 5335"))
-o:value("1", translate("Use Pdnsd tcp query and cache"))
-o:value("2", translate("Use Pdnsd udp query and cache"))
-if nixio.fs.access("/usr/bin/dnsforwarder") then
-o:value("3", translate("Use dnsforwarder tcp query and cache"))
-o:value("4", translate("Use dnsforwarder udp query and cache"))
-end
-if nixio.fs.access("/usr/bin/dnscrypt-proxy") then
-o:value("5", translate("Use dnscrypt-proxy query and cache"))
-end
-if nixio.fs.access("/usr/bin/chinadns") then
-o:value("6", translate("Use chinadns query and cache"))
-end
-
 o.default = 1
-
-o = s:option(ListValue, "chinadns_enable", translate("Chiadns Resolve Dns Mode"))
-o:value("0", translate("Use Local DNS Service"))
-o:value("1", translate("Use Pdnsd tcp query and cache"))
-o:value("2", translate("Use Pdnsd udp query and cache"))
-if nixio.fs.access("/usr/bin/dnsforwarder") then
-o:value("3", translate("Use dnsforwarder tcp query and cache"))
-o:value("4", translate("Use dnsforwarder udp query and cache"))
-end
-if nixio.fs.access("/usr/bin/dnscrypt-proxy") then
-o:value("5", translate("Use dnscrypt-proxy query and cache"))
-end
-
-if nixio.fs.access("/usr/sbin/smartdns") then
-o:value("6", translate("Use smartdns query and cache"))
-end
-
-if nixio.fs.access("/usr/sbin/https_dns_proxy") then
-o:value("7", translate("Use https_dns_proxy query and cache"))
-end
-o.default = 1
-o:depends("pdnsd_enable", "6")
 
 o = s:option(Value, "tunnel_forward", translate("Anti-pollution DNS Server"))
-o:value("0.0.0.0:53", translate("Using System Default DNS"))
-o:value("0.0.0.0:5333", translate("Using acceleration center DNS"))
 o:value("8.8.4.4:53", translate("Google Public DNS (8.8.4.4)"))
 o:value("8.8.8.8:53", translate("Google Public DNS (8.8.8.8)"))
 o:value("208.67.222.222:53", translate("OpenDNS (208.67.222.222)"))
@@ -194,20 +162,7 @@ o:value("114.114.114.114:53", translate("Oversea Mode DNS-1 (114.114.114.114)"))
 o:value("114.114.115.115:53", translate("Oversea Mode DNS-2 (114.114.115.115)"))
 o:depends("pdnsd_enable", "1")
 o:depends("pdnsd_enable", "2")
-o:depends("pdnsd_enable", "3")
-o:depends("pdnsd_enable", "4")
-o:depends("pdnsd_enable", "6")
-o.default = "8.8.4.4:53"
-
-o = s:option(Flag, "bt", translate("Kill BT"))
-o.default = 0
-o.rmempty = false
-o.description = translate("Prohibit downloading tool ports through proxy")
-
-o = s:option(Value, "bt_port", translate("BT Port"))
-o.default = "1236:65535"
-o.rmempty = true
-o:depends("bt", "1")
+o.description = translate("Custom DNS Server format as IP:PORT (default: 8.8.4.4:53)")
 
 o = s:option(Button,"gfw_data",translate("GFW List Data"))
 o.rawhtml  = true

@@ -60,10 +60,31 @@ jobs:
            tar   xvJf  luci-app-nps.tar.xz
            git clone  https://github.com/Sweet-Fairy/openwrt-package
            git clone  https://github.com/Sweet-Fairy/luci-app-ssr-plus-Jo
+            git clone -b lean  https://github.com/Sweet-Fairy/luci-app-ssr-plus-Jo package/luci-app-ssr-plus-lean    
            git clone  https://github.com/Leo-Jo-My/luci-app-vssr
            git clone  https://github.com/lisaac/luci-lib-docker.git package/luci-lib-docker
-           git clone  https://github.com/lisaac/luci-app-dockerman.git package/luci-app-dockerman             
+           git clone  https://github.com/lisaac/luci-app-dockerman.git package/luci-app-dockerman  
+           # ==========ssr-plus-Jo   ssr-plus-lean不要一起编译  +vssr   ==========
            # ==========以上是示范如何加入tar.xz解包和拉github源码编译==========
+      - name: 自定义配置文件1
+        run: |
+           cd package
+           git clone   https://github.com/Lienol/openwrt-package   
+           rm    -rfv  openwrt-package/package/v2ray-plugin
+           rm    -rfv  openwrt-package/package/v2ray
+           rm    -rfv  openwrt-package/package/simple-obfs
+           rm    -rfv  openwrt-package/package/dns2socks
+           rm    -rfv  openwrt-package/package/ipt2socks
+           rm    -rfv  openwrt-package/package/shadowsocksr-libev
+           rm    -rfv  ipt2socks
+           
+      - name: 自定义配置文件2
+        run: |
+           cd package/my
+             rm    -rfv  chinadns-ng
+             rm    -rfv  luci-app-passwall
+             rm    -rfv  tcping    
+             
       - name: Update feeds
         run: |
           ./scripts/feeds update -a
@@ -183,8 +204,10 @@ jobs:
             CONFIG_PACKAGE_luci-app-smartdns=y
           # CONFIG_PACKAGE_kmod-tcp-bbr-mod=y
             CONFIG_PACKAGE_kmod-tcp-bbr-nanqinlang=y
+            CONFIG_PACKAGE_luci-app-passwall=y 
             CONFIG_PACKAGE_luci-app-vssr=y
             CONFIG_PACKAGE_luci-app-ssr-plus-Jo=y
+          # CONFIG_PACKAGE_luci-app-ssr-plus-lean=y
             CONFIG_PACKAGE_luci-app-advanced-reboot=y
             CONFIG_PACKAGE_luci-app-amule=y
             CONFIG_PACKAGE_luci-app-oaf=y
@@ -201,8 +224,8 @@ jobs:
             CONFIG_PACKAGE_luci-app-control-webrestriction=y
             CONFIG_PACKAGE_luci-app-control-weburl=y
             CONFIG_PACKAGE_luci-app-dnspod=y
-          # CONFIG_PACKAGE_luci-app-filebrowser=y
-          # CONFIG_PACKAGE_luci-app-fileassistant=y
+            CONFIG_PACKAGE_luci-app-filebrowser=y
+            CONFIG_PACKAGE_luci-app-fileassistant=y
             CONFIG_PACKAGE_luci-app-haproxy-tcp=y
           # CONFIG_PACKAGE_luci-app-mentohust=y
             CONFIG_PACKAGE_luci-app-mjpg-streamer=y
@@ -216,6 +239,7 @@ jobs:
             CONFIG_PACKAGE_luci-app-ssr-libev-server=y
             CONFIG_PACKAGE_luci-app-ssr-python-pro-server=y
             CONFIG_PACKAGE_luci-app-transmission=y
+           
             CONFIG_LUCI_LANG_en=y
             CONFIG_LUCI_LANG_zh-tw=y
            EOF

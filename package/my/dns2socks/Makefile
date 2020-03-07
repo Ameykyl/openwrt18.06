@@ -1,13 +1,13 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=dns2socks
-PKG_VERSION:=2.0
-PKG_RELEASE:=20150628
+PKG_VERSION:=2.1
+PKG_RELEASE:=20200218
 
 PKG_SOURCE:=SourceCode.zip
 PKG_SOURCE_SUBDIR:=DNS2SOCKS
 PKG_SOURCE_URL:=@SF/dns2socks
-PKG_MD5SUM:=6a6d5462113929cb8ba3511a884211cf
+PKG_MD5SUM:=ec82de936ad004cc940502cd2a1bff5b
 
 PKG_MAINTAINER:=ghostmaker
 PKG_LICENSE:=BSD-3-Clause
@@ -60,7 +60,5 @@ define Package/dns2socks/install
 	$(INSTALL_DIR) $(1)/usr/bin
 	$(INSTALL_BIN) $(PKG_BUILD_DIR)/$(PKG_SOURCE_SUBDIR)/$(PKG_NAME) $(1)/usr/bin/dns2socks
 endef
-
-#$(shell $(RM) $(DL_DIR)/$(PKG_SOURCE))
 
 $(eval $(call BuildPackage,dns2socks))

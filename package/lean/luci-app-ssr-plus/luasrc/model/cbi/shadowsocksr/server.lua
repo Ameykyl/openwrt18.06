@@ -4,15 +4,9 @@
 local m, sec, o
 local shadowsocksr = "shadowsocksr"
 local uci = luci.model.uci.cursor()
-local ipkg = require("luci.model.ipkg")
 
-m = Map(shadowsocksr)
 
-local type = {
-	"ssr",
-	"ss",
-	"v2ray",
-}
+m = Map(shadowsocksr, translate("ShadowSocksR Server"))
 
 local encrypt_methods = {
 	"table",
@@ -25,9 +19,6 @@ local encrypt_methods = {
 	"aes-128-ctr",
 	"aes-192-ctr",
 	"aes-256-ctr",
-	"aes-128-gcm",
-	"aes-192-gcm",
-	"aes-256-gcm",
 	"bf-cfb",
 	"camellia-128-cfb",
 	"camellia-192-cfb",
@@ -40,8 +31,6 @@ local encrypt_methods = {
 	"salsa20",
 	"chacha20",
 	"chacha20-ietf",
-	"chacha20-ietf-poly1305",
-	"xchacha20-ietf-poly1305",
 }
 
 local protocol = {
@@ -53,7 +42,7 @@ local protocol = {
 	"auth_chain_a",
 }
 
-local obfs = {
+obfs = {
 	"plain",
 	"http_simple",
 	"http_post",
@@ -62,8 +51,6 @@ local obfs = {
 	"tls1.2_ticket_fastauth",
 }
 
-
-m:section(SimpleSection).template  = "shadowsocksr/status2"
 -- [[ Global Setting ]]--
 sec = m:section(TypedSection, "server_global", translate("Global Setting"))
 sec.anonymous = true
@@ -75,9 +62,8 @@ o.rmempty = false
 sec = m:section(TypedSection, "server_config", translate("Server Setting"))
 sec.anonymous = true
 sec.addremove = true
-sec.sortable =  true
 sec.template = "cbi/tblsection"
-sec.extedit = luci.dispatcher.build_url("admin/vpn/shadowsocksr/server/%s")
+sec.extedit = luci.dispatcher.build_url("admin/services/shadowsocksr/server/%s")
 function sec.create(...)
 	local sid = TypedSection.create(...)
 	if sid then
@@ -92,25 +78,25 @@ function o.cfgvalue(...)
 end
 o.rmempty = false
 
-o = sec:option(DummyValue, "type", translate("Server Node Type"))
-function o.cfgvalue(...)
-	return Value.cfgvalue(...) or "?"
-end
-
 o = sec:option(DummyValue, "server_port", translate("Server Port"))
 function o.cfgvalue(...)
 	return Value.cfgvalue(...) or "?"
 end
 
 o = sec:option(DummyValue, "encrypt_method", translate("Encrypt Method"))
-o.width="10%"
+function o.cfgvalue(...)
+	local v = Value.cfgvalue(...)
+	return v and v:upper() or "?"
+end
 
 o = sec:option(DummyValue, "protocol", translate("Protocol"))
-o.width="10%"
+function o.cfgvalue(...)
+	return Value.cfgvalue(...) or "?"
+end
 
 o = sec:option(DummyValue, "obfs", translate("Obfs"))
-o.width="10%"
+function o.cfgvalue(...)
+	return Value.cfgvalue(...) or "?"
+end
 
-m:append(Template("shadowsocksr/server_list"))
 return m
-

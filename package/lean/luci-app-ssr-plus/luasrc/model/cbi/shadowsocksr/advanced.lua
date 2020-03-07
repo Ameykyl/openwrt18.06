@@ -1,27 +1,7 @@
-local shadowsocksr = "shadowsocksr"
-local uci = luci.model.uci.cursor()
-local server_table = {}
 
-
-uci:foreach(shadowsocksr, "servers", function(s)
-	if s.alias then
-		server_table[s[".name"]] = "[%s]:%s" %{string.upper(s.type), s.alias}
-	elseif s.server and s.server_port then
-		server_table[s[".name"]] = "[%s]:%s:%s" %{string.upper(s.type), s.server, s.server_port}
-	end
-end)
-
-local key_table = {}   
-for key,_ in pairs(server_table) do  
-    table.insert(key_table,key)  
-end 
-
-table.sort(key_table)
-
-m = Map(shadowsocksr)
-
+m = Map("shadowsocksr")
 -- [[ global ]]--
-s = m:section(TypedSection, "global", translate("Server failsafe auto swith settings"))
+s = m:section(TypedSection, "global", translate("Server failsafe auto swith and custom update settings"))
 s.anonymous = true
 
 o = s:option(Flag, "monitor_enable", translate("Enable Process Deamon"))
@@ -47,68 +27,53 @@ o.datatype = "uinteger"
 o:depends("enable_switch", "1")
 o.default = 3
 
-
-
--- [[ SOCKS5 Proxy ]]--
-if nixio.fs.access("/usr/bin/ssr-local") then
-s = m:section(TypedSection, "socks5_proxy", translate("SOCKS5 Proxy"))
-s.anonymous = true
-
-o = s:option(ListValue, "server", translate("Server"))
-o:value("nil", translate("Disable"))
-for _,key in pairs(key_table) do o:value(key,server_table[key]) end
-o.default = "nil"
+o = s:option(Flag, "chnroute", translate("Enable Custom Chnroute"))
 o.rmempty = false
 
-o = s:option(Value, "local_port", translate("Local Port"))
-o.datatype = "port"
-o.default = 1080
-o.rmempty = false
-
--- [[ HTTP Proxy ]]--
-if nixio.fs.access("/usr/sbin/privoxy") then
-o = s:option(Flag, "http_enable", translate("Enable HTTP Proxy"))
-o.rmempty = false
-
-o = s:option(Value, "http_port", translate("HTTP Port"))
-o.datatype = "port"
-o.default = 1081
-o.rmempty = false
-
-end
-end
--- [[ adblock ]]--
-s = m:section(TypedSection, "global", translate("adblock settings"))
-s.anonymous = true
+o = s:option(Value, "chnroute_url", translate("Chnroute Update url"))
+o.default = "https://ispip.clang.cn/all_cn.txt"
+o:depends("chnroute", "1")
 
 o = s:option(Flag, "adblock", translate("Enable adblock"))
 o.rmempty = false
 
 o = s:option(Value, "adblock_url", translate("adblock_url"))
-o.default = "https://easylist-downloads.adblockplus.org/easylistchina+easylist.txt"
+o.default = "https://gitee.com/privacy-protection-tools/anti-ad/raw/master/anti-ad-for-dnsmasq.conf"
+o:depends("adblock", "1")
+o.description = translate("Support AdGuardHome and DNSMASQ format list")
 
--- [[ haProxy ]]--
-
-s = m:section(TypedSection, "global_haproxy", translate("haProxy settings"))
+-- [[ SOCKS Proxy ]]--
+if nixio.fs.access("/usr/bin/microsocks") then
+s = m:section(TypedSection, "socks5_proxy", translate("SOCKS5 Proxy Server Settings"))
 s.anonymous = true
 
-o = s:option(Flag, "admin_enable", translate("Enabling the Management Console"))
+o = s:option(Flag, "socks", translate("Enable SOCKS5 Proxy Server"))
 o.rmempty = false
-o.default = 1
 
-o = s:option(Value, "admin_port", translate("Service Port"))
-o.datatype = "uinteger"
-o.default = 1111
+o = s:option(Value, "local_port", translate("Local Port"))
+o.datatype = "port"
+o.default = 10800
+o.rmempty = true
+o:depends("socks", "1")
 
-o = s:option(Value, "admin_user", translate("User name"))
-o.default = "admin"
+o = s:option(Flag, "auth_enable", translate("Enable Authentication"))
+o.rmempty = false
+o.default = "0"
+o:depends("socks", "1")
 
-o = s:option(Value, "admin_password", translate("Password"))
-o.default = "root"
+o = s:option(Value, "username", translate("Username"))
+o.default = "username"
+o:depends("auth_enable", "1")
 
+o = s:option(Value, "password", translate("Password"))
+o.password = true
+o.default = "password"
+o:depends("auth_enable", "1")
 
+o = s:option(Flag, "wan_enable", translate("Enable WAN Access"))
+o.rmempty = true
+o.default = "0"
+o:depends("auth_enable", "1")
 
-
+end
 return m
-
-

@@ -1,13 +1,11 @@
 <%+cbi/valueheader%>
-
 <script type="text/javascript">//<![CDATA[
-
 	function check_connect(btn,urlname)
 	{
 		btn.disabled = true;
 		btn.value    = '<%:Check...%>';
 		murl=urlname;
-		XHR.get('<%=luci.dispatcher.build_url("admin", "vpn", "shadowsocksr","check")%>',
+		XHR.get('<%=luci.dispatcher.build_url("admin", "services", "shadowsocksr","check")%>',
 			{ set:murl },
 			function(x,rv)
 			{
@@ -18,20 +16,14 @@
 				s.innerHTML ="<font color='green'>"+"<%:Connect OK%>"+"</font>";
 				else
 				s.innerHTML ="<font color='red'>"+"<%:Connect Error%>"+"</font>";
-
-
 			}
-
 				btn.disabled = false;
 				btn.value    = '<%:Check Connect%>';
 			}
 		);
-
 		return false;
 	}
 //]]></script>
-
-
 <input type="button" class="cbi-button cbi-button-apply" value="<%:Check Connect%>" onclick="return check_connect(this,'<%=self.option%>')" />
 <span id="<%=self.option%>-status"><em><%=self.value%></em></span>
 
