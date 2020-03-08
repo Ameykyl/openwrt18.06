@@ -60,7 +60,7 @@ jobs:
            tar   xvJf  luci-app-nps.tar.xz
            git clone  https://github.com/Sweet-Fairy/openwrt-package
            git clone  https://github.com/Sweet-Fairy/luci-app-ssr-plus-Jo
-            git clone -b lean  https://github.com/Sweet-Fairy/luci-app-ssr-plus-Jo package/luci-app-ssr-plus-lean    
+           git clone -b lean  https://github.com/Leo-Jo-My/luci-app-ssr-plus-Jo package/luci-app-ssr-plus-lean
            git clone  https://github.com/Leo-Jo-My/luci-app-vssr
            git clone  https://github.com/lisaac/luci-lib-docker.git package/luci-lib-docker
            git clone  https://github.com/lisaac/luci-app-dockerman.git package/luci-app-dockerman  
@@ -136,10 +136,10 @@ jobs:
             CONFIG_EFI_IMAGES=y
             EOF
           # IPv6支持:
-          # cat >> .config <<EOF
-          # CONFIG_PACKAGE_dnsmasq_full_dhcpv6=y
-          # CONFIG_PACKAGE_ipv6helper=y
-          # EOF
+           cat >> .config <<EOF
+           CONFIG_PACKAGE_dnsmasq_full_dhcpv6=y
+           CONFIG_PACKAGE_ipv6helper=y
+           EOF
           # 多文件系统支持:
           # cat >> .config <<EOF
           # CONFIG_PACKAGE_kmod-fs-nfs=y
@@ -156,7 +156,10 @@ jobs:
            CONFIG_PACKAGE_kmod-usb2=y
            CONFIG_PACKAGE_kmod-usb2-pci=y
            CONFIG_PACKAGE_kmod-usb3=y
-          EOF
+           CONFIG_PACKAGE_kmod-video-core=y
+           CONFIG_PACKAGE_kmod-video-uvc=y
+           CONFIG_PACKAGE_kmod-video-videobuf2=y
+           EOF
           # 常用LuCI插件选择:
            cat >> .config <<EOF
             CONFIG_PACKAGE_luci-app-adbyby-plus=y
