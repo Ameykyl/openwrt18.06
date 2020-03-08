@@ -7,7 +7,7 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=dnscrypt-proxy-full
-PKG_VERSION:=2.0.36
+PKG_VERSION:=2.0.39
 PKG_RELEASE:=1
 PKG_BUILD_DIR:=$(BUILD_DIR)/$(PKG_NAME)-$(PKG_VERSION)
 
@@ -18,7 +18,7 @@ define Package/$(PKG_NAME)
 	CATEGORY:=Network
 	TITLE:=A flexible DNS proxy, with support for modern encrypted DNS protocols such as DNSCrypt v2 and DNS-over-HTTPS.
 	DEPENDS:=
-	URL:=https://github.com/jedisct1/dnscrypt-proxy/releases
+	URL:=https://github.com/DNSCrypt/dnscrypt-proxy/releases
 endef
 
 define Package/$(PKG_NAME)/description
@@ -42,16 +42,16 @@ ifeq ($(ARCH),mips)
 	PKG_BUILD_DNSCRYPT:=linux-mips64
 endif
 ifeq ($(ARCH),arm)
-	PKG_ARCH_DNSCRYPT:=linux_armv6
-	PKG_BUILD_DNSCRYPT:=linux-armv6
+	PKG_ARCH_DNSCRYPT:=linux_arm
+	PKG_BUILD_DNSCRYPT:=linux_arm
 endif
 ifeq ($(ARCH),aarch64)
-	PKG_ARCH_DNSCRYPT:=linux_armv8
-	PKG_BUILD_DNSCRYPT:=linux-armv8
+	PKG_ARCH_DNSCRYPT:=linux_arm64
+	PKG_BUILD_DNSCRYPT:=linux_arm64
 endif
 
 define Build/Prepare
-	[ ! -f $(PKG_BUILD_DIR)/dnscrypt-proxy-$(PKG_ARCH_DNSCRYPT)-$(PKG_VERSION).tar.gz ] && wget https://github.com/jedisct1/dnscrypt-proxy/releases/download/$(PKG_VERSION)/dnscrypt-proxy-$(PKG_ARCH_DNSCRYPT)-$(PKG_VERSION).tar.gz -O $(PKG_BUILD_DIR)/dnscrypt-proxy-$(PKG_ARCH_DNSCRYPT)-$(PKG_VERSION).tar.gz
+	[ ! -f $(PKG_BUILD_DIR)/dnscrypt-proxy-$(PKG_ARCH_DNSCRYPT)-$(PKG_VERSION).tar.gz ] && wget https://github.com/DNSCrypt/dnscrypt-proxy/releases/download/$(PKG_VERSION)/dnscrypt-proxy-$(PKG_ARCH_DNSCRYPT)-$(PKG_VERSION).tar.gz -O $(PKG_BUILD_DIR)/dnscrypt-proxy-$(PKG_ARCH_DNSCRYPT)-$(PKG_VERSION).tar.gz
 	tar -xzvf $(PKG_BUILD_DIR)/dnscrypt-proxy-$(PKG_ARCH_DNSCRYPT)-$(PKG_VERSION).tar.gz -C $(PKG_BUILD_DIR)
 endef
 
