@@ -206,8 +206,8 @@ jobs:
             CONFIG_PACKAGE_kmod-tcp-bbr-nanqinlang=y
             CONFIG_PACKAGE_luci-app-passwall=y 
             CONFIG_PACKAGE_luci-app-vssr=y
-            CONFIG_PACKAGE_luci-app-ssr-plus-Jo=y
-          # CONFIG_PACKAGE_luci-app-ssr-plus-lean=y
+          #  CONFIG_PACKAGE_luci-app-ssr-plus-Jo=y
+            CONFIG_PACKAGE_luci-app-ssr-plus-lean=y
             CONFIG_PACKAGE_luci-app-advanced-reboot=y
             CONFIG_PACKAGE_luci-app-amule=y
             CONFIG_PACKAGE_luci-app-oaf=y
