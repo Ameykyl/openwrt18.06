@@ -58,6 +58,7 @@ jobs:
            tar   xvJf  luci-app-rclone.tar.xz
            tar   xvJf  autocore.tar.xz
            tar   xvJf  luci-app-nps.tar.xz
+           tar   xvJf  luci-app-cpufreq.tar.xz
            git clone  https://github.com/Sweet-Fairy/openwrt-package
            git clone  https://github.com/Sweet-Fairy/luci-app-ssr-plus-Jo
             git clone -b lean  https://github.com/Sweet-Fairy/luci-app-ssr-plus-Jo package/luci-app-ssr-plus-lean    
@@ -224,6 +225,7 @@ jobs:
             CONFIG_PACKAGE_luci-app-control-webrestriction=y
             CONFIG_PACKAGE_luci-app-control-weburl=y
             CONFIG_PACKAGE_luci-app-dnspod=y
+            CONFIG_PACKAGE_luci-app-cpufreq=y
             CONFIG_PACKAGE_luci-app-filebrowser=y
             CONFIG_PACKAGE_luci-app-fileassistant=y
             CONFIG_PACKAGE_luci-app-haproxy-tcp=y

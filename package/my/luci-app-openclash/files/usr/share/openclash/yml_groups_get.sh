@@ -38,7 +38,7 @@ fi
 echo "开始更新【$CONFIG_NAME】的策略组配置..." >$START_LOG
 
 /usr/share/openclash/yml_groups_name_get.sh
-[ ! -z "$(grep "读取错误" /tmp/Proxy_Group)"] && {
+[ ! -z "$(grep "读取错误" /tmp/Proxy_Group)" ] && {
 	echo "读取错误，配置文件【$CONFIG_NAME】异常！" >$START_LOG
 	uci commit openclash
 	sleep 5
