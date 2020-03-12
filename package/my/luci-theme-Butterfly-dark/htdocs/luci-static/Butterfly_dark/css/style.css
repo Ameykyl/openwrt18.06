@@ -1051,7 +1051,7 @@ form[method="post"] + form[method="post"],
 
 .cbi-value-description {
     font-size: small;
-   color: #99CCFF;
+  
     opacity: .5;
     padding: .5rem 0 0
 }
