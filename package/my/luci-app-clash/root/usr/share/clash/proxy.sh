@@ -10,7 +10,7 @@ config_name=$(uci get clash.config.create_tag 2>/dev/null)
 CONFIG_YAML="/usr/share/clash/config/custom/${config_name}.yaml" 
 check_name=$(grep -F "${config_name}.yaml" "/usr/share/clashbackup/create_list.conf") 
 same_tag=$(uci get clash.config.same_tag 2>/dev/null)
-
+new_conf=$(uci get clash.config.new_conff 2>/dev/null)
 
 if  [ $config_name == "" ] || [ -z $config_name ];then
 
@@ -54,8 +54,6 @@ if [ "${create}" -eq 1 ];then
 	elif [ $lang == "zh_cn" ];then
     	 echo "开始创建自定义配置..." >$REAL_LOG
 	fi
-	sleep 1
-	
 	
 CONFIG_YAML_RULE="/usr/share/clash/custom_rule.yaml"
 SERVER_FILE="/tmp/servers.yaml"
@@ -82,7 +80,6 @@ PROVIDER_FILE="/tmp/yaml_provider.yaml"
 	fi
 	exit 0	
    fi
-	sleep 2
 
 
 
@@ -150,7 +147,11 @@ fi
 
 if [ -f $PROVIDER_FILE ];then 
 sed -i "1i\   " $PROVIDER_FILE 2>/dev/null 
+if [ "${new_conf}" -eq 1 ];then
+sed -i "2i\proxy-providers:" $PROVIDER_FILE 2>/dev/null
+else
 sed -i "2i\proxy-provider:" $PROVIDER_FILE 2>/dev/null
+fi
 #echo "proxy-provider:" >$PROVIDER_FILE
 rm -rf /tmp/Proxy_Provider
 
@@ -404,8 +405,12 @@ fi
 if [ ! -z "${scount}" ] || [ "${scount}" -ne 0 ];then
 
 sed -i "1i\   " $SERVER_FILE 2>/dev/null 
-sed -i "2i\Proxy:" $SERVER_FILE 2>/dev/null 
 
+if [ "${new_conf}" -eq 1 ];then
+sed -i "2i\proxies:" $SERVER_FILE 2>/dev/null 
+else
+sed -i "2i\Proxy:" $SERVER_FILE 2>/dev/null 
+fi
 egrep '^ {0,}-' $SERVER_FILE |grep name: |awk -F 'name: ' '{print $2}' |sed 's/,.*//' >$Proxy_Group 2>&1
 
 sed -i "s/^ \{0,\}/    - /" $Proxy_Group 2>/dev/null 
@@ -549,7 +554,11 @@ config_foreach yml_groups_set "groups"
 
 if [ "$(ls -l $GROUP_FILE|awk '{print $5}')" -ne 0 ]; then
 sed -i "1i\  " $GROUP_FILE 2>/dev/null 
+if [ "${new_conf}" -eq 1 ];then
+sed -i "2i\proxy-groups:" $GROUP_FILE 2>/dev/null 
+else
 sed -i "2i\Proxy Group:" $GROUP_FILE 2>/dev/null 
+fi
 fi
 
 
