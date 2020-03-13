@@ -16,7 +16,6 @@ SUBTARGETS:=bcm2708 bcm2709 bcm2710 bcm2711
 
 KERNEL_PATCHVER:=4.19
 
-
 define Target/Description
 	Build firmware image for Broadcom BCM27xx SoC devices.
 	Currently produces SD Card image for Raspberry Pi.
