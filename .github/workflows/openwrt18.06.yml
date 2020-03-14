@@ -52,13 +52,14 @@ jobs:
       - name: 自定义插件
         run: |
            rm    -rfv  package/lean/autocore
+           rm    -rfv  package/lean/luci-app-adbyby-plus
            cd package/diy
            tar   xvJf  luci-app-docker.tar.xz
            tar   xvJf  luci-app-koolddns.tar.xz
            tar   xvJf  luci-app-rclone.tar.xz
            tar   xvJf  autocore.tar.xz
            tar   xvJf  luci-app-nps.tar.xz
-           tar   xvJf  luci-app-cpufreq.tar.xz
+           tar   xvJf  luci-app-adbyby-plus.tar.xz
            git clone  https://github.com/Sweet-Fairy/openwrt-package
            git clone  https://github.com/Sweet-Fairy/luci-app-ssr-plus-Jo
             git clone -b lean  https://github.com/Sweet-Fairy/luci-app-ssr-plus-Jo package/luci-app-ssr-plus-lean    
@@ -164,8 +165,8 @@ jobs:
             CONFIG_PACKAGE_luci-app-aria2=y
             CONFIG_PACKAGE_luci-app-baidupcs-web=y
           # CONFIG_PACKAGE_luci-app-docker=y
-          # CONFIG_PACKAGE_luci-lib-docker=y
-          # CONFIG_PACKAGE_luci-app-dockerman=y
+            CONFIG_PACKAGE_luci-lib-docker=y
+            CONFIG_PACKAGE_luci-app-dockerman=y
             CONFIG_PACKAGE_luci-app-diskman=y
             CONFIG_PACKAGE_luci-app-aliddns=y
             CONFIG_PACKAGE_luci-app-rclone=y
