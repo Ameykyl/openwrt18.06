@@ -4,65 +4,32 @@
 
 local m, s, sec, o, kcp_enable
 local shadowsocksr = "shadowsocksr"
-local gfw_count=0
-local ad_count=0
-local ip_count=0
-local gfwmode=0
-
-if nixio.fs.access("/etc/dnsmasq.ssr/gfw_list.conf") then
-gfwmode=1		
-end
 local uci = luci.model.uci.cursor()
 
 local sys = require "luci.sys"
 
-if gfwmode==1 then 
- gfw_count = tonumber(sys.exec("cat /etc/dnsmasq.ssr/gfw_list.conf | wc -l"))/2
- if nixio.fs.access("/etc/dnsmasq.ssr/ad.conf") then
-  ad_count=tonumber(sys.exec("cat /etc/dnsmasq.ssr/ad.conf | wc -l"))
- end
-end
- 
-if nixio.fs.access("/etc/china_ssr.txt") then 
- ip_count = sys.exec("cat /etc/china_ssr.txt | wc -l")
-end
-m = Map(shadowsocksr)
+m = Map(shadowsocksr, translate("ShadowSocksR Plus+ Settings"))
 
 m:section(SimpleSection).template  = "shadowsocksr/status"
 
 local server_table = {}
-local v2ray_table = {}
 uci:foreach(shadowsocksr, "servers", function(s)
 	if s.alias then
 		server_table[s[".name"]] = "[%s]:%s" %{string.upper(s.type), s.alias}
 	elseif s.server and s.server_port then
 		server_table[s[".name"]] = "[%s]:%s:%s" %{string.upper(s.type), s.server, s.server_port}
 	end
-if s.type == "v2ray"	then
-		if s.alias then
-			v2ray_table[s[".name"]] = "[%s]:%s" %{string.upper(s.type), s.alias}
-		elseif s.server and s.server_port then
-			v2ray_table[s[".name"]] = "[%s]:%s:%s" %{string.upper(s.type), s.server, s.server_port}
-		end
-	end
 end)
 
-local key_table = {}   
-for key,_ in pairs(server_table) do  
-    table.insert(key_table,key)  
-end 
+local key_table = {}
+for key,_ in pairs(server_table) do
+	table.insert(key_table,key)
+end
 
-table.sort(key_table)  
-
-local key_table_v2 = {}  
-for key,_ in pairs(v2ray_table) do  
-    table.insert(key_table_v2,key)  
-end 
-
-table.sort(key_table_v2)
+table.sort(key_table)
 
 -- [[ Global Setting ]]--
-s = m:section(TypedSection, "global", translate("ShadowSocksR Plus+ Settings"))
+s = m:section(TypedSection, "global")
 s.anonymous = true
 
 o = s:option(ListValue, "global_server", translate("Main Server"))
@@ -76,44 +43,11 @@ o:value("", translate("Disable"))
 o:value("same", translate("Same as Global Server"))
 for _,key in pairs(key_table) do o:value(key,server_table[key]) end
 
-o = s:option(Flag, "v2ray_flow", translate("Open v2ray split-flow"))
+o = s:option(ListValue, "netflix_server", translate("Netflix Node"))
+o:value("same", translate("Same as Global Server"))
+for _,key in pairs(key_table) do o:value(key,server_table[key]) end
+o.default = "same"
 o.rmempty = false
-o.description = translate("When open v2ray split-flow,your main server must be a v2ray server")
-
-o = s:option(ListValue, "youtube_server", translate("Youtube Proxy"))
-o:value("nil", translate("Same as Global Server"))
-for _,key in pairs(key_table_v2) do o:value(key,v2ray_table[key]) end
-o:depends("v2ray_flow", "1")
-o.default = "nil"
-
-
-
-o = s:option(ListValue, "tw_video_server", translate("TaiWan Video Proxy"))
-o:value("nil", translate("Same as Global Server"))
-for _,key in pairs(key_table_v2) do o:value(key,v2ray_table[key]) end
-o:depends("v2ray_flow", "1")
-o.default = "nil"
-
-
-o = s:option(ListValue, "netflix_server", translate("Netflix Proxy"))
-o:value("nil", translate("Same as Global Server"))
-for _,key in pairs(key_table_v2) do o:value(key,v2ray_table[key]) end
-o:depends("v2ray_flow", "1")
-o.default = "nil"
-
-
-o = s:option(ListValue, "disney_server", translate("Diseny+ Proxy"))
-o:value("nil", translate("Same as Global Server"))
-for _,key in pairs(key_table_v2) do o:value(key,v2ray_table[key]) end
-o:depends("v2ray_flow", "1")
-o.default = "nil"
-
-
-o = s:option(ListValue, "prime_server", translate("Prime Video Proxy"))
-o:value("nil", translate("Same as Global Server"))
-for _,key in pairs(key_table_v2) do o:value(key,v2ray_table[key]) end
-o:depends("v2ray_flow", "1")
-o.default = "nil"
 
 o = s:option(ListValue, "threads", translate("Multi Threads Option"))
 o:value("0", translate("Auto Threads"))
@@ -163,24 +97,5 @@ o:value("114.114.115.115:53", translate("Oversea Mode DNS-2 (114.114.115.115)"))
 o:depends("pdnsd_enable", "1")
 o:depends("pdnsd_enable", "2")
 o.description = translate("Custom DNS Server format as IP:PORT (default: 8.8.4.4:53)")
-
-o = s:option(Button,"gfw_data",translate("GFW List Data"))
-o.rawhtml  = true
-o.template = "shadowsocksr/refresh"
-o.value =tostring(math.ceil(gfw_count)) .. " " .. translate("Records")
-
-o = s:option(Button,"ad_data",translate("Advertising Data")) 
-o .rawhtml  = true
-o .template = "shadowsocksr/refresh"
-o .value =tostring(math.ceil(ad_count)) .. " " .. translate("Records")
-
-o = s:option(Button,"ip_data",translate("China IP Data"))
-o.rawhtml  = true
-o.template = "shadowsocksr/refresh"
-o.value =ip_count .. " " .. translate("Records")
-
-o = s:option(Button,"check_port",translate("Check Server Port"))
-o.template = "shadowsocksr/checkport"
-o.value =translate("No Check")
 
 return m
