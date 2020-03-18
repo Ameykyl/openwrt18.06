@@ -1,14 +1,18 @@
 local nt = require "luci.sys".net
-local log=require"nixio.fs"
+local fs=require"nixio.fs"
 local e=luci.model.uci.cursor()
 local net = require "luci.model.network".init()
 local sys = require "luci.sys"
 local ifaces = sys.net:devices()
 
-m=Map("serverchan",translate("ServerChan"),translate("「Server酱」，英文名「ServerChan」，是一款从服务器推送报警信息和日志到微信的工具。"))
+m=Map("serverchan",translate("ServerChan"),
+translate("「Server酱」，英文名「ServerChan」，是一款从服务器推送报警信息和日志到微信的工具。<br /><br />如果你在使用中遇到问题，请到这里提交：")
+.. [[<a href="https://github.com/tty228/luci-app-serverchan" target="_blank">]]
+.. translate("github 项目地址")
+.. [[</a>]]
+)
 
 m:section(SimpleSection).template  = "serverchan/serverchan_status"
-
 s=m:section(NamedSection,"serverchan","serverchan",translate("Server酱设置"))
 s:tab("tab_basic", translate("基本设置"))
 s:tab("tab_basic2", translate("设备状态"))
@@ -23,8 +27,16 @@ a=s:taboption("tab_basic", Flag,"serverchan_enable",translate("启用"))
 a.default=0
 a.rmempty=true
 
-a=s:taboption("tab_basic", Value,"sckey",translate('SCKEY'))
+a=s:taboption("tab_basic", Value,"sckey",translate('SCKEY'), translate("Serverchan Sckey").."<br>调用代码获取<a href='http://sc.ftqq.com' target='_blank'>点击这里</a><br><br>")
 a.rmempty=true
+
+device_name=s:taboption("tab_basic", Value,"device_name",translate('本设备名称'))
+device_name.rmempty=true
+device_name.description = translate("在推送信息标题中会标识本设备名称，用于区分推送信息的来源设备")
+
+sleeptime=s:taboption("tab_basic", Value,"sleeptime",translate('检测时间间隔'))
+sleeptime.default = "60"
+sleeptime.description = translate("越短的时间时间响应越及时，但会占用更多的系统资源")
 
 debuglevel=s:taboption("tab_basic", ListValue,"debuglevel",translate("日志调试等级"))
 debuglevel:value("",translate("关闭"))
@@ -38,6 +50,7 @@ device_aliases.rmempty = true
 device_aliases.optional = true
 device_aliases.description = translate("<br/> 请输入设备 MAC 和设备别名，用“-”隔开，如：<br/> XX:XX:XX:XX:XX:XX-我的手机")
 
+local logfile = "/tmp/serverchan/serverchan.log" 
 
 e=s:taboption("log",TextValue,"log")
 e:depends({debuglevel="1"})
@@ -46,14 +59,72 @@ e.rows=26
 e.wrap="off"
 e.readonly=true
 e.cfgvalue=function(s,s)
-return log.readfile("/tmp/serverchan/server_chan.log")or""
+return fs.readfile(logfile)or""
 end
 e.write=function(e,e,e)
 end
 
-a=s:taboption("tab_basic2", Flag,"serverchan_ip",translate("WAN ip 变化通知"))
-a.default=0
-a.rmempty=true
+e=s:taboption("log", Button,translate(""))
+e:depends({debuglevel="1"})
+e:depends({debuglevel="2"})
+e.inputtitle=translate("清理日志")
+e.inputstyle = "clean_log"
+function e.write(self, section)
+
+luci.sys.call("cbi.clean_log")
+	fs.writefile(logfile, "")
+end
+
+a=s:taboption("tab_basic2", ListValue,"serverchan_ipv4",translate("ipv4 变动通知"))
+a.default="disable"
+a:value("0",translate("关闭"))
+a:value("1",translate("通过接口获取"))
+a:value("2",translate("通过URL获取"))
+a = s:taboption("tab_basic2", ListValue, "ipv4_interface", translate("接口名称"))
+a:depends({serverchan_ipv4="1"})
+for _, iface in ipairs(ifaces) do
+	if not (iface == "lo" or iface:match("^ifb.*")) then
+		local nets = net:get_interface(iface)
+		nets = nets and nets:get_networks() or {}
+		for k, v in pairs(nets) do
+			nets[k] = nets[k].sid
+		end
+		nets = table.concat(nets, ",")
+		a:value(iface, ((#nets > 0) and "%s (%s)" % {iface, nets} or iface))
+	end
+end
+a.description = translate("<br/>一般选择 wan 接口，多拨环境请自行选择")
+a= s:taboption("tab_basic2", Value, "ipv4_URL", "URL 地址")
+a.rmempty = true 
+a.default = "members.3322.org/dyndns/getip"
+a:depends({serverchan_ipv4="2"})
+a.description = translate("<br/>会因服务器稳定性/连接频繁等原因导致获取失败，一般不推荐")
+
+a=s:taboption("tab_basic2", ListValue,"serverchan_ipv6",translate("ipv6 变动通知"))
+a.default="disable"
+a:value("0",translate("关闭"))
+a:value("1",translate("通过接口获取"))
+a:value("2",translate("通过URL获取"))
+a = s:taboption("tab_basic2", ListValue, "ipv6_interface", translate("接口名称"))
+a:depends({serverchan_ipv6="1"})
+for _, iface in ipairs(ifaces) do
+	if not (iface == "lo" or iface:match("^ifb.*")) then
+		local nets = net:get_interface(iface)
+		nets = nets and nets:get_networks() or {}
+		for k, v in pairs(nets) do
+			nets[k] = nets[k].sid
+		end
+		nets = table.concat(nets, ",")
+		a:value(iface, ((#nets > 0) and "%s (%s)" % {iface, nets} or iface))
+	end
+end
+a.description = translate("<br/>一般选择 wan 接口，多拨环境请自行选择")
+a= s:taboption("tab_basic2", Value, "ipv6_URL", "URL 地址")
+a.rmempty = true 
+a.default = "v6.ip.zxinc.org/getip"
+a:depends({serverchan_ipv6="2"})
+a.description = translate("<br/>会因服务器稳定性/连接频繁等原因导致获取失败，一般不推荐")
+
 a=s:taboption("tab_basic2", Flag,"serverchan_up",translate("设备上线通知"))
 a.default=0
 a.rmempty=true
@@ -64,20 +135,68 @@ a=s:taboption("tab_basic2", Flag,"cpuload_enable",translate("CPU 负载报警"))
 a.default=0
 a.rmempty=true
 a= s:taboption("tab_basic2", Value, "cpuload", "负载报警阈值")
+a.default = "3.0"
 a.rmempty = true 
-a.placeholder = "2.0"
 a:depends({cpuload_enable="1"})
 a=s:taboption("tab_basic2", Flag,"temperature_enable",translate("CPU 温度报警"))
 a.default=0
 a.rmempty=true
 a= s:taboption("tab_basic2", Value, "temperature", "温度报警阈值")
 a.rmempty = true 
-a.placeholder = "80"
+a.default = "80"
+a.datatype="uinteger"
 a:depends({temperature_enable="1"})
-a.description = translate("<br/>设备报警只会在连续五次超过阈值的时候才会推送<br/>而且一个小时内不会再提醒第二次")
+a.description = translate("<br/>设备报警只会在连续五分钟超过设定值时才会推送<br/>而且一个小时内不会再提醒第二次")
+a=s:taboption("tab_basic2", Flag,"err_enable",translate("无人值守任务"))
+a.default=0
+a.rmempty=true
+a.description = translate("请确认脚本可以正常运行！！<br/>否则可能造成频繁重启等错误！")
+device_aliases= s:taboption("tab_basic2", DynamicList, "err_device_aliases", translate("列表中设备都不在线时才会执行"))
+device_aliases.rmempty = true 
+device_aliases.optional = true
+device_aliases.description = translate("请输入设备 MAC")
+nt.mac_hints(function(mac, name) device_aliases :value(mac, "%s (%s)" %{ mac, name }) end)
+device_aliases:depends({err_enable="1"})
+a=s:taboption("tab_basic2", ListValue,"network_err_event",translate("网络断开时"))
+a.default=""
+a:depends({err_enable="1"})
+a:value("",translate("无操作"))
+a:value("1",translate("重启路由器"))
+a:value("2",translate("重启网络接口"))
+a:value("3",translate("修改相关设置项，尝试自动修复网络"))
+a.description = translate("选项 1 选项 2 不会修改设置，并最多尝试 2 次。<br/>选项 3 会将设置项备份于 /usr/bin/serverchan/configbak 目录，并在失败后还原。<br/>自用于远程误操作无法连接，人在塔在请自行修复。<br/>【！！因为我无法保证兼容性！！】不熟悉系统设置项，不会救砖请勿使用")
+a=s:taboption("tab_basic2", ListValue,"system_time_event",translate("定时重启"))
+a.default=""
+a:depends({err_enable="1"})
+a:value("",translate("无操作"))
+a:value("1",translate("重启路由器"))
+a:value("2",translate("重启网络接口"))
+a= s:taboption("tab_basic2", Value, "autoreboot_time", "系统运行时间大于")
+a.rmempty = true 
+a.default = "24"
+a.datatype="uinteger"
+a:depends({system_time_event="1"})
+a.description = translate("单位为小时")
+a= s:taboption("tab_basic2", Value, "network_restart_time", "网络在线时间大于")
+a.rmempty = true 
+a.default = "24"
+a.datatype="uinteger"
+a:depends({system_time_event="2"})
+a.description = translate("单位为小时")
+
+a=s:taboption("tab_basic2", Flag,"public_ip_event",translate("重拨尝试获取公网 ip"))
+a.default=0
+a.rmempty=true
+a:depends({err_enable="1"})
+a.description = translate("重拨时不会推送 ip 变动通知，并会导致你的域名无法及时更新 ip 地址<br/>请确认你可以通过重拨获取公网 ip，否则这不仅徒劳无功还会引起频繁断网<br/>移动等大内网你就别挣扎了！！")
+a= s:taboption("tab_basic2", Value, "public_ip_retry_count", "当天最大重试次数")
+a.rmempty = true 
+a.default = "10"
+a.datatype="uinteger"
+a:depends({public_ip_event="1"})
 
 e=s:taboption("tab_basic3", ListValue,"send_mode",translate("定时任务设定"))
-e.default="disable"
+e.default=""
 e:value("",translate("关闭"))
 e:value("1",translate("定时发送"))
 e:value("2",translate("间隔发送"))
@@ -85,8 +204,26 @@ e:value("2",translate("间隔发送"))
 e=s:taboption("tab_basic3", ListValue,"regular_time",translate("发送时间"))
 for t=0,23 do
 e:value(t,translate("每天"..t.."点"))
-end
-e.default=12
+end	
+e.default=8	
+e.datatype=uinteger
+e:depends("send_mode","1")
+
+e=s:taboption("tab_basic3", ListValue,"regular_time_2",translate("发送时间"))
+e:value("",translate("关闭"))
+for t=0,23 do
+e:value(t,translate("每天"..t.."点"))
+end	
+e.default="关闭"
+e.datatype=uinteger
+e:depends("send_mode","1")
+
+e=s:taboption("tab_basic3", ListValue,"regular_time_3",translate("发送时间"))
+e:value("",translate("关闭"))
+for t=0,23 do
+e:value(t,translate("每天"..t.."点"))
+end	
+e.default="关闭"
 e.datatype=uinteger
 e:depends("send_mode","1")
 
@@ -97,6 +234,7 @@ end
 e.default=6
 e.datatype=uinteger
 e:depends("send_mode","2")
+e.description = translate("<br/>从 00:00 开始，每 * 小时发送一次")
 
 title= s:taboption("tab_basic3", Value, "send_title", translate("微信推送标题"))
 title:depends("send_mode","1")
@@ -132,10 +270,19 @@ luci.sys.call("cbi.apply")
         luci.sys.call("/usr/bin/serverchan/serverchan send &")
 end
 
+up_timeout=s:taboption("tab_basic4", Value,"up_timeout",translate('设备上线检测超时'))
+up_timeout.default = "2"
+up_timeout.datatype="uinteger"
+
+down_timeout=s:taboption("tab_basic4", Value,"down_timeout",translate('设备离线检测超时'))
+down_timeout.default = "10"
+down_timeout.datatype="uinteger"
+down_timeout.description = translate("如果遇到设备 wifi 休眠，频繁推送离线，可以把超时时间设置长一些")
+
 sheep=s:taboption("tab_basic4", ListValue,"serverchan_sheep",translate("免打扰时段设置"),translate("在指定整点时间段内，暂停推送消息<br/>免打扰时间中，定时推送也会被阻止。"))
 sheep:value("0",translate("关闭"))
-sheep:value("1",translate("模式一：脚本挂起，不检测设备"))
---[[sheep:value("2",translate("模式二：脚本继续运行但不发送消息"))--]]
+sheep:value("1",translate("模式一：脚本挂起，延迟发送"))
+sheep:value("2",translate("模式二：静默模式，不发送任何信息"))
 sheep.rmempty = true 
 sheep.optional = true
 sheep=s:taboption("tab_basic4", ListValue,"starttime",translate("免打扰开始时间"))
@@ -187,9 +334,9 @@ for _, iface in ipairs(ifaces) do
 	end
 end
 
-
 local apply = luci.http.formvalue("cbi.apply")
  if apply then
-     io.popen("/etc/init.d/serverchan start")
+     io.popen("/etc/init.d/serverchan start &")
 end
+
 return m
