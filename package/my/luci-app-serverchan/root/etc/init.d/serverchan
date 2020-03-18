@@ -1,15 +1,20 @@
 #!/bin/sh /etc/rc.common
+
 START=99
 STOP=10
 
-
 start() {
-	flag=$(ps | grep "serverchan/serverchan" | grep -v "grep" | wc -l)
-	if [ $flag -eq 0 ] ;then
-		/usr/bin/serverchan/serverchan &
-	fi
+	kill -9 `pgrep -f "/usr/bin/serverchan/serverchan"` 2>/dev/null
+	/usr/bin/serverchan/serverchan &
+	echo "serverchan is starting now ..."
 }
 
 stop() {
-	kill -9 $(ps | grep serverchan | grep -v "grep" | awk '{print $1}') >/dev/null 2>&1
+	kill -9 `pgrep -f "/usr/bin/serverchan/serverchan"` 2>/dev/null
+	kill -9 `pgrep -f "/etc/init.d/serverchan"` 2>/dev/null
+	echo "serverchan exit ..."
 }
+
+restart(){
+	start
+} 
