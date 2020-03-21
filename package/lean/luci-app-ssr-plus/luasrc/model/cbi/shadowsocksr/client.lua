@@ -4,9 +4,30 @@
 
 local m, s, sec, o, kcp_enable
 local shadowsocksr = "shadowsocksr"
+local gfw_count=0
+local ad_count=0
+local ip_count=0
+local gfwmode=0
+local nfip_count=0
+
+if nixio.fs.access("/etc/dnsmasq.ssr/gfw_list.conf") then
+gfwmode=1		
+end
+
 local uci = luci.model.uci.cursor()
 
 local sys = require "luci.sys"
+
+if gfwmode==1 then 
+ gfw_count = tonumber(sys.exec("cat /etc/dnsmasq.ssr/gfw_list.conf | wc -l"))/2
+ if nixio.fs.access("/etc/dnsmasq.ssr/ad.conf") then
+  ad_count=tonumber(sys.exec("cat /etc/dnsmasq.ssr/ad.conf | wc -l"))
+ end
+end
+ 
+if nixio.fs.access("/etc/china_ssr.txt") then 
+ ip_count = sys.exec("cat /etc/china_ssr.txt | wc -l")
+end
 
 m = Map(shadowsocksr, translate("ShadowSocksR Plus+ Settings"))
 
@@ -49,6 +70,11 @@ for _,key in pairs(key_table) do o:value(key,server_table[key]) end
 o.default = "same"
 o.rmempty = false
 
+o = s:option(Flag, "netflix_proxy", translate("External Proxy Mode"))
+o.rmempty = false
+o.description = translate("Forward Netflix Proxy through Main Proxy")
+o.default="0"
+
 o = s:option(ListValue, "threads", translate("Multi Threads Option"))
 o:value("0", translate("Auto Threads"))
 o:value("1", translate("1 Thread"))
@@ -77,7 +103,11 @@ o.default = 1
 o = s:option(ListValue, "pdnsd_enable", translate("Resolve Dns Mode"))
 o:value("1", translate("Use Pdnsd tcp query and cache"))
 o:value("2", translate("Use DNS2SOCKS query and cache"))
+if nixio.fs.access("/usr/bin/dnscrypt-proxy") then
+o:value("3", translate("Use dnscrypt-proxy query and cache"))
+end
 o:value("0", translate("Use Local DNS Service listen port 5335"))
+
 o.default = 1
 
 o = s:option(Value, "tunnel_forward", translate("Anti-pollution DNS Server"))
@@ -96,6 +126,28 @@ o:value("114.114.114.114:53", translate("Oversea Mode DNS-1 (114.114.114.114)"))
 o:value("114.114.115.115:53", translate("Oversea Mode DNS-2 (114.114.115.115)"))
 o:depends("pdnsd_enable", "1")
 o:depends("pdnsd_enable", "2")
+o:depends("pdnsd_enable", "3")
 o.description = translate("Custom DNS Server format as IP:PORT (default: 8.8.4.4:53)")
+
+
+o = s:option(Button,"gfw_data",translate("GFW List Data"))
+o.rawhtml  = true
+o.template = "shadowsocksr/refresh"
+o.value =tostring(math.ceil(gfw_count)) .. " " .. translate("Records")
+
+o = s:option(Button,"ad_data",translate("Advertising Data")) 
+o .rawhtml  = true
+o .template = "shadowsocksr/refresh"
+o .value =tostring(math.ceil(ad_count)) .. " " .. translate("Records")
+
+o = s:option(Button,"ip_data",translate("China IP Data"))
+o.rawhtml  = true
+o.template = "shadowsocksr/refresh"
+o.value =ip_count .. " " .. translate("Records")
+
+
+o = s:option(Button,"check_port",translate("Check Server Port"))
+o.template = "shadowsocksr/checkport"
+o.value =translate("No Check")
 
 return m
