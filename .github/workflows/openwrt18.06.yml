@@ -213,7 +213,7 @@ jobs:
             CONFIG_PACKAGE_luci-app-advanced-reboot=y
             CONFIG_PACKAGE_luci-app-amule=y
             CONFIG_PACKAGE_luci-app-oaf=y
-          # CONFIG_PACKAGE_luci-app-adblock=y
+            CONFIG_PACKAGE_luci-app-adblock=y
           # CONFIG_PACKAGE_luci-app-cd8021x=y
             CONFIG_PACKAGE_luci-app-chinadns=y
             CONFIG_PACKAGE_luci-app-cifs=y
@@ -237,7 +237,7 @@ jobs:
           # CONFIG_PACKAGE_luci-app-ocserv=y
           # CONFIG_PACKAGE_luci-app-oscam=y
           # CONFIG_PACKAGE_luci-app-samba4=y
-          # CONFIG_PACKAGE_luci-app-softethervpn5=y
+            CONFIG_PACKAGE_luci-app-softethervpn5=y
           # CONFIG_PACKAGE_luci-app-speederv2=y
             CONFIG_PACKAGE_luci-app-ssr-libev-server=y
             CONFIG_PACKAGE_luci-app-ssr-python-pro-server=y
