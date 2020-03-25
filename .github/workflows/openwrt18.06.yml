@@ -84,7 +84,7 @@ jobs:
            cd package/my
              rm    -rfv  chinadns-ng
              rm    -rfv  luci-app-passwall
-             rm    -rfv  tcping    
+                 
              
       - name: Update feeds
         run: |
