@@ -334,9 +334,6 @@ msgstr "启用广告屏蔽"
 msgid "adblock_url"
 msgstr "广告屏蔽订阅"
 
-msgid "Enable Custom Netflix IP Url"
-msgstr "启用自定义Netflix IP更新URL"
-
 msgid "nfip_url"
 msgstr "Netflix IP更新URL"
 
@@ -351,9 +348,6 @@ msgstr "【广告屏蔽】数据库"
 
 msgid "Chnroute Setting"
 msgstr "国内IP段数据库更新设置"
-
-msgid "Enable custom chnroute"
-msgstr "启用自定义更新地址"
 
 msgid "Update url"
 msgstr "更新链接"
@@ -660,3 +654,30 @@ msgstr "Netflix 分流域名列表"
 
 msgid "Netflix IP List"
 msgstr "Netflix 分流IP列表"
+
+msgid "External Proxy Mode"
+msgstr "分流服务器套娃模式"
+
+msgid "Forward Netflix Proxy through Main Proxy"
+msgstr "分流服务器流量通过主服务节点(前置)中转代理转发"
+
+msgid "Subscription"
+msgstr "订阅管理"
+
+msgid "Node List"
+msgstr "节点列表"
+
+msgid "youtube"
+msgstr "国外网站"
+
+msgid "baidu"
+msgstr "国内网站"
+
+msgid "Game Mode"
+msgstr "游戏模式"
+
+msgid "Client"
+msgstr "客户端"
+
+msgid "Use dnscrypt-proxy query and cache"
+msgstr "使用dnscrypt-proxy TCP查询并缓存"

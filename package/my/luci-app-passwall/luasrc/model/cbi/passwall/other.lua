@@ -54,25 +54,38 @@ s = m:section(TypedSection, "global_forwarding",
 s.anonymous = true
 s.addremove = false
 
+---- TCP No Redir Ports
+o = s:option(Value, "tcp_no_redir_ports", translate("TCP No Redir Ports"))
+o.default = "disable"
+o:value("disable", translate("No patterns are used"))
+o:value("1:65535", translate("All"))
+
+---- UDP No Redir Ports
+o = s:option(Value, "udp_no_redir_ports", translate("UDP No Redir Ports"),
+             "<font color='red'>" .. translate(
+                 "Fill in the ports you don't want to be forwarded by the agent, with the highest priority.") ..
+                 "</font>")
+o.default = "disable"
+o:value("disable", translate("No patterns are used"))
+o:value("1:65535", translate("All"))
+
 ---- TCP Redir Ports
 o = s:option(Value, "tcp_redir_ports", translate("TCP Redir Ports"))
-o.default = "80,443"
-o:value("disable", translate("No Proxy"))
+o.default = "22,25,53,143,465,587,993,995,80,443"
 o:value("1:65535", translate("All"))
-o:value("80,443", "80,443")
+o:value("22,25,53,143,465,587,993,995,80,443", translate("Common Use"))
+o:value("80,443", translate("Only Web"))
 o:value("80:", "80 " .. translate("or more"))
 o:value(":443", "443 " .. translate("or less"))
 
 ---- UDP Redir Ports
 o = s:option(Value, "udp_redir_ports", translate("UDP Redir Ports"))
 o.default = "1:65535"
-o:value("disable", translate("No Proxy"))
 o:value("1:65535", translate("All"))
-o:value("53", "53")
+o:value("53", "DNS")
 
 ---- Multi SS/SSR Process Option
-o = s:option(Value, "process", translate("Multi Process Option"),
-             translate("you can start SS/SSR with multiple process"))
+o = s:option(Value, "process", translate("Multi Process Option"))
 o.default = "0"
 o.rmempty = false
 o:value("0", translate("Auto"))
@@ -114,9 +127,9 @@ o.rmempty = true
 
 -- [[ Other Settings ]]--
 s = m:section(TypedSection, "global_other", translate("Other Settings"),
-              translatef(
+              "<font color='red'>" .. translatef(
                   "You can only set up a maximum of %s nodes for the time being, Used for access control.",
-                  "3"))
+                  "3") .. "</font>")
 s.anonymous = true
 s.addremove = false
 
@@ -159,16 +172,6 @@ o.rmempty = false
 o = s:option(Flag, "status_show_ip111", translate("Status Show IP111"))
 o.default = "0"
 o.rmempty = false
-
----- Hide Menu
-o = s:option(Button, "hide", translate("Hide Menu"),
-             translate(
-                 "After the hidden to the display, input example in the address bar: ") ..
-                 "http://192.168.1.1/cgi-bin/luci/admin/vpn/passwall/show")
-o.inputstyle = "remove"
-function o.write(e, e)
-    luci.http.redirect(luci.dispatcher.build_url("admin", "vpn", "passwall",
-                                                 "hide"))
-end
-
+---- Tips
+s:append(Template("passwall/global/tips"))
 return m
