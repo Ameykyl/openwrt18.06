@@ -1,43 +1,10 @@
 local e = require "nixio.fs"
 local e = require "luci.sys"
--- local t = luci.sys.exec("cat /usr/share/passwall/dnsmasq.d/gfwlist.conf|grep -c ipset")
 
 m = Map("passwall")
--- [[ Other Settings ]]--
-s = m:section(TypedSection, "global_other",translate("Add the node via the link"))
-s.anonymous = true
-
-
----- Auto Ping
-o = s:option(Flag, "auto_ping", translate("Auto Ping"),
-             translate("This will automatically ping the node for latency"))
-o.default = 1
-
----- Use TCP Detection delay
-o = s:option(Flag, "use_tcping", translate("Use TCP Detection delay"),
-             translate("This will use tcping replace ping detection of node"))
-o.default = 1
-
----- Concise display nodes
-o = s:option(Flag, "compact_display_nodes", translate("Concise display nodes"))
-o.default = 0
-
----- Show Add Mode
-o = s:option(Flag, "show_add_mode", translate("Show Add Mode"))
-o.default = 1
-
----- Show group
-o = s:option(Flag, "show_group", translate("Show Group"))
-o.default = 1
-
--- [[ Add the node via the link ]]--
-s:append(Template("passwall/node_list/link_add_node"))
-
 
 -- [[ Subscribe Settings ]]--
-s = m:section(TypedSection, "global_subscribe", translate("Node Subscribe"),
-              translate(
-                  "Please input the subscription url first, save and submit before updating. If you subscribe to update, it is recommended to delete all subscriptions and then re-subscribe."))
+s = m:section(TypedSection, "global_subscribe", "")
 s.anonymous = true
 
 ---- Subscribe via proxy
@@ -69,22 +36,56 @@ o:depends("auto_update_subscribe", 1)
 o = s:option(Button, "_update", translate("Manual subscription"))
 o.inputstyle = "apply"
 function o.write(e, e)
-    luci.sys
-        .call("nohup /usr/share/passwall/subscription.sh > /dev/null 2>&1 &")
+    luci.sys.call(
+        "lua /usr/share/passwall/subscribe.lua start log > /dev/null 2>&1 &")
     luci.http.redirect(luci.dispatcher.build_url("admin", "vpn", "passwall",
                                                  "log"))
 end
+-- [[ Other Settings ]]--
+s = m:section(TypedSection, "global_other")
+s.anonymous = true
 
+---- Auto Ping
+o = s:option(Flag, "auto_ping", translate("Auto Ping"),
+             translate("This will automatically ping the node for latency"))
+o.default = 1
+
+---- Use TCP Detection delay
+o = s:option(Flag, "use_tcping", translate("Use TCP Detection delay"),
+             translate("This will use tcping replace ping detection of node"))
+o.default = 1
+
+---- Concise display nodes
+o = s:option(Flag, "compact_display_nodes", translate("Concise display nodes"))
+o.default = 0
+
+---- Show Add Mode
+o = s:option(Flag, "show_add_mode", translate("Show Add Mode"))
+o.default = 1
+
+---- Show group
+o = s:option(Flag, "show_group", translate("Show Group"))
+o.default = 1
+
+-- [[ Add the node via the link ]]--
+s:append(Template("passwall/node_list/link_add_node"))
 ---- Subscribe Delete All
 o = s:option(Button, "_stop", translate("Delete All Subscribe Node"))
 o.inputstyle = "remove"
 function o.write(e, e)
-    luci.sys.call("/usr/share/passwall/subscription.sh stop")
+    luci.sys.call(
+        "lua /usr/share/passwall/subscribe.lua truncate log > /dev/null 2>&1 &")
     luci.http.redirect(luci.dispatcher.build_url("admin", "vpn", "passwall",
                                                  "log"))
 end
 
-s = m:section(TypedSection, "subscribe_list")
+filter_keyword = s:option(DynamicList, "filter_keyword", translate("Filter keyword"),
+	translate("When subscribing, the keywords in the list are discarded."))
+
+s = m:section(TypedSection, "subscribe_list", "",
+              "<font color='red'>" .. translate(
+                  "Please input the subscription url first, save and submit before updating. If you subscribe to update, it is recommended to delete all subscriptions and then re-subscribe.") ..
+                  "</font>")
 s.addremove = true
 s.anonymous = true
 s.sortable = true
@@ -102,5 +103,3 @@ o.width = "auto"
 o.rmempty = false
 
 return m
-
-
