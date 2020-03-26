@@ -76,7 +76,8 @@ jobs:
            rm    -rfv  openwrt-package/package/simple-obfs
            rm    -rfv  openwrt-package/package/dns2socks
            rm    -rfv  openwrt-package/package/ipt2socks
-           rm    -rfv  openwrt-package/package/shadowsocksr-libev        
+           rm    -rfv  openwrt-package/package/shadowsocksr-libev 
+           rm    -rfv  openwrt-package/package/trojan         
            rm    -rfv  ipt2socks
            
       - name: 自定义配置文件2
