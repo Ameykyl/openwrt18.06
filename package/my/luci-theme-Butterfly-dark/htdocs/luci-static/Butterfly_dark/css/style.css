@@ -759,7 +759,7 @@ cursor: pointer;
 	background-color: #e6e6e6;
 	background-repeat: no-repeat;	
 	padding: 5px 14px 6px;
-	
+	white-space: nowrap;
 	color: #333;
 	font-size: 14px;
 	line-height: normal;
