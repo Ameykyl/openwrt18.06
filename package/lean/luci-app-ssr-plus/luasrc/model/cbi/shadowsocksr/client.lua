@@ -29,7 +29,7 @@ if nixio.fs.access("/etc/china_ssr.txt") then
  ip_count = sys.exec("cat /etc/china_ssr.txt | wc -l")
 end
 
-m = Map(shadowsocksr, translate("ShadowSocksR Plus+ Settings"))
+m = Map(shadowsocksr)
 
 m:section(SimpleSection).template  = "shadowsocksr/status"
 
@@ -50,7 +50,7 @@ end
 table.sort(key_table)
 
 -- [[ Global Setting ]]--
-s = m:section(TypedSection, "global")
+s = m:section(TypedSection, "global", translate("ShadowSocksR Plus+ Settings"))
 s.anonymous = true
 
 o = s:option(ListValue, "global_server", translate("Main Server"))
@@ -65,9 +65,10 @@ o:value("same", translate("Same as Global Server"))
 for _,key in pairs(key_table) do o:value(key,server_table[key]) end
 
 o = s:option(ListValue, "netflix_server", translate("Netflix Node"))
+o:value("nil", translate("Disable"))
 o:value("same", translate("Same as Global Server"))
 for _,key in pairs(key_table) do o:value(key,server_table[key]) end
-o.default = "same"
+o.default = "nil"
 o.rmempty = false
 
 o = s:option(Flag, "netflix_proxy", translate("External Proxy Mode"))
@@ -149,5 +150,5 @@ o.value =ip_count .. " " .. translate("Records")
 o = s:option(Button,"check_port",translate("Check Server Port"))
 o.template = "shadowsocksr/checkport"
 o.value =translate("No Check")
-
+m:section(SimpleSection).template  = "vssr/status2"
 return m

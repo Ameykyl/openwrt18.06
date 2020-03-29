@@ -68,21 +68,21 @@ if luci.sys.call("busybox ps -w | grep ssr-retcp | grep -v grep >/dev/null") == 
 redir_run=1
 end
 
-if luci.sys.call("busybox ps -w | grep ssr-socks | grep -v grep >/dev/null") == 0 then
+if luci.sys.call("busybox ps -w | grep ssr-local | grep -v ssr-socksdns |grep -v grep >/dev/null") == 0 then
 sock5_run=1
 end
 
 if luci.sys.call("pidof kcptun-client >/dev/null") == 0 then
 kcptun_run=1
 end
-
-if luci.sys.call("pidof ssr-server >/dev/null") == 0 then
+if luci.sys.call("busybox ps -w | grep ssr-server | grep -v grep >/dev/null") == 0 then
 server_run=1
 end
 
 if luci.sys.call("busybox ps -w | grep ssr-tunnel |grep -v grep >/dev/null") == 0 then
 tunnel_run=1
 end
+
 if luci.sys.call("pidof dnsparsing >/dev/null") == 0 then                 
 dnsforwarder_run=1     
 end
@@ -94,6 +94,7 @@ end
 if luci.sys.call("pidof pdnsd >/dev/null") == 0 or (luci.sys.call("busybox ps -w | grep ssr-dns |grep -v grep >/dev/null") == 0 and luci.sys.call("pidof dns2socks >/dev/null") == 0)then
 pdnsd_run=1
 end
+
 
 m = SimpleForm("Version")
 m.reset = false
@@ -131,26 +132,21 @@ s.value =font_blue .. bold_on .. translate("Running") .. bold_off .. font_off
 else             
 s.value = translate("Not Running")
 end 
-if uci:get_first(shadowsocksr, 'socks5_proxy', 'socks', '0') == '1' then
-if nixio.fs.access("/usr/bin/microsocks") then
-s=m:field(DummyValue,"sock5_run",translate("SOCKS5 Proxy Server"))
+
+s=m:field(DummyValue,"sock5_run",translate("Global SOCKS5 Proxy Server"))
 s.rawhtml = true
 if sock5_run == 1 then
 s.value =font_blue .. bold_on .. translate("Running") .. bold_off .. font_off
 else
 s.value = translate("Not Running")
 end
-end
-end
 
-if nixio.fs.access("/usr/bin/ssr-server") then
-s=m:field(DummyValue,"server_run",translate("Global SSR Server"))
+s=m:field(DummyValue,"server_run",translate("Local Servers"))
 s.rawhtml = true
 if server_run == 1 then
 s.value =font_blue .. bold_on .. translate("Running") .. bold_off .. font_off
 else
 s.value = translate("Not Running")
-end
 end
 
 if nixio.fs.access("/usr/bin/kcptun-client") then
@@ -193,10 +189,6 @@ s=m:field(DummyValue,"nfip_data",translate("Netflix IP Data"))
 s.rawhtml = true
 s.template = "shadowsocksr/refresh"
 s.value = nfip_count .. " " .. translate("Records")
-
-
-
-
 
 s=m:field(DummyValue,"check_port",translate("Check Server Port"))
 s.template = "shadowsocksr/checkport"

@@ -15,7 +15,7 @@ local sys = require "luci.sys"
 local ucic = luci.model.uci.cursor()
 
 m = Map(shadowsocksr,  translate("Node List"))
-m:section(SimpleSection).template  = "shadowsocksr/status"
+m:section(SimpleSection).template  = "shadowsocksr/status2"
 
 
 -- [[ Servers Manage ]]--
@@ -25,7 +25,7 @@ s.addremove = true
 s.template = "cbi/tblsection"
 s.sortable = true
 s.description = string.format(translate("Server Count") ..  ": %d", server_count)
-s.extedit = luci.dispatcher.build_url("admin/services/shadowsocksr/servers/%s")
+s.extedit = luci.dispatcher.build_url("admin/vpn/shadowsocksr/servers/%s")
 function s.create(...)
 	local sid = TypedSection.create(...)
 	if sid then
@@ -65,7 +65,7 @@ node.write = function(self, section)
   ucic:save("shadowsocksr") 
   ucic:commit("shadowsocksr")
   luci.sys.exec("/etc/init.d/shadowsocksr restart")
-  luci.http.redirect(luci.dispatcher.build_url("admin", "services", "shadowsocksr", "client"))
+  luci.http.redirect(luci.dispatcher.build_url("admin", "vpn", "shadowsocksr", "client"))
 end
 
 o = s:option(Flag, "switch_enable", translate("Auto Switch"))

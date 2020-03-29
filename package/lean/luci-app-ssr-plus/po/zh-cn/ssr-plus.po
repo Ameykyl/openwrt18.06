@@ -656,10 +656,10 @@ msgid "Netflix IP List"
 msgstr "Netflix 分流IP列表"
 
 msgid "External Proxy Mode"
-msgstr "分流服务器套娃模式"
+msgstr "分流服务器（前置）代理"
 
 msgid "Forward Netflix Proxy through Main Proxy"
-msgstr "分流服务器流量通过主服务节点(前置)中转代理转发"
+msgstr "分流服务器流量通过主服务节点中转代理转发"
 
 msgid "Subscription"
 msgstr "订阅管理"
@@ -681,3 +681,23 @@ msgstr "客户端"
 
 msgid "Use dnscrypt-proxy query and cache"
 msgstr "使用dnscrypt-proxy TCP查询并缓存"
+
+msgid "Server Type"
+msgstr "服务端类型"
+
+msgid "Local Servers"
+msgstr "本机服务端"
+
+msgid "Global SOCKS5 Proxy Server"
+msgstr "SOCKS5 代理服务端（全局）"
+
+msgid "gfwlist Update url"
+msgstr "GFWList更新URL"
+
+msgid "Subscribe Filter Words"
+msgstr "订阅节点关键字过滤"
+
+msgid "Filter Words splited by /"
+msgstr "命中关键字的节点将被丢弃。多个关键字用 / 分隔"
+
+

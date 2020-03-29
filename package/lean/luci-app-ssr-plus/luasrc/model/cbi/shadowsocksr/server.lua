@@ -6,7 +6,7 @@ local shadowsocksr = "shadowsocksr"
 local uci = luci.model.uci.cursor()
 
 
-m = Map(shadowsocksr, translate("ShadowSocksR Server"))
+m = Map(shadowsocksr)
 
 local encrypt_methods = {
 	"table",
@@ -63,7 +63,7 @@ sec = m:section(TypedSection, "server_config", translate("Server Setting"))
 sec.anonymous = true
 sec.addremove = true
 sec.template = "cbi/tblsection"
-sec.extedit = luci.dispatcher.build_url("admin/services/shadowsocksr/server/%s")
+sec.extedit = luci.dispatcher.build_url("admin/vpn/shadowsocksr/server/%s")
 function sec.create(...)
 	local sid = TypedSection.create(...)
 	if sid then
@@ -78,25 +78,35 @@ function o.cfgvalue(...)
 end
 o.rmempty = false
 
+o = sec:option(DummyValue, "type", translate("Server Type"))
+function o.cfgvalue(...)
+	return Value.cfgvalue(...) or "ssr"
+end
+
 o = sec:option(DummyValue, "server_port", translate("Server Port"))
 function o.cfgvalue(...)
-	return Value.cfgvalue(...) or "?"
+	return Value.cfgvalue(...) or "-"
+end
+
+o = sec:option(DummyValue, "username", translate("Username"))
+function o.cfgvalue(...)
+	return Value.cfgvalue(...) or "-"
 end
 
 o = sec:option(DummyValue, "encrypt_method", translate("Encrypt Method"))
 function o.cfgvalue(...)
 	local v = Value.cfgvalue(...)
-	return v and v:upper() or "?"
+	return v and v:upper() or "-"
 end
 
 o = sec:option(DummyValue, "protocol", translate("Protocol"))
 function o.cfgvalue(...)
-	return Value.cfgvalue(...) or "?"
+	return Value.cfgvalue(...) or "-"
 end
 
 o = sec:option(DummyValue, "obfs", translate("Obfs"))
 function o.cfgvalue(...)
-	return Value.cfgvalue(...) or "?"
+	return Value.cfgvalue(...) or "-"
 end
 
 return m
