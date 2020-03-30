@@ -225,6 +225,8 @@ load_rules() {
 			fanboy.txt)
 				sed -i '5s/0/1/g' $KP_DIR/data/source.list
 			;;
+                                                   AdGuardHome.txt)
+				sed -i '5s/0/1/g' $KP_DIR/data/source.list
 		esac
 	done
 
