@@ -210,6 +210,12 @@ load_rules() {
 			kp.dat)
 				sed -i '2s/0/1/g' $KP_DIR/data/source.list
 			;;
+                                                   daily.txt)
+				sed -i '3s/0/1/g' $KP_DIR/data/source.list
+			;;
+                                                   koolproxy.txt)
+				sed -i '3s/0/1/g' $KP_DIR/data/source.list
+			;;
 			user.txt)
 				sed -i '3s/0/1/g' $KP_DIR/data/source.list
 			;;
