@@ -731,12 +731,12 @@ color: #e8c6c6;
     position: absolute;
     display: block;
     width: 1px;
-    border-left: 1px dashed #00FF00 ;
+    border-left: 1px dashed #606c77 ;
     z-index: 1;
 }
 
 .main > .main-left > .nav > .slide > .slide-menu > .active {
-    background-color: #154360 ;
+   
 }
 
 .main > .main-left > .nav > .slide > .slide-menu > li > a {
@@ -754,7 +754,7 @@ color: #e8c6c6;
     position: absolute;
     display: block;
     width: 15px;
-    border-bottom: 1px dashed #00FF00 ;
+    border-bottom: 1px dashed #606c77 ;
     z-index: 1;
 }
 
@@ -783,7 +783,7 @@ li {
 }
 
 #maincontent>.container {
-	 margin:40px 40px 40px 50px;
+margin: 40px 40px 40px 50px;	 
 }
 h1 {
     font-size: 20px;
@@ -1059,7 +1059,7 @@ form.inline + form.inline,
 .cbi-button-remove {
 	color: #fff !important;
 	background-color: #6600FF    !important;
-	border-color: #fb6340 !important;
+	border-color: #6600FF !important;
 }
 
 
