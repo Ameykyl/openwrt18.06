@@ -393,7 +393,7 @@ function(o,a,i)
 end
 )
 
-t=o:section(TypedSection,"rss_rules",translate("技术支持"),translate("本软件由KPR提供技术支持"))
+t=o:section(TypedSection,"rss_rules",translate("技术支持"))
 t.anonymous = true
 t:append(Template("koolproxy/feedback"))
 return o
