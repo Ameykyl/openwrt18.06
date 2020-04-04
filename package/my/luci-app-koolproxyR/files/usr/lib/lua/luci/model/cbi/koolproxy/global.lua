@@ -31,8 +31,10 @@ else
 	status = translate("<strong><font color=\"red\">KoolProxyR plus+  已停止</font></strong>")
 end
 
-o = Map("koolproxy", translate("KoolProxyR plus+ "), translate("KoolProxyR plus+是能识别adblock规则的免费开源软件,追求体验更快、更清洁的网络，屏蔽烦人的广告 <br /><font color=\"red\"><br /></font>"))
-
+o = Map("koolproxy", translate("KoolProxyR plus+ "),    
+      "<font color='blue'>" .. translate(
+          "KoolProxyR plus+是能识别adblock规则的免费开源软件,追求体验更快、更清洁的网络，屏蔽烦人的广告") ..
+          "</font>")
 
 t = o:section(TypedSection, "global")
 t.anonymous = true
@@ -47,7 +49,7 @@ e.rmempty = false
 e = t:taboption("base", DummyValue, "koolproxy_status", translate("程序版本"))
 e.value = string.format("[ %s ]", v)
 
-e = t:taboption("base", Value, "startup_delay", translate("Startup Delay"))
+e = t:taboption("base", Value, "startup_delay", translate("启动延迟"))
 e:value(0, translate("Not enabled"))
 for _, v in ipairs({5, 10, 15, 25, 40}) do
 	e:value(v, translate("%u seconds") %{v})
@@ -107,7 +109,9 @@ e:value(3, translate("全部过滤"))
 e.description = translate(string.format("<font color=\"blue\"><strong>访问控制设置中其他主机的默认规则</strong></font>"))
 
 e = t:taboption("base", ListValue, "time_update", translate("定时更新"))
+
 for t = 0,23 do
+
 	e:value(t,translate("每天"..t.."点"))
 end
 e:value(0, translate("关闭"))
