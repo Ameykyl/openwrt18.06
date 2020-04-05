@@ -1,0 +1,7 @@
+#!/bin/sh
+uci batch <<-EOF
+	set luci.themes.tomato=/luci-static/tomato
+	set luci.main.mediaurlbase=/luci-static/tomato
+	commit luci
+EOF
+exit 0
