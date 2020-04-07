@@ -72,7 +72,12 @@ change_dns() {
 revert_dns() {
    uci del_list dhcp.@dnsmasq[0].server=127.0.0.1#"$3" >/dev/null 2>&1
    [ "$1" = "1" ] && {
+   	  [ -s "/tmp/resolv.conf.d/resolv.conf.auto" ] && {
+      uci set dhcp.@dnsmasq[0].resolvfile=/tmp/resolv.conf.d/resolv.conf.auto >/dev/null 2>&1
+      }
+   	  [ -s "/tmp/resolv.conf.auto" ] && {
       uci set dhcp.@dnsmasq[0].resolvfile=/tmp/resolv.conf.auto >/dev/null 2>&1
+      }
       uci set dhcp.@dnsmasq[0].noresolv=0 >/dev/null 2>&1
    }
    [ "$2" = "1" ] && {
@@ -106,25 +111,17 @@ yml_check()
    #检查关键字避免后续操作出错
    #proxies
    [ -z "$(grep "^Proxy:" "$3")" ] && {
-      sed -i "/^ \{0,\}\'Proxy\':/c\Proxy:" "$3" 2>/dev/null
-      sed -i '/^ \{0,\}\"Proxy\":/c\Proxy:' "$3" 2>/dev/null
       sed -i "/^ \{1,\}Proxy:/c\Proxy:" "$3" 2>/dev/null
    }
    [ -z "$(grep "^Proxy:" "$3")" ] && {
-      sed -i "s/^\'proxies\':/Proxy:/" "$3" 2>/dev/null
-      sed -i 's/^\"proxies\":/Proxy:/' "$3" 2>/dev/null
       sed -i "s/^proxies:/Proxy:/" "$3" 2>/dev/null
    }
 
 	 #proxy-providers
 	 [ -z "$(grep "^proxy-provider:" "$3")" ] && {
-      sed -i "/^ \{0,\}\'proxy-provider\':/c\proxy-provider:" "$3" 2>/dev/null
-      sed -i '/^ \{0,\}\"proxy-provider\":/c\proxy-provider:' "$3" 2>/dev/null
       sed -i "/^ \{1,\}proxy-provider:/c\proxy-provider:" "$3" 2>/dev/null
    }
    [ -z "$(grep "^proxy-provider:" "$3")" ] && {
-      sed -i "/^ \{0,\}\'proxy-providers\':/c\proxy-provider:" "$3" 2>/dev/null
-      sed -i '/^ \{0,\}\"proxy-providers\":/c\proxy-provider:' "$3" 2>/dev/null
       sed -i "/^ \{0,\}proxy-providers:/c\proxy-provider:" "$3" 2>/dev/null
    }
    #proxy-groups
@@ -134,27 +131,19 @@ yml_check()
       sed -i "/^ \{1,\}Proxy Group:/c\Proxy Group:" "$3" 2>/dev/null
    }
    [ -z "$(grep "^Proxy Group:" "$3")" ] && {
-      sed -i "/^ \{0,\}\'proxy-groups\':/c\Proxy Group:" "$3" 2>/dev/null
-      sed -i '/^ \{0,\}\"proxy-groups\":/c\Proxy Group:' "$3" 2>/dev/null
       sed -i "/^ \{0,\}proxy-groups:/c\Proxy Group:" "$3" 2>/dev/null
    }
    
    #rules
    [ -z "$(grep "^Rule:" "$3")" ] && {
-      sed -i "/^ \{0,\}\'Rule\':/c\Rule:" "$3" 2>/dev/null
-      sed -i '/^ \{0,\}\"Rule\":/c\Rule:' "$3" 2>/dev/null
       sed -i "/^ \{1,\}Rule:/c\Rule:" "$3" 2>/dev/null
    }
    [ -z "$(grep "^Rule:" "$3")" ] && {
-      sed -i "/^ \{0,\}\'rules\':/c\Rule:" "$3" 2>/dev/null
-      sed -i '/^ \{0,\}\"rules\":/c\Rule:' "$3" 2>/dev/null
       sed -i "/^ \{0,\}rules:/c\Rule:" "$3" 2>/dev/null
    }
    
    #dns
    [ -z "$(grep "^dns:" "$3")" ] && {
-      sed -i "/^ \{0,\}\'dns\':/c\dns:" "$3" 2>/dev/null
-      sed -i '/^ \{0,\}\"dns\":/c\dns:' "$3" 2>/dev/null
       sed -i "/^ \{1,\}dns:/c\dns:" "$3" 2>/dev/null
    }
 	 
@@ -285,9 +274,17 @@ yml_dns_check()
    fi
   
    if [ ! -z "$(grep "^ \{0,\}listen:" "$CONFIG_FILE")" ]; then
-      sed -i "/^ \{0,\}listen:/c\  listen: 0.0.0.0:${dns_port}" "$CONFIG_FILE" 2>/dev/null
+      if [ "$ipv6_enable" -ne 1 ]; then
+         sed -i "/^ \{0,\}listen:/c\  listen: 127.0.0.1:${dns_port}" "$CONFIG_FILE" 2>/dev/null
+      else
+         sed -i "/^ \{0,\}listen:/c\  listen: 0.0.0.0:${dns_port}" "$CONFIG_FILE" 2>/dev/null
+      fi
    else
-      sed -i "/^dns:/a\  listen: 0.0.0.0:${dns_port}" "$CONFIG_FILE" 2>/dev/null
+      if [ "$ipv6_enable" -ne 1 ]; then
+         sed -i "/^dns:/a\  listen: 127.0.0.1:${dns_port}" "$CONFIG_FILE" 2>/dev/null
+      else
+         sed -i "/^dns:/a\  listen: 0.0.0.0:${dns_port}" "$CONFIG_FILE" 2>/dev/null
+      fi
    fi
    
    uci set openclash.config.dns_port="$dns_port" && uci commit openclash
@@ -762,6 +759,16 @@ if [ "$enable" -eq 1 ] && [ -f "$CONFIG_FILE" ]; then
              ln -s /usr/share/openclash/yacd /www/luci-static/openclash 2>/dev/null
        
              echo "第八步: 设置 OpenClash 防火墙规则..." >$START_LOG
+             if [ "$(iptables -t nat -nL PREROUTING --line-number |grep "udp dpt:53" |wc -l)" -gt 1 ] && [ "$enable_redirect_dns" -eq "1" ]; then
+                echo "发现53端口被劫持，清理防火墙规则..." >$START_LOG
+                pre_lines=$(iptables -nvL PREROUTING -t nat |sed 1,2d |sed -n '/udp dpt:53/=' 2>/dev/null |sort -rn)
+                for pre_line in $pre_lines; do
+                   iptables -t nat -D PREROUTING "$pre_line" >/dev/null 2>&1
+                done
+                iptables -t nat -A PREROUTING -p udp --dport 53 -j REDIRECT --to-ports 53 >/dev/null 2>&1
+                sleep 2
+             fi
+             
              if [ -z "$(uci get firewall.openclash 2>/dev/null)" ] || [ -z "$(uci get ucitrack.@openclash[-1].init 2>/dev/null)" ]; then
                 uci delete ucitrack.@openclash[-1] >/dev/null 2>&1
                 uci add ucitrack openclash >/dev/null 2>&1
@@ -774,7 +781,7 @@ if [ "$enable" -eq 1 ] && [ -f "$CONFIG_FILE" ]; then
                 uci set firewall.openclash.reload=1 >/dev/null 2>&1
              fi
           
-             if [ ! -z "$en_mode_tun" ] && [ "$(uci get firewall.@defaults[0].forward)" != "ACCEPT" ]; then
+             if [ "$(uci get firewall.@defaults[0].forward)" != "ACCEPT" ]; then
                 uci set firewall.@defaults[0].forward=ACCEPT >/dev/null 2>&1
                 uci commit firewall >/dev/null 2>&1
                 /etc/init.d/firewall reload >/dev/null 2>&1
@@ -823,8 +830,8 @@ EOF
                 
                 #udp
                 if [ "$enable_udp_proxy" -eq 1 ]; then
-                ip rule add fwmark 1 table 100
-                ip route add local default dev lo table 100
+                ip rule add fwmark "$PROXY_FWMARK" table "$PROXY_ROUTE_TABLE" pref 789
+                ip route add local default dev lo table "$PROXY_ROUTE_TABLE"
                 iptables -t mangle -N openclash
                 iptables -t mangle -A openclash -m set --match-set lan_ac_black_ips src -j RETURN >/dev/null 2>&1
                 iptables -t mangle -A openclash -m set ! --match-set lan_ac_white_ips src -j RETURN >/dev/null 2>&1
@@ -842,14 +849,14 @@ EOF
                    done
                 fi
                 
-                iptables -t mangle -A openclash -p udp -j TPROXY --on-port "$proxy_port" --tproxy-mark 1
+                iptables -t mangle -A openclash -p udp -j TPROXY --on-port "$proxy_port" --tproxy-mark "$PROXY_FWMARK"
                 iptables -t mangle -A PREROUTING -p udp -j openclash
                 fi
                 
                 if [ "$en_mode" = "fake-ip" ]; then
                    iptables -t nat -A OUTPUT -p tcp -d 198.18.0.0/16 -j REDIRECT --to-ports "$proxy_port"
                    if [ "$enable_udp_proxy" -eq 1 ]; then
-                      iptables -t mangle -A OUTPUT -p udp -d 198.18.0.0/16 -j MARK --set-mark 1
+                      iptables -t mangle -A OUTPUT -p udp -d 198.18.0.0/16 -j MARK --set-mark "$PROXY_FWMARK"
                    fi
                 fi
                 
@@ -874,7 +881,7 @@ EOF
                             fi
                          done
                       fi
-                      ip6tables -t mangle -A openclash -p udp -j TPROXY --on-port "$proxy_port" --tproxy-mark 1
+                      ip6tables -t mangle -A openclash -p udp -j TPROXY --on-port "$proxy_port" --tproxy-mark "$PROXY_FWMARK"
                       ip6tables -t mangle -A PREROUTING -p udp -j openclash
                    fi
                 fi
@@ -907,7 +914,7 @@ EOF
                 done
                 ip route replace default dev utun table "$PROXY_ROUTE_TABLE"
              fi
-                ip rule add fwmark "$PROXY_FWMARK" table "$PROXY_ROUTE_TABLE"
+                ip rule add fwmark "$PROXY_FWMARK" table "$PROXY_ROUTE_TABLE" pref 789
              #设置防火墙
                 iptables -t mangle -N openclash
                 iptables -t mangle -F openclash
@@ -921,17 +928,12 @@ EOF
                 iptables -t mangle -I PREROUTING -m set ! --match-set localnetwork dst -j MARK --set-mark "$PROXY_FWMARK"
                 iptables -t nat -I PREROUTING -p tcp --dport 53 -j ACCEPT
              #ipv6
-                #if [ "$ipv6_enable" -eq 1 ]; then
-                   #ip6tables -t mangle -I PREROUTING -j MARK --set-mark "$PROXY_FWMARK"
-                #fi
+             #    if [ "$ipv6_enable" -eq 1 ]; then
+             #        ip6tables -t mangle -I PREROUTING -j MARK --set-mark "$PROXY_FWMARK"
+             #    fi
              fi
 
              echo "第九步: 重启 Dnsmasq 程序..." >$START_LOG
-             if [ "$(iptables -t nat -nL PREROUTING --line-number |grep "udp dpt:53" |wc -l)" -gt 1 ]; then
-                echo "发现53端口被劫持，如连接异常请将OpenClash设置为劫持53端口程序的上游DNS服务器！" >$START_LOG
-                echo "${LOGTIME} Warring: OpenClash May Can Not Take Over DNS, Please Use OpenClash for Upstream DNS Resolve Server" >> $LOG_FILE
-                sleep 5
-             fi
              change_dns "$enable_redirect_dns" "$disable_masq_cache"
              fake_block "$en_mode" "$direct_dns"
              /etc/init.d/dnsmasq restart >/dev/null 2>&1
@@ -954,7 +956,7 @@ EOF
                 if [ "$rule_source" != 0 ] || [ "$enable_custom_clash_rules" != 0 ]; then
                    echo "错误: OpenClash 启动失败，尝试还原规则并重新启动 Clash 主程序..." >$START_LOG
                    echo "${LOGTIME} OpenClash Can Not Start, Try Use Backup Rules Start Again" >> $LOG_FILE
-                   mv "$BACKUP_FILE" /etc/openclash/configrules.bak
+                   mv "$START_BACKUP" /etc/openclash/configrules.bak
                    sed -i -n '/^Rule:/,$p' /etc/openclash/configrules.bak
                    sed -i '/^Rule:/,$d' "$CONFIG_FILE"
                    cat /etc/openclash/configrules.bak >> "$CONFIG_FILE"
@@ -1031,8 +1033,8 @@ stop()
     
 #ipv4
 
-    ip rule del fwmark 1 table 100 >/dev/null 2>&1
-    ip route del local default dev lo table 100 >/dev/null 2>&1
+    ip rule del fwmark "$PROXY_FWMARK" table "$PROXY_ROUTE_TABLE" pref 789 >/dev/null 2>&1
+    ip route del local default dev lo table "$PROXY_ROUTE_TABLE" >/dev/null 2>&1
     
     iptables -t nat -D PREROUTING -p tcp --dport 53 -j ACCEPT >/dev/null 2>&1
 
@@ -1057,9 +1059,9 @@ stop()
         iptables -t nat -D OUTPUT "$out_line" >/dev/null 2>&1
     done
     
-    out_lines=$(iptables -nvL PREROUTING -t nat |sed 1,2d |sed -n '/8.8./=' 2>/dev/null |sort -rn)
-    for out_line in $out_lines; do
-        iptables -t nat -D PREROUTING "$out_line" >/dev/null 2>&1
+    pre_lines=$(iptables -nvL PREROUTING -t nat |sed 1,2d |sed -n '/8.8./=' 2>/dev/null |sort -rn)
+    for pre_line in $pre_lines; do
+        iptables -t nat -D PREROUTING "$pre_line" >/dev/null 2>&1
     done
     
 #ipv6
@@ -1076,7 +1078,7 @@ stop()
     ip tuntap del clash0 mode tun >/dev/null 2>&1
     ip route del default dev clash0 table "$PROXY_ROUTE_TABLE" >/dev/null 2>&1
     ip route del default dev utun table "$PROXY_ROUTE_TABLE" >/dev/null 2>&1
-    ip rule del fwmark "$PROXY_FWMARK" table "$PROXY_ROUTE_TABLE" >/dev/null 2>&1
+    ip rule del fwmark "$PROXY_FWMARK" table "$PROXY_ROUTE_TABLE" pref 789 >/dev/null 2>&1
 
     iptables -t mangle -D OUTPUT -j openclash >/dev/null 2>&1
     iptables -t mangle -D PREROUTING -m set --match-set lan_ac_black_ips src -j RETURN >/dev/null 2>&1
