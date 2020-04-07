@@ -4,6 +4,7 @@ status=$(ps|grep -c /usr/share/openclash/yml_proxys_get.sh)
 
 START_LOG="/tmp/openclash_start.log"
 CONFIG_FILE=$(uci get openclash.config.config_path 2>/dev/null)
+SERVER_RELAY="/tmp/relay_server"
 CONFIG_NAME=$(echo "$CONFIG_FILE" |awk -F '/' '{print $5}' 2>/dev/null)
 UPDATE_CONFIG_FILE=$(uci get openclash.config.config_update_path 2>/dev/null)
 UPDATE_CONFIG_NAME=$(echo "$UPDATE_CONFIG_FILE" |awk -F '/' '{print $5}' 2>/dev/null)
@@ -66,11 +67,15 @@ servers_if_update=$(uci get openclash.config.servers_if_update 2>/dev/null)
 new_servers_group=$(uci get openclash.config.new_servers_group 2>/dev/null)
 
 #proxy
-line=$(sed -n '/^ \{0,\}-/=' $server_file 2>/dev/null)
-num=$(grep -c "^ \{0,\}-" $server_file 2>/dev/null)
+sed -i "s/\'//g" $server_file 2>/dev/null
+sed -i 's/\"//g' $server_file 2>/dev/null
+line=$(sed -n '/name:/=' $server_file 2>/dev/null)
+num=$(grep -c "name:" $server_file 2>/dev/null)
 count=1
 
 #provider
+sed -i "s/\'//g" $provider_file 2>/dev/null
+sed -i 's/\"//g' $provider_file 2>/dev/null
 sed -i '/^ *$/d' $provider_file 2>/dev/null
 sed -i '/^ \{0,\}#/d' $provider_file 2>/dev/null
 sed -i 's/\t/ /g' $provider_file 2>/dev/null
@@ -83,21 +88,19 @@ cfg_get()
 	echo "$(grep "$1" "$2" 2>/dev/null |awk -v tag=$1 'BEGIN{FS=tag} {print $2}' 2>/dev/null |sed 's/,.*//' 2>/dev/null |sed 's/\}.*//' 2>/dev/null |sed 's/^ \{0,\}//g' 2>/dev/null |sed 's/ \{0,\}$//g' 2>/dev/null)"
 }
 
-echo "开始更新【$CONFIG_NAME】的代理集配置..." >$START_LOG
-
-[ "$servers_update" -eq "1" ] && {
-echo "" >"$match_provider"
-provider_nums=0
-config_load "openclash"
-config_foreach yml_provider_name_get "proxy-provider"
+cfg_get_dynamic()
+{
+	echo "$(grep "^ \{0,\}$1" "$2" 2>/dev/null |grep -v "^ \{0,\}- name:"  |grep -v "^ \{0,\}- keep-alive" |awk -v tag=$1 'BEGIN{FS=tag} {print $2}' 2>/dev/null |sed 's/,.*//' 2>/dev/null |sed 's/\}.*//' 2>/dev/null |sed 's/^ \{0,\}//g' 2>/dev/null |sed 's/ \{0,\}$//g' 2>/dev/null)"
 }
+
+echo "开始更新【$CONFIG_NAME】的代理集配置..." >$START_LOG
 
 yml_provider_name_get()
 {
    local section="$1"
    config_get "name" "$section" "name" ""
    [ ! -z "$name" ] && {
-      echo "$provider_nums"."$name" >>"$match_provider"
+      echo "$provider_nums.$name" >>"$match_provider"
    }
    provider_nums=$(( $provider_nums + 1 ))
 }
@@ -109,6 +112,13 @@ cfg_new_provider_groups_get()
    fi
    
    ${uci_add}groups="${1}"
+}
+
+[ "$servers_update" -eq "1" ] && {
+echo "" >"$match_provider"
+provider_nums=0
+config_load "openclash"
+config_foreach yml_provider_name_get "proxy-provider"
 }
 
 for n in $provider_line
@@ -160,7 +170,7 @@ do
    #代理集存在时获取代理集编号
    provider_nums=$(grep -Fw "$provider_name" "$match_provider" |awk -F '.' '{print $1}')
    if [ "$servers_update" -eq "1" ] && [ ! -z "$provider_nums" ]; then
-      sed -i "/^${provider_nums}\./c\#match#" "$match_servers" 2>/dev/null
+      sed -i "/^${provider_nums}\./c\#match#" "$match_provider" 2>/dev/null
       uci_set="uci -q set openclash.@proxy-provider["$provider_nums"]."
       ${uci_set}manual="0"
       ${uci_set}name="$provider_name"
@@ -220,20 +230,20 @@ do
             proxies_line=$(sed -n '/^ \{0,\}proxies:/=' $single_group)
             if [ "$use_line" -le "$proxies_line" ]; then
                if [ ! -z "$(sed -n "${use_line},${proxies_line}p" "$single_group" |grep -F "$provider_name")" ]; then
-                  group_name=$(grep "name:" $single_group 2>/dev/null |awk -F 'name:' '{print $2}' 2>/dev/null |sed 's/,.*//' 2>/dev/null |sed 's/^ \{0,\}//g' 2>/dev/null |sed 's/ \{0,\}$//g' 2>/dev/null)
+                  group_name=$(cfg_get "name:" "$single_group")
                   ${uci_add}groups="$group_name"
                fi
             elif [ "$use_line" -ge "$proxies_line" ]; then
                if [ ! -z "$(sed -n "${use_line},\$p" "$single_group" |grep -F "$provider_name")" ]; then
-                  group_name=$(grep "name:" $single_group 2>/dev/null |awk -F 'name:' '{print $2}' 2>/dev/null |sed 's/,.*//' 2>/dev/null |sed 's/^ \{0,\}//g' 2>/dev/null |sed 's/ \{0,\}$//g' 2>/dev/null)
+                  group_name=$(cfg_get "name:" "$single_group")
                   ${uci_add}groups="$group_name"
                fi
             elif [ ! -z "$use_line" ] && [ -z "$proxies_line" ]; then
          	     if [ ! -z "$(grep -F "$provider_name" $single_group)" ]; then
-                  group_name=$(grep "name:" $single_group 2>/dev/null |awk -F 'name:' '{print $2}' 2>/dev/null |sed 's/,.*//' 2>/dev/null |sed 's/^ \{0,\}//g' 2>/dev/null |sed 's/ \{0,\}$//g' 2>/dev/null)
+                  group_name=$(cfg_get "name:" "$single_group")
                   ${uci_add}groups="$group_name"
                fi
-            fi
+            fi 2>/dev/null
 	       done
 	    fi
    fi
@@ -261,7 +271,7 @@ yml_servers_name_get()
 	 local section="$1"
    config_get "name" "$section" "name" ""
    [ ! -z "$name" ] && {
-      echo "$server_num"."$name" >>"$match_servers"
+      echo "$server_num.$name" >>"$match_servers"
    }
    server_num=$(( $server_num + 1 ))
 }
@@ -404,11 +414,6 @@ do
    config_load "openclash"
    config_foreach server_key_get "config_subscribe"
    
-#节点存在时获取节点编号
-   server_num=$(grep -Fw "$server_name" "$match_servers" |awk -F '.' '{print $1}')
-   if [ "$servers_update" -eq "1" ] && [ ! -z "$server_num" ]; then
-      sed -i "/^${server_num}\./c\#match#" "$match_servers" 2>/dev/null
-   fi
 #匹配关键字订阅节点
    if [ "$servers_if_update" = "1" ]; then
       if [ ! -z "$config_keyword" ] || [ ! -z "$config_ex_keyword" ]; then
@@ -430,6 +435,13 @@ do
          fi
       fi
    fi
+   
+#节点存在时获取节点编号
+   server_num=$(grep -Fw "$server_name" "$match_servers" |awk -F '.' '{print $1}')
+   if [ "$servers_update" -eq "1" ] && [ ! -z "$server_num" ]; then
+      sed -i "/^${server_num}\./c\#match#" "$match_servers" 2>/dev/null
+   fi
+   
    #type
    server_type="$(cfg_get "type:" "$single_server")"
    #server
@@ -474,16 +486,24 @@ do
    uuid="$(cfg_get "uuid:" "$single_server")"
    #alterId:
    alterId="$(cfg_get "alterId:" "$single_server")"
-   #network
+   #network:
    network="$(cfg_get "network:" "$single_server")"
-   #username
+   #username:
    username="$(cfg_get "username:" "$single_server")"
+   #sni:
+   sni="$(cfg_get "sni:" "$single_server")"
+   #alpn:
+   alpns="$(cfg_get_dynamic "-" "$single_server")"
+   #http_paths:
+   http_paths="$(cfg_get_dynamic "-" "$single_server")"
    
    echo "正在读取【$CONFIG_NAME】-【$server_type】-【$server_name】服务器节点配置..." >$START_LOG
    
    if [ "$servers_update" -eq "1" ] && [ ! -z "$server_num" ]; then
 #更新已有节点
       uci_set="uci -q set openclash.@servers["$server_num"]."
+      uci_add="uci -q add_list $name.$uci_name_tmp."
+      uci_del="uci -q del_list $name.$uci_name_tmp."
       
       ${uci_set}manual="0"
       ${uci_set}type="$server_type"
@@ -497,26 +517,36 @@ do
       ${uci_set}udp="$udp"
       ${uci_set}obfs="$obfs"
       ${uci_set}host="$obfs_host"
-      ${uci_set}obfs_snell="$mode"
-      [ -z "$obfs" ] && ${uci_set}obfs="$mode"
-      [ -z "$obfs" ] && [ -z "$mode" ] && ${uci_set}obfs="none"
-      [ -z "$mode" ] && ${uci_set}obfs_snell="none"
-      [ -z "$mode" ] && [ ! -z "$network" ] && ${uci_set}obfs_vmess="websocket"
-      [ -z "$mode" ] && [ -z "$network" ] && ${uci_set}obfs_vmess="none"
+      [ -z "$mode" ] && [ "$server_type" = "snell" ] && ${uci_set}obfs_snell="$mode"
+      [ -z "$obfs" ] && [ "$server_type" = "ss" ] && ${uci_set}obfs="$mode"
+      [ -z "$obfs" ] && [ "$server_type" = "ss" ] && [ -z "$mode" ] && ${uci_set}obfs="none"
+      [ -z "$mode" ] && [ "$server_type" = "snell" ] &&  ${uci_set}obfs_snell="none"
+      [ -z "$mode" ] && [ "$network" = "ws" ] && [ "$server_type" = "vmess" ] && ${uci_set}obfs_vmess="websocket"
+      [ -z "$mode" ] && [ "$network" = "http" ] && [ "$server_type" = "vmess" ] && ${uci_set}obfs_vmess="http"
+      [ -z "$mode" ] && [ -z "$network" ] && [ "$server_type" = "vmess" ] && ${uci_set}obfs_vmess="none"
       [ -z "$obfs_host" ] && ${uci_set}host="$host"
       ${uci_set}psk="$psk"
       ${uci_set}tls="$tls"
       ${uci_set}skip_cert_verify="$verify"
       ${uci_set}path="$path"
-      [ -z "$path" ] && ${uci_set}path="$ws_path"
+      [ -z "$path" ] && [ "$network" = "ws" ] && ${uci_set}path="$ws_path"
       ${uci_set}mux="$mux"
       ${uci_set}custom="$headers"
-      [ -z "$headers" ] && ${uci_set}custom="$Host"
+      [ -z "$headers" ] && [ "$network" = "ws" ] && ${uci_set}custom="$Host"
     
 	   if [ "$server_type" = "vmess" ]; then
        #v2ray
        ${uci_set}alterId="$alterId"
        ${uci_set}uuid="$uuid"
+       ${uci_del}http_path >/dev/null 2>&1
+       for http_path in $http_paths; do
+          ${uci_add}http_path="$http_path" >/dev/null 2>&1
+       done
+       if [ ! -z "$(grep "^ \{0,\}- keep-alive" "$single_server")" ]; then
+          ${uci_set}keep_alive="true"
+       else
+          ${uci_set}keep_alive="false"
+       fi
 	   fi
 	
 	   if [ "$server_type" = "socks5" ] || [ "$server_type" = "http" ]; then
@@ -524,6 +554,15 @@ do
         ${uci_set}auth_pass="$password"
      else
         ${uci_set}password="$password"
+	   fi
+	   
+	   if [ "$server_type" = "trojan" ]; then
+       #trojan
+       ${uci_set}sni="$sni"
+       ${uci_del}alpn >/dev/null 2>&1
+       for alpn in $alpns; do
+          ${uci_add}alpn="$alpn" >/dev/null 2>&1
+       done
 	   fi
    else
 #添加新节点
@@ -556,26 +595,36 @@ do
       ${uci_set}udp="$udp"
       ${uci_set}obfs="$obfs"
       ${uci_set}host="$obfs_host"
-      ${uci_set}obfs_snell="$mode"
-      [ -z "$obfs" ] && ${uci_set}obfs="$mode"
-      [ -z "$obfs" ] && [ -z "$mode" ] && ${uci_set}obfs="none"
-      [ -z "$mode" ] && ${uci_set}obfs_snell="none"
-      [ -z "$mode" ] && [ ! -z "$network" ] && ${uci_set}obfs_vmess="websocket"
-      [ -z "$mode" ] && [ -z "$network" ] && ${uci_set}obfs_vmess="none"
+      [ -z "$mode" ] && [ "$server_type" = "snell" ] && ${uci_set}obfs_snell="$mode"
+      [ -z "$obfs" ] && [ "$server_type" = "ss" ] && ${uci_set}obfs="$mode"
+      [ -z "$obfs" ] && [ "$server_type" = "ss" ] && [ -z "$mode" ] && ${uci_set}obfs="none"
+      [ -z "$mode" ] && [ "$server_type" = "snell" ] &&  ${uci_set}obfs_snell="none"
+      [ -z "$mode" ] && [ "$network" = "ws" ] && [ "$server_type" = "vmess" ] && ${uci_set}obfs_vmess="websocket"
+      [ -z "$mode" ] && [ "$network" = "http" ] && [ "$server_type" = "vmess" ] && ${uci_set}obfs_vmess="http"
+      [ -z "$mode" ] && [ -z "$network" ] && [ "$server_type" = "vmess" ] && ${uci_set}obfs_vmess="none"
       [ -z "$obfs_host" ] && ${uci_set}host="$host"
       ${uci_set}psk="$psk"
       ${uci_set}tls="$tls"
       ${uci_set}skip_cert_verify="$verify"
       ${uci_set}path="$path"
-      [ -z "$path" ] && ${uci_set}path="$ws_path"
+      [ -z "$path" ] && [ "$network" = "ws" ] && ${uci_set}path="$ws_path"
       ${uci_set}mux="$mux"
       ${uci_set}custom="$headers"
-      [ -z "$headers" ] && ${uci_set}custom="$Host"
+      [ -z "$headers" ] && [ "$network" = "ws" ] && ${uci_set}custom="$Host"
     
 	   if [ "$server_type" = "vmess" ]; then
        #v2ray
        ${uci_set}alterId="$alterId"
        ${uci_set}uuid="$uuid"
+       ${uci_del}http_path >/dev/null 2>&1
+       for http_path in $http_paths; do
+          ${uci_add}http_path="$http_path" >/dev/null 2>&1
+       done
+       if [ ! -z "$(grep "^ \{0,\}- keep-alive" "$single_server")" ]; then
+          ${uci_set}keep_alive="true"
+       else
+          ${uci_set}keep_alive="false"
+       fi
 	   fi
 	
 	   if [ "$server_type" = "socks5" ] || [ "$server_type" = "http" ]; then
@@ -583,6 +632,14 @@ do
         ${uci_set}auth_pass="$password"
      else
         ${uci_set}password="$password"
+	   fi
+	   
+	   if [ "$server_type" = "trojan" ]; then
+       #trojan
+       ${uci_set}sni="$sni"
+       for alpn in $alpns; do
+        ${uci_add}alpn="$alpn" >/dev/null 2>&1
+       done
 	   fi
 
 #加入策略组
@@ -594,8 +651,22 @@ do
 	      for ((i=1;i<=$group_num;i++))
 	      do
 	         single_group="/tmp/group_$i.yaml"
-           if [ ! -z "$(grep -F "$server_name" "$single_group")" ]; then
-              group_name=$(grep "name:" $single_group 2>/dev/null |awk -F 'name:' '{print $2}' 2>/dev/null |sed 's/,.*//' 2>/dev/null |sed 's/^ \{0,\}//g' 2>/dev/null |sed 's/ \{0,\}$//g' 2>/dev/null)
+	         group_type="$(cfg_get "type:" "$single_group")"
+	         if [ ! -z "$(grep -F "$server_name" "$single_group")" ] && [ "$group_type" = "relay" ]; then
+	         	  group_name=$(cfg_get "name:" "$single_group")
+	            grep "^ \{0,\}-" "$single_group" 2>/dev/null |grep -v "^ \{0,\}- name:" 2>/dev/null > $SERVER_RELAY
+	            s=1
+	            cat $SERVER_RELAY |while read -r line
+	            do
+	               if [ ! -z "$(echo "$line" |grep -F "$server_name" 2>/dev/null)" ]; then
+                    ${uci_add}groups="$group_name"
+                    ${uci_add}relay_groups="$group_name#relay#$s"
+                 else
+                    s=$(expr "$s" + 1)
+                 fi
+              done
+           elif [ ! -z "$(grep -F "$server_name" "$single_group")" ]; then
+              group_name=$(cfg_get "name:" "$single_group")
               ${uci_add}groups="$group_name"
            fi
 	      done
@@ -613,7 +684,7 @@ if [ "$servers_if_update" = "1" ]; then
         if [ -z "$line" ]; then
            continue
         fi
-        if [ "$(uci get openclash.@servers["$line"].manual)" = "0" ] && [ "$(uci get openclash.@servers["$line"].config)" = "$CONFIG_NAME" ]; then
+        if [ "$(uci get openclash.@servers["$line"].manual 2>/dev/null)" = "0" ] && [ "$(uci get openclash.@servers["$line"].config 2>/dev/null)" = "$CONFIG_NAME" ]; then
            uci delete openclash.@servers["$line"] 2>/dev/null
         fi
      done
@@ -635,3 +706,4 @@ rm -rf /tmp/provider.yaml 2>/dev/null
 rm -rf /tmp/provider_gen.yaml 2>/dev/null
 rm -rf /tmp/provider_che.yaml 2>/dev/null
 rm -rf /tmp/match_provider.list 2>/dev/null
+rm -rf /tmp/relay_server 2>/dev/null

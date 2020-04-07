@@ -36,7 +36,7 @@ function config_check(CONFIG_FILE)
      if (proxy ~= 0) then
         proxy = luci.sys.call(string.format('egrep "^proxies:" "%s" >/dev/null 2>&1',CONFIG_FILE))
      end
-     group = luci.sys.call(string.format('egrep "^ {0,}Proxy Group:" "%s" >/dev/null 2>&1',CONFIG_FILE))
+     group = luci.sys.call(string.format('egrep " {0,}Proxy Group" "%s" >/dev/null 2>&1',CONFIG_FILE))
      if (group ~= 0) then
      	  group = luci.sys.call(string.format('egrep "^ {0,}proxy-groups:" "%s" >/dev/null 2>&1',CONFIG_FILE))
      end
@@ -163,7 +163,11 @@ e[t]={}
 e[t].name=fs.basename(o)
 BACKUP_FILE="/etc/openclash/backup/".. e[t].name
 CONFIG_FILE="/etc/openclash/config/".. e[t].name
-e[t].mtime=os.date("%Y-%m-%d %H:%M:%S",fs.mtime(BACKUP_FILE)) or os.date("%Y-%m-%d %H:%M:%S",a.mtime)
+if fs.mtime(BACKUP_FILE) then
+   e[t].mtime=os.date("%Y-%m-%d %H:%M:%S",fs.mtime(BACKUP_FILE))
+else
+   e[t].mtime=os.date("%Y-%m-%d %H:%M:%S",a.mtime)
+end
 if string.sub(luci.sys.exec("uci get openclash.config.config_path 2>/dev/null"), 23, -2) == e[t].name then
    e[t].state=translate("Enable")
 else
@@ -245,8 +249,9 @@ e.inputstyle="reset"
 Button.render(e,t,a)
 end
 btnrm.write=function(a,t)
-local a=fs.unlink("/etc/openclash/config/"..luci.openclash.basename(e[t].name))
-local db=fs.unlink("/etc/openclash/backup/"..luci.openclash.basename(e[t].name))
+	fs.unlink("/tmp/Proxy_Group")
+	fs.unlink("/etc/openclash/backup/"..luci.openclash.basename(e[t].name))
+	local a=fs.unlink("/etc/openclash/config/"..luci.openclash.basename(e[t].name))
 if a then table.remove(e,t)end
 return a
 end
