@@ -1,4 +1,3 @@
-
 config global
 	option enabled '0'
 	option tcp_node1 'nil'
@@ -60,6 +59,7 @@ config global_app
 config global_subscribe
 	option subscribe_proxy '0'
 	option auto_update_subscribe '0'
+	option filter_keyword_discarded '1'
 	list filter_keyword '过期时间'
 	list filter_keyword '剩余流量'
 	list filter_keyword 'QQ群'

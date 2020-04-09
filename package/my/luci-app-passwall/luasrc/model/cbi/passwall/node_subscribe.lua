@@ -3,6 +3,7 @@ local e = require "luci.sys"
 
 m = Map("passwall")
 
+
 -- [[ Subscribe Settings ]]--
 s = m:section(TypedSection, "global_subscribe", "")
 s.anonymous = true
@@ -17,6 +18,48 @@ o = s:option(Flag, "auto_update_subscribe",
              translate("Enable auto update subscribe"))
 o.default = 0
 o.rmempty = false
+
+
+
+---- Auto Ping
+o = s:option(Flag, "auto_ping", translate("Auto Ping"),
+             translate("This will automatically ping the node for latency"))
+o.default = 1
+
+---- Use TCP Detection delay
+o = s:option(Flag, "use_tcping", translate("Use TCP Detection delay"),
+             translate("This will use tcping replace ping detection of node"))
+o.default = 1
+
+---- Concise display nodes
+o = s:option(Flag, "compact_display_nodes", translate("Concise display nodes"))
+o.default = 0
+
+---- Show Add Mode
+o = s:option(Flag, "show_add_mode", translate("Show Add Mode"))
+o.default = 1
+
+---- Show group
+o = s:option(Flag, "show_group", translate("Show Group"))
+o.default = 1
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 ---- Week update rules
 o = s:option(ListValue, "week_update_subscribe", translate("Week update rules"))
@@ -41,34 +84,9 @@ function o.write(e, e)
     luci.http.redirect(luci.dispatcher.build_url("admin", "vpn", "passwall",
                                                  "log"))
 end
--- [[ Other Settings ]]--
-s = m:section(TypedSection, "global_other")
-s.anonymous = true
-
----- Auto Ping
-o = s:option(Flag, "auto_ping", translate("Auto Ping"),
-             translate("This will automatically ping the node for latency"))
-o.default = 1
-
----- Use TCP Detection delay
-o = s:option(Flag, "use_tcping", translate("Use TCP Detection delay"),
-             translate("This will use tcping replace ping detection of node"))
-o.default = 1
-
----- Concise display nodes
-o = s:option(Flag, "compact_display_nodes", translate("Concise display nodes"))
-o.default = 0
-
----- Show Add Mode
-o = s:option(Flag, "show_add_mode", translate("Show Add Mode"))
-o.default = 1
-
----- Show group
-o = s:option(Flag, "show_group", translate("Show Group"))
-o.default = 1
-
 -- [[ Add the node via the link ]]--
 s:append(Template("passwall/node_list/link_add_node"))
+
 ---- Subscribe Delete All
 o = s:option(Button, "_stop", translate("Delete All Subscribe Node"))
 o.inputstyle = "remove"
@@ -79,8 +97,11 @@ function o.write(e, e)
                                                  "log"))
 end
 
-filter_keyword = s:option(DynamicList, "filter_keyword", translate("Filter keyword"),
-	translate("When subscribing, the keywords in the list are discarded."))
+filter_keyword = s:option(DynamicList, "filter_keyword", translate("Filter keyword"))
+    
+o = s:option(Flag, "filter_keyword_discarded", translate("Filter keyword discarded"), translate("When checked, the keywords in the list are discarded. Otherwise, it is not discarded."))
+o.default = "1"
+o.rmempty = false
 
 s = m:section(TypedSection, "subscribe_list", "",
               "<font color='red'>" .. translate(
@@ -101,5 +122,10 @@ o.rmempty = false
 o = s:option(Value, "url", translate("Subscribe URL"))
 o.width = "auto"
 o.rmempty = false
+-- [[ Other Settings ]]--
+s = m:section(TypedSection, "global_other")
+s.anonymous = true
+
+
 
 return m

@@ -225,14 +225,15 @@ o:value("chnroute", translate("Game Mode") .. "（" .. translate("China WhiteLis
 o:value("global", translate("Global Proxy"))
 o.default = "default"
 o.rmempty = false
+m:section(SimpleSection).template  = "vssr/status2"
+---- Tips
+--[[s:append(Template("passwall/global/tips"))
 
 
-
---[[
 local apply = luci.http.formvalue("cbi.apply")
 if apply then
 os.execute("/etc/init.d/passwall restart")
 end
 --]]
-m:section(SimpleSection).template  = "vssr/status2"
+
 return m

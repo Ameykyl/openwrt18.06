@@ -40,7 +40,7 @@ function index()
           _("Rule Update"), 96).leaf = true
     entry({"admin", "vpn", "passwall", "acl"}, cbi("passwall/acl"),
           _("Access control"), 97).leaf = true
-      entry({"admin", "vpn", "passwall", "Status"},form("passwall/Status"),
+   entry({"admin", "vpn", "passwall", "Status"},form("passwall/Status"),
           _("Status"), 98).leaf = true
     entry({"admin", "vpn", "passwall", "log"}, form("passwall/log"),
           _("Watch Logs"), 99).leaf = true
@@ -174,7 +174,7 @@ function connect_status()
     local start_time = os.time()
     if luci.http.formvalue("type") == "google" then
         e.status = luci.sys.call(
-                       "echo $(/usr/share/passwall/test.sh test_url 'www.google.com') | grep 200 >/dev/null") ==
+                       "echo $(/usr/share/passwall/test.sh test_url 'www.google.com/generate_204') | grep 200 >/dev/null") ==
                        0
     else
         e.status = luci.sys.call(

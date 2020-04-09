@@ -120,7 +120,4 @@ end
 
 m:append(Template("passwall/node_list/node_list"))
 
-
-
-
 return m
