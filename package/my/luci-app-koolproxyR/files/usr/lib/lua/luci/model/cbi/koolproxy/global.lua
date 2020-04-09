@@ -26,15 +26,12 @@ local i=luci.sys.exec("cat /usr/share/koolproxy/dnsmasq.adblock | wc -l")
 
 
 if luci.sys.call("pidof koolproxy >/dev/null") == 0 then
-	status = translate("<strong><font color=\"green\">KoolProxyR plus+  运行中</font></strong>")
+	status = translate("<strong><font color=\"green\">广告过滤大师 plus+  运行中</font></strong>")
 else
-	status = translate("<strong><font color=\"red\">KoolProxyR plus+  已停止</font></strong>")
+	status = translate("<strong><font color=\"red\">广告过滤大师 plus+  已停止</font></strong>")
 end
 
-o = Map("koolproxy", translate("KoolProxyR plus+ "),    
-      "<font color='blue'>" .. translate(
-          "KoolProxyR plus+是能识别adblock规则的免费开源软件,追求体验更快、更清洁的网络，屏蔽烦人的广告") ..
-          "</font>")
+o = Map("koolproxy", "<font color='green'>" .. translate("广告过滤大师 plus+ ") .."</font>",     "<font color='purple'>" .. translate( "广告过滤大师 plus+是能识别adblock规则的广告屏蔽软件，可以过滤网页广告、视频广告、HTTPS广告") .."</font>")
 
 t = o:section(TypedSection, "global")
 t.anonymous = true
@@ -293,7 +290,7 @@ end
 function e.write(self, section, value)
 end
 
-t=o:section(TypedSection,"acl_rule",translate("KoolProxyR 访问控制"),
+t=o:section(TypedSection,"acl_rule",translate("访问控制"),
 translate("ACLs is a tools which used to designate specific IP filter mode,The MAC addresses added to the list will be filtered using https"))
 t.template="cbi/tblsection"
 t.sortable=true
@@ -328,7 +325,7 @@ e:value(1,translate("http only"))
 e:value(2,translate("http + https"))
 e:value(3,translate("full port"))
 
-t=o:section(TypedSection,"rss_rule",translate("KoolProxyR 规则订阅"), translate("请确保订阅规则的兼容性"))
+t=o:section(TypedSection,"rss_rule",translate("广告过滤规则订阅"), translate("请确保订阅规则的兼容性"))
 t.anonymous=true
 t.addremove=true
 t.sortable=true
