@@ -855,3 +855,9 @@ msgstr "客户端文件不适合当前设备。"
 
 msgid "Can't move new file to path: %s"
 msgstr "无法移动新文件到：%s"
+
+msgid "Filter keyword discarded"
+msgstr "关键字丢弃"
+
+msgid "When checked, the keywords in the list are discarded. Otherwise, it is not discarded."
+msgstr "当勾选时，将丢弃包含列表里的关键字的节点。否则，将保留列表的关键字的节点（反过来）。"
