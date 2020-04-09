@@ -1,14 +1,9 @@
 
 local m, s, o
 local clash = "clash"
-local uci = luci.model.uci.cursor()
-local fs = require "nixio.fs"
-local sys = require "luci.sys"
 local sid = arg[1]
 local uuid = luci.sys.exec("cat /proc/sys/kernel/random/uuid")
 
-
-local server_table = {}
 
 local encrypt_methods_ss = {
 
@@ -86,10 +81,16 @@ if m.uci:get(clash, sid) ~= "servers" then
 	return
 end
 
+
 -- [[ Servers Setting ]]--
 s = m:section(NamedSection, sid, "servers")
 s.anonymous = true
 s.addremove   = false
+
+o = s:option(DummyValue,"ssr_url",translate("Import config info")) 
+o.rawhtml  = true
+o.template = "clash/ssrurl"
+o.value =sid
 
 o = s:option(ListValue, "type", translate("Server Node Type"))
 o:value("ss", translate("Shadowsocks"))
@@ -98,6 +99,9 @@ o:value("vmess", translate("Vmess"))
 o:value("socks5", translate("Socks5"))
 o:value("http", translate("HTTP(S)"))
 o:value("snell", translate("Snell"))
+o:value("trojan", translate("trojan"))
+
+
 
 o.description = translate("Using incorrect encryption mothod may causes service fail to start")
 
@@ -118,6 +122,7 @@ o.password = true
 o.rmempty = true
 o:depends("type", "ss")
 o:depends("type", "ssr")
+o:depends("type", "trojan")
 
 o = s:option(Value, "psk", translate("Psk"))
 o.rmempty = false
@@ -178,6 +183,7 @@ o = s:option(ListValue, "obfs_vmess", translate("obfs-mode"))
 o.default = "none"
 o:value("none")
 o:value("websocket", translate("websocket (ws)"))
+o:value("http", translate("http"))
 o:depends("type", "vmess")
 
 o = s:option(Value, "host", translate("hosts"))
@@ -193,6 +199,9 @@ o = s:option(ListValue, "udp", translate("udp"))
 o:value("true")
 o:value("false")
 o:depends("type", "ss")
+o:depends("type", "vmess")
+o:depends("type", "socks5")
+o:depends("type", "trojan")
 
 o = s:option(ListValue, "tls_custom", translate("tls"))
 o.default = "false"
@@ -210,22 +219,35 @@ o.rmempty = true
 o:depends("obfs", "websocket")
 o:depends("obfs_vmess", "websocket")
 
-o = s:option(ListValue, "mux", translate("Mux"))
-o.default = "false"
-o:value("true")
-o:value("false")
-o:depends("obfs", "websocket")
+o = s:option(DynamicList, "http_path", translate("path"))
+o.rmempty = true
+o:value("/")
+o:value("/video")
+o:depends("obfs_vmess", "http")
 
 o = s:option(Value, "custom", translate("headers"))
 o.rmempty = true
 o:depends("obfs", "websocket")
 o:depends("obfs_vmess", "websocket")
 
+o = s:option(Value, "keep_alive", translate("keep-alive"))
+o.rmempty = true
+o.default = "true"
+o:value("true")
+o:value("false")
+o:depends("obfs_vmess", "http")
+
+o = s:option(ListValue, "mux", translate("Mux"))
+o.default = "false"
+o:value("true")
+o:value("false")
+o:depends("obfs", "websocket")
+
 
 -- AlterId
 o = s:option(Value, "alterId", translate("AlterId"))
 o.datatype = "port"
-o.default = 16
+o.default = 32
 o.rmempty = true
 o:depends("type", "vmess")
 
@@ -258,6 +280,8 @@ o:depends("type", "vmess")
 o:depends("type", "socks5")
 o:depends("type", "http")
 o:depends("obfs_vmess", "none")
+o:depends("type", "trojan")
+o:depends("obfs_vmess", "websocket")
 
 -- [[ TLS ]]--
 o = s:option(ListValue, "tls", translate("TLS"))
@@ -265,10 +289,26 @@ o.rmempty = true
 o.default = "false"
 o:value("true")
 o:value("false")
-o:depends("type", "vmess")
+o:depends("obfs", "websocket")
+o:depends("obfs_vmess", "none")
+o:depends("obfs_vmess", "websocket")
+o:depends("obfs_vmess", "http")
 o:depends("type", "socks5")
 o:depends("type", "http")
-o:depends("obfs_vmess", "none")
+
+-- [[ sni ]]--
+o = s:option(Value, "sni", translate("sni"))
+o.datatype = "host"
+o.placeholder = translate("example.com")
+o.rmempty = true
+o:depends("type", "trojan")
+
+-- [[ alpn ]]--
+o = s:option(DynamicList, "alpn", translate("alpn"))
+o.default = "http/1.1"
+o:value("h2")
+o:value("http/1.1")
+o:depends("type", "trojan")
 
 local apply = luci.http.formvalue("cbi.apply")
 if apply then

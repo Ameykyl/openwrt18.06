@@ -62,19 +62,10 @@ cc = s:option(Flag, "create", translate("Enable Create"))
 cc.default = 1
 cc.description = translate("Enable to create configuration")
 
-cc = s:option(Flag, "ping_enable", translate("Enable Ping Servers"))
-cc.default = 0
-cc.description = translate("Enable Ping Servers")
-
 o = s:option(Value, "create_tag")
 o.title = translate("Config Name")
 o.rmempty = true
 o.description = translate("Give a name for your config")
-
-o = s:option(ListValue, "new_conff", translate("New Config(Rename fields)"))
-o:value("0", translate("Disable"))
-o:value("1", translate("Enable"))
-o.description = translate("https://github.com/Dreamacro/clash/commit/88d8f937938d7aba774b1af638df6910b1a1a14d")
 
 cc = s:option(Flag, "same_tag", translate("Force Same Name"))
 cc.default = 1
