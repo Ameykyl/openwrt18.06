@@ -7,3 +7,4 @@ if [ -f /tmp/adnew.conf ]; then
   fi
 fi
 rm -f /tmp/adnew.conf
+
