@@ -36,6 +36,10 @@ o.rmempty = false
 o = s:option(DynamicList, "subscribe_url", translate("Subscribe URL"))
 o.rmempty = true
 
+o = s:option(Value, "filter_words", translate("Subscribe Filter Words"))
+o.rmempty = true
+o.description = translate("Filter Words splited by /")
+
 o = s:option(Button,"update_Sub",translate("Update Subscribe List"))
 o.inputstyle = "reload"
 o.description = translate("Update subscribe url list first")
@@ -52,10 +56,9 @@ o = s:option(Flag, "proxy", translate("Through proxy update"))
 o.rmempty = false
 o.description = translate("Through proxy update list, Not Recommended ")
 
-
-o = s:option(Button,"subscribe", translate("Update All Subscribe Severs"))
-o.rawhtml  = true
-o.template = "shadowsocksr/subscribe"
+o = s:option(DummyValue, "", "")
+o.rawhtml = true
+o.template = "shadowsocksr/update_subscribe"
 
 o = s:option(Button,"delete",translate("Delete All Subscribe Severs"))
 o.inputstyle = "reset"

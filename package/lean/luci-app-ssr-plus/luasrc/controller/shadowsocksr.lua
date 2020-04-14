@@ -9,9 +9,11 @@ function index()
 	end
 	entry({"admin", "vpn", "shadowsocksr"}, alias("admin", "vpn", "shadowsocksr", "client"),_("ShadowSocksR Plus+"), 10).dependent = true
 	entry({"admin", "vpn", "shadowsocksr", "client"}, cbi("shadowsocksr/client"),_("SSR Client"), 10).leaf = true
-	entry({"admin", "vpn", "shadowsocksr", "servers"}, arcombine(cbi("shadowsocksr/servers", {autoapply=true}), cbi("shadowsocksr/client-config")),_("Severs Nodes"), 20).leaf = true
+	entry({"admin", "vpn", "shadowsocksr", "servers"}, cbi("shadowsocksr/servers"), _("Node List"), 11).leaf = true
+                 entry({"admin", "vpn", "shadowsocksr", "servers"},arcombine(cbi("shadowsocksr/servers"), cbi("shadowsocksr/client-config")),_("Node List"), 11).leaf = true
                  entry({"admin", "vpn", "shadowsocksr", "subscription"},cbi("shadowsocksr/subscription"),_("Subscription"),30).leaf=true
 	entry({"admin", "vpn", "shadowsocksr", "control"},cbi("shadowsocksr/control"), _("Access Control"), 40).leaf = true
+                 entry({"admin", "vpn", "shadowsocksr", "servers-list"},arcombine(cbi("shadowsocksr/servers-list"), cbi("shadowsocksr/client-config")),_("Severs Nodes"), 45).leaf = true
 	entry({"admin", "vpn", "shadowsocksr", "advanced"},cbi("shadowsocksr/advanced"),_("Advanced Settings"), 50).leaf = true
 	entry({"admin", "vpn", "shadowsocksr", "server"},arcombine(cbi("shadowsocksr/server"), cbi("shadowsocksr/server-config")),_("SSR Server"), 60).leaf = true
 	entry({"admin", "vpn", "shadowsocksr", "status"},form("shadowsocksr/status"),_("Status"), 70).leaf = true
@@ -19,15 +21,82 @@ function index()
 	entry({"admin", "vpn", "shadowsocksr", "refresh"}, call("refresh_data"))
 	entry({"admin", "vpn", "shadowsocksr", "subscribe"}, call("subscribe"))
 	entry({"admin", "vpn", "shadowsocksr", "checkport"}, call("check_port"))
-	entry({"admin", "vpn", "shadowsocksr", "log"},form("shadowsocksr/log"),_("Log"), 80).leaf = true
+                 entry({"admin", "vpn", "shadowsocksr", "checkports"}, call("check_ports"))
+	entry({"admin", "vpn", "shadowsocksr", "logview"}, cbi("shadowsocksr/logview", {hideapplybtn=true, hidesavebtn=true, hideresetbtn=true}), _("Log") ,80).leaf=true
+                 entry({"admin", "vpn", "shadowsocksr", "fileread"}, call("act_read"), nil).leaf=true
 	entry({"admin", "vpn", "shadowsocksr","run"},call("act_status")).leaf=true
+                 entry({"admin", "vpn", "shadowsocksr", "change"}, call("change_node"))
+                 entry({"admin", "vpn", "shadowsocksr", "allserver"}, call("get_servers"))
+                 entry({"admin", "vpn", "shadowsocksr", "subscribe"}, call("get_subscribe"))
 	entry({"admin", "vpn", "shadowsocksr", "ping"}, call("act_ping")).leaf=true
 end
 
-function subscribe()
-	luci.sys.call("/usr/bin/lua /usr/share/shadowsocksr/subscribe.lua >> /tmp/ssrplus.log 2>&1")
-	luci.http.prepare_content("application/json")
-	luci.http.write_json({ ret = 1 })
+function get_subscribe()
+
+    local cjson = require "cjson"
+    local e = {}
+    local uci = luci.model.uci.cursor()
+    local auto_update = luci.http.formvalue("auto_update")
+    local auto_update_time = luci.http.formvalue("auto_update_time")
+    local proxy = luci.http.formvalue("proxy")
+    local subscribe_url = luci.http.formvalue("subscribe_url")
+    if subscribe_url ~= "[]" then
+        local cmd1 = 'uci set shadowsocksr.@server_subscribe[0].auto_update="' ..
+                         auto_update .. '"'
+        local cmd2 = 'uci set shadowsocksr.@server_subscribe[0].auto_update_time="' ..
+                         auto_update_time .. '"'
+        local cmd3 = 'uci set shadowsocksr.@server_subscribe[0].proxy="' .. proxy .. '"'
+        luci.sys.call('uci delete shadowsocksr.@server_subscribe[0].subscribe_url ')
+        luci.sys.call(cmd1)
+        luci.sys.call(cmd2)
+        luci.sys.call(cmd3)
+        for k, v in ipairs(cjson.decode(subscribe_url)) do
+            luci.sys.call(
+                'uci add_list shadowsocksr.@server_subscribe[0].subscribe_url="' .. v ..
+                    '"')
+        end
+        luci.sys.call('uci commit shadowsocksr')
+        luci.sys.call(
+              "nohup /usr/bin/lua /usr/share/shadowsocksr/subscribe.lua >/www/check_update.htm 2>/dev/null &")
+        
+        e.error = 0
+    else
+        e.error = 1
+    end
+
+    luci.http.prepare_content("application/json")
+    luci.http.write_json(e)
+
+end
+-- 获取所有节点
+function get_servers()
+    local uci = luci.model.uci.cursor()
+    local server_table = {}
+    uci:foreach("shadowsocksr", "servers", function(s)
+        s["name"] = s[".name"]
+        table.insert(server_table,s)
+    end)
+    luci.http.prepare_content("application/json")
+    luci.http.write_json(server_table)
+end
+
+-- 切换节点
+function change_node()
+                local e = {}
+                local uci = luci.model.uci.cursor()
+                local sid = luci.http.formvalue("set")
+                local name = ""
+                uci:foreach("shadowsocksr", "global", function(s) name = s[".name"] end)
+                e.status = false
+                e.sid = sid
+                if sid ~= "" then
+                uci:set("shadowsocksr", name, "global_server", sid)
+                uci:commit("shadowsocksr")
+                luci.sys.call("/etc/init.d/shadowsocksr restart")
+                e.status = true
+    end
+                luci.http.prepare_content("application/json")
+                luci.http.write_json(e)
 end
 
 
@@ -225,35 +294,71 @@ function refresh_data()
 	luci.http.prepare_content("application/json")
 	luci.http.write_json({ret = retstring,retcount = icount})
 end
-function check_port()
-	local set=""
-	local retstring="<br /><br />"
-	local s
-	local server_name=""
-	local shadowsocksr="shadowsocksr"
-	local uci=luci.model.uci.cursor()
-	local iret=1
-	uci:foreach(shadowsocksr, "servers", function(s)
-		if s.alias then
-			server_name=s.alias
-		elseif s.server and s.server_port then
-			server_name="%s:%s" %{s.server, s.server_port}
-		end
-		iret=luci.sys.call(" ipset add ss_spec_wan_ac " .. s.server .. " 2>/dev/null")
-		socket=nixio.socket("inet", "stream")
-		socket:setopt("socket", "rcvtimeo", 3)
-		socket:setopt("socket", "sndtimeo", 3)
-		ret=socket:connect(s.server,s.server_port)
-		if tostring(ret) == "true" then
-			socket:close()
-			retstring=retstring .. "<font color='green'>[" .. server_name .. "] OK.</font><br />"
-		else
-			retstring=retstring .. "<font color='red'>[" .. server_name .. "] Error.</font><br />"
-		end
-		if iret == 0 then
-			luci.sys.call(" ipset del ss_spec_wan_ac " .. s.server)
-		end
-	end)
-	luci.http.prepare_content("application/json")
-	luci.http.write_json({ret=retstring})
+
+
+function check_ports()
+    local set = ""
+    local retstring = "<br /><br />"
+    local s
+    local server_name = ""
+    local shadowsocksr = "shadowsocksr"
+    local uci = luci.model.uci.cursor()
+    local iret = 1
+
+    uci:foreach(
+        shadowsocksr,
+        "servers",
+        function(s)
+            if s.alias then
+                server_name = s.alias
+            elseif s.server and s.server_port then
+                server_name = "%s:%s" % {s.server, s.server_port}
+            end
+            iret = luci.sys.call(" ipset add ss_spec_wan_ac " .. s.server .. " 2>/dev/null")
+            socket = nixio.socket("inet", "stream")
+            socket:setopt("socket", "rcvtimeo", 3)
+            socket:setopt("socket", "sndtimeo", 3)
+            ret = socket:connect(s.server, s.server_port)
+            if tostring(ret) == "true" then
+                socket:close()
+                retstring = retstring .. "<font color='green'>[" .. server_name .. "] OK.</font><br />"
+            else
+                retstring = retstring .. "<font color='red'>[" .. server_name .. "] Error.</font><br />"
+            end
+            if iret == 0 then
+                luci.sys.call(" ipset del ss_spec_wan_ac " .. s.server)
+            end
+        end
+    )
+
+    luci.http.prepare_content("application/json")
+    luci.http.write_json({ret = retstring})
 end
+
+
+-- 检测单个节点状态并返回连接速度
+function check_port()
+
+    local e = {}
+    -- e.index=luci.http.formvalue("host")
+    local t1 = luci.sys.exec(
+                   "ping -c 1 -W 1 %q 2>&1 | grep -o 'time=[0-9]*.[0-9]' | awk -F '=' '{print$2}'" %
+                       luci.http.formvalue("host"))
+    luci.http.prepare_content("application/json")
+    luci.http.write_json({ret = 1, used = t1})
+
+end
+
+function act_read(lfile)
+	local NXFS = require "nixio.fs"
+	local HTTP = require "luci.http"
+	local lfile = HTTP.formvalue("lfile")
+	local ldata={}
+	ldata[#ldata+1] = NXFS.readfile(lfile) or "_nofile_"
+	if ldata[1] == "" then
+		ldata[1] = "_nodata_"
+	end
+	HTTP.prepare_content("application/json")
+	HTTP.write_json(ldata)
+end
+
