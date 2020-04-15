@@ -185,7 +185,7 @@ local get_parted_info = function(device)
         partition_temp["name"] = device.."p"..partition_temp["number"]
       end
       if partition_temp["number"] > 0 and partition_temp["fs"] == "" and d.command.lsblk then
-        partition_temp["fs"] = luci.util.exec(d.command.lsblk .. " /dev/"..device.. tostring(partition_temp["number"]) .. " -no fstype")
+        partition_temp["fs"] = luci.util.exec(d.command.lsblk .. " /dev/"..device.. tostring(partition_temp["number"]) .. " -no fstype"):match("([^%s]+)") or ""
       end
       partition_temp["fs"] = partition_temp["fs"] == "" and "raw" or partition_temp["fs"]
       partition_temp["sec_start"] = partition_temp["sec_start"] and partition_temp["sec_start"]:sub(1,-2)
@@ -455,11 +455,11 @@ d.get_format_cmd = function()
     ext2 = { cmd = "mkfs.ext2", option = "-F -E lazy_itable_init=1" },
     ext3 = { cmd = "mkfs.ext3", option = "-F -E lazy_itable_init=1" },
     ext4 = { cmd = "mkfs.ext4", option = "-F -E lazy_itable_init=1" },
-    fat32 = { cmd = "mkfs.fat", option = "-F 32 -I" },
+    fat32 = { cmd = "mkfs.vfat", option = "-F" },
     exfat = { cmd = "mkexfat", option = "-f" },
     hfsplus = { cmd = "mkhfs", option = "-f" },
     ntfs = { cmd = "mkntfs", option = "-f" },
-    swap = { cmd = "mkswap", option = "-f" },
+    swap = { cmd = "mkswap", option = "" },
     btrfs = { cmd = "mkfs.btrfs", option = "-f" }
   }
   result = {}
@@ -712,6 +712,25 @@ end
 --   luci.util.exec("umount " .. m_point)
 -- end
 return subvolume
+end
+
+d.format_partition = function(partition, fs)
+  local partition_name = "/dev/".. partition
+  if not nixio.fs.access(partition_name) then
+    return 500, "Partition NOT found!"
+  end
+
+  local format_cmd = d.get_format_cmd()
+  if not format_cmd[fs] then
+    return 500, "Filesystem NOT support!"
+  end
+  local cmd = format_cmd[fs].cmd .. " " .. format_cmd[fs].option .. " " .. partition_name
+  local res = luci.util.exec(cmd .. " 2>&1")
+  if res and res:lower():match("error+") then
+    return 500, res
+  else
+    return 200, "OK"
+  end
 end
 
 return d
