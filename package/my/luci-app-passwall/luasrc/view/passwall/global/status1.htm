@@ -38,7 +38,7 @@ math.randomseed(os.time())
         min-width: inherit;
         overflow-x: auto;
         overflow-y: hidden;
-        padding: 6px 10px 7px 8px;
+      
         border: 1px solid rgba(0,0,0,.05);
         border-radius: .375rem;
         background-color: #fff;
@@ -412,7 +412,7 @@ var HTTP = {
 
 //]]></script>
 
-  <script>
+ <script>
 		//<![CDATA[
 		var imgs = document.getElementsByTagName('img');
 		for (var i = 0 ; i < imgs.length; i++) {
@@ -432,16 +432,16 @@ var HTTP = {
 							var text = '<%:Client%><br />';
 							if (tcp_node_num == 1) {
 								if (data["tcp_node1_status"])
-									text += '<span class="green"><%:RUNNING%></span>';
+									text += '<span class="green"><%:RUNNING%>✓</span>';
 								else
-									text += '<span class="red"><%:NOT RUNNING%></span>';
+									text += '<span class="red"><%:NOT RUNNING%>X</span>';
 							} else {
 								for(var i = 0; i < tcp_node_num; i++) {
 									var k = i + 1;
 									if (data["tcp_node" + k + "_status"])
-										text += '<span class="green"> ✓</span>';
+										text += '<span class="green"><%:RUNNING%>✓</span>';
 									else
-										text += '<span class="red"> X</span>';
+										text += '<span class="red"><%:NOT RUNNING%>X</span>';
 								}
 							}
 							status_tcp_node.innerHTML = text;
@@ -458,9 +458,9 @@ var HTTP = {
 								for(var i = 0; i < tcp_node_num; i++) {
 									var k = i + 1;
 									if (data["kcptun_tcp_node" + k + "_status"])
-										text += '<span class="green"> ✓</span>';
+										text += '<span class="green"><%:RUNNING%>✓</span>';
 									else
-										text += '<span class="red"> X</span>';
+										text += '<span class="red"><%:NOT RUNNING%>X</span>';
 								}
 							}
 							status_kcptun.innerHTML = text;
@@ -474,16 +474,16 @@ var HTTP = {
 							var text = '<%:Game Mode%><br />';
 							if (udp_node_num == 1) {
 								if (data["udp_node1_status"])
-									text += '<span class="green"><%:RUNNING%></span>';
+									text += '<span class="green"><%:RUNNING%>✓</span>';
 									else
-									text += '<span class="red"><%:NOT RUNNING%></span>';
+									text += '<span class="red"><%:NOT RUNNING%>X</span>';
 							} else {
 								for(var i = 0; i < udp_node_num; i++) {
 									var k = i + 1;
 									if (data["udp_node" + k + "_status"])
-										text += '<span class="green"> ✓</span>';
+										text += '<span class="green"><%:RUNNING%> ✓</span>';
 									else
-										text += '<span class="red"> X</span>';
+										text += '<span class="red"> <%:NOT RUNNING%>X</span>';
 								}
 							}
 							status_udp_node.innerHTML = text;
@@ -497,14 +497,14 @@ var HTTP = {
 							var text = 'SOCKS5<br />';
 							if (socks_node_num == 1) {
 								if (data["socks_node1_status"])
-									text += '<span class="green"><%:RUNNING%></span>';
+									text += '<span class="green"><%:RUNNING%>✓</span>';
 								else
-									text += '<span class="red"><%:NOT RUNNING%></span>';
+									text += '<span class="red"><%:NOT RUNNING%>X</span>';
 							} else {
 								for(var i = 0; i < socks_node_num; i++) {
 									var k = i + 1;
 									if (data["socks_node" + k + "_status"])
-										text += '<span class="green"> ✓</span>';
+										text += '<span class="green">✓</span>';
 									else
 										text += '<span class="red"> X</span>';
 								}
@@ -514,15 +514,15 @@ var HTTP = {
 					}
 					
                     if (data.dns_mode_status) {
-                        status_dns.innerHTML = 'ChinaDNS<br /><span class="green"><%:RUNNING%></span>';
+                        status_dns.innerHTML = 'ChinaDNS<br /><span class="green"><%:RUNNING%>✓</span>';
                     } else {
-                        status_dns.innerHTML = 'ChinaDNS<br /><span class="red"><%:NOT RUNNING%></span>';
+                        status_dns.innerHTML = 'ChinaDNS<br /><span class="red"><%:NOT RUNNING%>X</span>';
                     }
 					if (status_haproxy) {
 						if (data.haproxy_status) {
-							status_haproxy.innerHTML = '<%:Load Balancing%><br /><span class="green"><%:RUNNING%></span>'
+							status_haproxy.innerHTML = '<%:Load Balancing%><br /><span class="green"><%:RUNNING%>✓</span>'
 						} else {
-							status_haproxy.innerHTML = '<%:Load Balancing%><br /><span class="red"><%:NOT RUNNING%></span>'
+							status_haproxy.innerHTML = '<%:Load Balancing%><br /><span class="red"><%:NOT RUNNING%>X</span>'
 						}
 					}
 				}
