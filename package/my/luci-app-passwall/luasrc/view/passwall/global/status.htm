@@ -13,7 +13,7 @@ end
 
 local tcp_node_num = api.uci_get_type("global_other", "tcp_node_num", 1)
 local udp_node_num = api.uci_get_type("global_other", "udp_node_num", 1)
-local socks5_node_num = api.uci_get_type("global_other", "socks5_node_num", 1)
+local socks_node_num = api.uci_get_type("global_other", "socks_node_num", 1)
 -%>
 <%
 math.randomseed(os.time())
@@ -94,7 +94,7 @@ math.randomseed(os.time())
     <div class="pure-u-1-6">
         <div class="block pure-g">
             <div class="pure-u-3-5">
-                <h4 id="status_socks5_node">𝙎𝙊𝘾𝙆𝙎5<br /><span class="red"><%:Not Running%>✘</span></h4>
+                <h4 id="status_socks_node">𝙎𝙊𝘾𝙆𝙎5<br /><span class="red"><%:Not Running%>✘</span></h4>
             </div>
             <div class="pure-u-2-5">
                 <div class="img-con">
@@ -122,7 +122,7 @@ math.randomseed(os.time())
                 var tb2 = document.getElementById('_baidu');
                 var tb3 = document.getElementById('status_udp_node');
                 var tb4 = document.getElementById('status_dns');
-                var tb5 = document.getElementById('status_socks5_node');  
+                var tb5 = document.getElementById('status_socks_node');  
                 if (data && tb) {
                     if (data.global) {
                         tb.innerHTML = '<%:Client%><br><span class="green"><%:Running%>✔</span>';
@@ -149,7 +149,7 @@ math.randomseed(os.time())
                     } else {
                         tb4.innerHTML = '𝐂𝐡𝐢𝐧𝐚𝐃𝐍𝐒<br><span class="red"><%:Not Running%>✘</span>';
                     }
-                    if (data.status_socks5_node) {
+                    if (data.status_socks_node) {
                         tb5.innerHTML = '𝙎𝙊𝘾𝙆𝙎5<br><span class="green"><%:Running%>✔</span>';
                     } else {
                         tb5.innerHTML = '𝙎𝙊𝘾𝙆𝙎5<br><span class="red"><%:Not Running%>✘</span>';
@@ -315,8 +315,7 @@ var HTTP = {
 
 //]]></script>
 
-    <script>
-
+  <script>
 		//<![CDATA[
 		var imgs = document.getElementsByTagName('img');
 		for (var i = 0 ; i < imgs.length; i++) {
@@ -333,7 +332,7 @@ var HTTP = {
 					if (tcp_node_num >= 1) {
 						var status_tcp_node = document.getElementById('status_tcp_node');
 						if (status_tcp_node) {
-							var text = '客户端<br />';
+							var text = '<%:Client%><br />';
 							if (tcp_node_num == 1) {
 								if (data["tcp_node1_status"])
 									text += '<span class="green"><%:RUNNING%>✓</span>';
@@ -345,10 +344,29 @@ var HTTP = {
 									if (data["tcp_node" + k + "_status"])
 										text += '<span class="green"><%:RUNNING%>✓</span>';
 									else
-										text += '<span class="red">未运行X</span>';
+										text += '<span class="red"><%:NOT RUNNING%>X</span>';
 								}
 							}
 							status_tcp_node.innerHTML = text;
+						}
+						var status_kcptun = document.getElementById('status_kcptun');
+						if (status_kcptun) {
+							var text = 'Kcptun<br />';
+							if (tcp_node_num == 1) {
+								if (data["kcptun_tcp_node1_status"])
+									text += '<span class="green"><%:RUNNING%></span>';
+								else
+									text += '<span class="red"><%:NOT RUNNING%></span>';
+							} else {
+								for(var i = 0; i < tcp_node_num; i++) {
+									var k = i + 1;
+									if (data["kcptun_tcp_node" + k + "_status"])
+										text += '<span class="green"><%:RUNNING%>✓</span>';
+									else
+										text += '<span class="red"><%:NOT RUNNING%>X</span>';
+								}
+							}
+							status_kcptun.innerHTML = text;
 						}
 					}
 					
@@ -356,7 +374,7 @@ var HTTP = {
 					if (udp_node_num >= 1) {
 						var status_udp_node = document.getElementById('status_udp_node');
 						if (status_udp_node) {
-							var text = '游戏模式<br />';
+							var text = '<%:Game Mode%><br />';
 							if (udp_node_num == 1) {
 								if (data["udp_node1_status"])
 									text += '<span class="green"><%:RUNNING%>✓</span>';
@@ -366,56 +384,48 @@ var HTTP = {
 								for(var i = 0; i < udp_node_num; i++) {
 									var k = i + 1;
 									if (data["udp_node" + k + "_status"])
-										text += '<span class="green"><%:RUNNING%>✓</span>';
+										text += '<span class="green"><%:RUNNING%> ✓</span>';
 									else
-										text += '<span class="red"><%:NOT RUNNING%>X</span>';
+										text += '<span class="red"> <%:NOT RUNNING%>X</span>';
 								}
 							}
 							status_udp_node.innerHTML = text;
 						}
 					}
 					
-					var socks5_node_num = <%=socks5_node_num%>;
-					if (socks5_node_num >= 1) {
-						var status_socks5_node = document.getElementById('status_socks5_node');
-						if (status_socks5_node) {
+					var socks_node_num = <%=socks_node_num%>;
+					if (socks_node_num >= 1) {
+						var status_socks_node = document.getElementById('status_socks_node');
+						if (status_socks_node) {
 							var text = 'SOCKS5<br />';
-							if (socks5_node_num == 1) {
-								if (data["socks5_node1_status"])
+							if (socks_node_num == 1) {
+								if (data["socks_node1_status"])
 									text += '<span class="green"><%:RUNNING%>✓</span>';
 								else
 									text += '<span class="red"><%:NOT RUNNING%>X</span>';
 							} else {
-								for(var i = 0; i < socks5_node_num; i++) {
+								for(var i = 0; i < socks_node_num; i++) {
 									var k = i + 1;
-									if (data["socks5_node" + k + "_status"])
-										text += '<span class="green"><%:RUNNING%>✓</span>';
+									if (data["socks_node" + k + "_status"])
+										text += '<span class="green">✓</span>';
 									else
-										text += '<span class="red"><%:NOT RUNNING%>X</span>';
+										text += '<span class="red"> X</span>';
 								}
 							}
-							status_socks5_node.innerHTML = text;
+							status_socks_node.innerHTML = text;
 						}
 					}
 					
                     if (data.dns_mode_status) {
-                        status_dns.innerHTML = 'ChinaDNS<br><span class="green"><%:RUNNING%>✓</span>';
+                        status_dns.innerHTML = 'ChinaDNS<br /><span class="green"><%:RUNNING%>✓</span>';
                     } else {
-                        status_dns.innerHTML = 'ChinaDNS<br><span class="red"><%:NOT RUNNING%>X</span>';
+                        status_dns.innerHTML = 'ChinaDNS<br /><span class="red"><%:NOT RUNNING%>X</span>';
                     }
 					if (status_haproxy) {
 						if (data.haproxy_status) {
 							status_haproxy.innerHTML = '<%:Load Balancing%><br /><span class="green"><%:RUNNING%>✓</span>'
 						} else {
 							status_haproxy.innerHTML = '<%:Load Balancing%><br /><span class="red"><%:NOT RUNNING%>X</span>'
-						}
-					}
-                                                                             
-					if (status_kcptun) {
-						if (data.kcptun_status) {
-							status_kcptun.innerHTML = 'KcpTun<br /><span class="green"><%:RUNNING%></span>'
-						} else {
-							status_kcptun.innerHTML = 'KcpTun<br /><span class="red"><%:NOT RUNNING%></span>'
 						}
 					}
 				}
@@ -427,13 +437,31 @@ var HTTP = {
 				var div = s.parentNode.parentNode.parentNode.parentNode;
 				div.removeAttribute('onclick');
 				s.innerHTML = '<%:Check...%>';
+				var sendDate = (new Date()).getTime();
 				XHR.get('<%=dsp.build_url("admin/vpn/passwall/connect_status")%>', {
 						type: type
 					},
 					function(x, rv) {
 						if (rv.status) {
-							s.className="green";
-							s.innerHTML = '<%:Working...%>';
+							var use_time = rv.use_time;
+							var speed = "";
+							if (use_time < 1) {
+								s.className="green";
+								speed = "<%:Very Fast%>";
+							} else if (use_time < 2) {
+								s.className="green";
+								speed = "<%:Fast%>";
+							}  else if (use_time < 3) {
+								s.className="yellow";
+								speed = "<%:General%>";
+							} else if (use_time < 4) {
+								s.className="red";
+								speed = "<%:Slow%>";
+							} else if (use_time >= 4) {
+								s.className="red";
+								speed = "<%:Very Slow%>";
+							}
+							s.innerHTML = speed;
 						}
 						else {
 							s.className="red";

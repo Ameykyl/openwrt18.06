@@ -1,6 +1,4 @@
-local fs = require "nixio.fs"
-local net = require"luci.model.network".init()
-local ifaces = require"luci.sys".net:devices()
+local api = require "luci.model.cbi.passwall.api.api"
 
 m = Map("passwall")
 
@@ -20,7 +18,7 @@ o = s:option(Flag, "start_daemon", translate("Open and close Daemon"))
 o.default = 1
 o.rmempty = false
 
---[[
+
 ---- Open and close automatically
 o = s:option(Flag, "auto_on", translate("Open and close automatically"))
 o.default = 0
@@ -46,7 +44,36 @@ o.default = nil
 o:depends("auto_on", "1")
 o:value(nil, translate("Disable"))
 for e = 0, 23 do o:value(e, e .. translate("oclock")) end
---]]
+
+-- [[ Other Settings ]]--
+s = m:section(TypedSection, "global_other")
+s.anonymous = true
+
+---- Auto Ping
+o = s:option(Flag, "auto_ping", translate("Auto Ping"),
+             translate("This will automatically ping the node for latency"))
+o.default = 1
+
+---- Use TCP Detection delay
+o = s:option(Flag, "use_tcping", translate("Use TCP Detection delay"),
+             translate("This will use tcping replace ping detection of node"))
+o.default = 1
+
+---- Concise display nodes
+o = s:option(Flag, "compact_display_nodes", translate("Concise display nodes"))
+o.default = 0
+
+---- Show Add Mode
+o = s:option(Flag, "show_add_mode", translate("Show Add Mode"))
+o.default = 1
+
+---- Show group
+o = s:option(Flag, "show_group", translate("Show Group"))
+o.default = 1
+
+
+
+
 
 -- [[ Forwarding Settings ]]--
 s = m:section(TypedSection, "global_forwarding",
@@ -94,16 +121,21 @@ o:value("2", "2 " .. translate("Process"))
 o:value("3", "3 " .. translate("Process"))
 o:value("4", "4 " .. translate("Process"))
 
----- Socks5 Proxy Port
-o = s:option(Value, "socks5_proxy_port", translate("Socks5 Proxy Port"))
-o.datatype = "port"
-o.default = 1081
-o.rmempty = true
+---- Socks Proxy Port
+local socks_node_num = tonumber(api.uci_get_type("global_other",
+                                                  "socks_node_num", 1))
+for i = 1, socks_node_num, 1 do
+    o = s:option(Value, "socks_proxy_port" .. i, translate("Socks Proxy Port"))
+    o.datatype = "port"
+    o.default = "108" .. i
+end
 
+--[[
 ---- Proxy IPv6
 o = s:option(Flag, "proxy_ipv6", translate("Proxy IPv6"),
              translate("The IPv6 traffic can be proxyed when selected"))
 o.default = 0
+--]]
 
 --[[
 ---- TCP Redir Port
@@ -149,8 +181,8 @@ o:value("1")
 o:value("2")
 o:value("3")
 
----- Socks5 Node Number Option
-o = s:option(ListValue, "socks5_node_num", "Socks5" .. translate("Node Number"))
+---- Socks Node Number Option
+o = s:option(ListValue, "socks_node_num", "Socks" .. translate("Node Number"))
 o.default = "1"
 o.rmempty = false
 o:value("1")

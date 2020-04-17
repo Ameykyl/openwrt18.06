@@ -40,7 +40,7 @@ function index()
           _("Rule Update"), 96).leaf = true
     entry({"admin", "vpn", "passwall", "acl"}, cbi("passwall/acl"),
           _("Access control"), 97).leaf = true
-   entry({"admin", "vpn", "passwall", "Status"},form("passwall/Status"),
+      entry({"admin", "vpn", "passwall", "Status"},form("passwall/Status"),
           _("Status"), 98).leaf = true
     entry({"admin", "vpn", "passwall", "log"}, form("passwall/log"),
           _("Watch Logs"), 99).leaf = true
@@ -151,17 +151,17 @@ function status()
                                              appname, i)) == 0
     end
 
-    local socks5_node_num = luci.sys.exec(
-                                "echo -n $(uci -q get %s.@global_other[0].socks5_node_num)" %
+    local socks_node_num = luci.sys.exec(
+                                "echo -n $(uci -q get %s.@global_other[0].socks_node_num)" %
                                     appname)
-    for i = 1, socks5_node_num, 1 do
+    for i = 1, socks_node_num, 1 do
         e["kcptun_socks_node%s_status" % i] =
             luci.sys.call(string.format(
                               "ps -w | grep -v grep | grep '%s/bin/' | grep 'kcptun_socks_%s' >/dev/null",
                               appname, i)) == 0
-        e["socks5_node%s_status" % i] = luci.sys.call(
+        e["socks_node%s_status" % i] = luci.sys.call(
                                             string.format(
-                                                "ps -w | grep -v grep | grep -v kcptun | grep '%s/bin/' | grep -i -E 'SOCKS_%s|SOCKS5_%s' >/dev/null",
+                                                "ps -w | grep -v grep | grep -v kcptun | grep '%s/bin/' | grep -i 'SOCKS_%s' >/dev/null",
                                                 appname, i, i)) == 0
     end
     luci.http.prepare_content("application/json")
@@ -193,19 +193,12 @@ function ping_node()
     local port = luci.http.formvalue("port")
     local e = {}
     e.index = index
-    if luci.sys.exec("echo -n $(uci -q get %s.@global_other[0].use_tcping)" %
-                         appname) == "1" and
-        luci.sys.exec("echo -n $(command -v tcping)") ~= "" then
-        e.ping = luci.sys.exec(string.format(
-                                   "echo -n $(tcping -q -c 1 -i 1 -p %s %s 2>&1 | grep -o 'time=[0-9]*' | awk -F '=' '{print$2}') 2>/dev/null",
-                                   port, address))
-        luci.sys.call(string.format(
-                          "ps -w | grep 'tcping -q -c 1 -i 1 -p %s %s' | grep -v grep | awk '{print $1}' | xargs kill -9 2>/dev/null",
-                          port, address))
-    else
-        e.ping = luci.sys.exec(
-                     "echo -n $(ping -c 1 -W 1 %q 2>&1 | grep -o 'time=[0-9]*' | awk -F '=' '{print$2}') 2>/dev/null" %
-                         address)
+    if luci.sys.exec("echo -n $(uci -q get %s.@global_other[0].use_tcping)" % appname) == "1" and luci.sys.exec("echo -n $(command -v tcping)") ~= "" then
+        e.ping = luci.sys.exec(string.format("echo -n $(tcping -q -c 1 -i 1 -p %s %s 2>&1 | grep -o 'time=[0-9]*' | awk -F '=' '{print$2}') 2>/dev/null", port, address))
+        luci.sys.call(string.format("ps -w | grep 'tcping -q -c 1 -i 1 -p %s %s' | grep -v grep | awk '{print $1}' | xargs kill -9 2>/dev/null", port, address))
+    end
+    if e.ping == nil or tonumber(e.ping) == 0 then
+        e.ping = luci.sys.exec("echo -n $(ping -c 1 -W 1 %q 2>&1 | grep -o 'time=[0-9]*' | awk -F '=' '{print$2}') 2>/dev/null" % address)
     end
     luci.http.prepare_content("application/json")
     luci.http.write_json(e)
