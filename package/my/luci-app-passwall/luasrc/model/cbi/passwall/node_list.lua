@@ -8,7 +8,6 @@ local appname = "passwall"
 m = Map(appname)
 m:append(Template("passwall/global/status1"))
 
-
 -- [[ Node List ]]--
 s = m:section(TypedSection, "nodes")
 -- s.description = translate("Support for more than 10,000 ping nodes and luci does not crash and not slow.")
