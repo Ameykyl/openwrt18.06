@@ -234,6 +234,7 @@ jobs:
             CONFIG_PACKAGE_luci-theme-opentomato=y
             CONFIG_PACKAGE_luci-theme-argon-mod=y
             CONFIG_PACKAGE_luci-theme-tomato=y
+            CONFIG_PACKAGE_luci-theme-luci-theme-argon=y
          
            EOF
           # 常用软件包:
