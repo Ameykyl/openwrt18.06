@@ -29,7 +29,7 @@ s.sortable = false
 s.des = server_count
 s.current = uci:get("shadowsocksr", name, "global_server")
 s.template = "shadowsocksr/add"
-s.extedit = luci.dispatcher.build_url("admin/vpn/shadowsocksr/servers/%s")
+s.extedit = luci.dispatcher.build_url("admin/Internet/shadowsocksr/servers/%s")
 function s.create(...)
 	local sid = TypedSection.create(...)
     if sid then

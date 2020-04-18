@@ -84,7 +84,7 @@ local passwall_version = get_luci_version()
 
 		var ckeckDetailElm = document.getElementById(btn.id + '-detail');
 
-		XHR.get('<%=dsp.build_url("admin/vpn/passwall/luci_check")%>', {
+		XHR.get('<%=dsp.build_url("admin/Internet/passwall/luci_check")%>', {
 			token: tokenStr,
 			arch: ''
 		}, function(x,json) {
@@ -124,7 +124,7 @@ local passwall_version = get_luci_version()
 
 		addPageNotice_luci();
 
-		var updateUrl = '<%=dsp.build_url("admin/vpn/passwall/luci_update")%>';
+		var updateUrl = '<%=dsp.build_url("admin/Internet/passwall/luci_update")%>';
 		// Download file
 		XHR.get(updateUrl, {
 			token: tokenStr,

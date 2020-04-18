@@ -98,7 +98,7 @@ table td, .table .td {
 	
 	function set_node(protocol,number) {
 		if (confirm('<%:Are you sure set to%> ' + protocol.toUpperCase() + "_" + number + '<%:the server?%>')==true){
-			window.location.href = '<%=dsp.build_url("admin/vpn/passwall/set_node")%>?protocol=' + protocol + '&number=' + number + '&section=' + section;
+			window.location.href = '<%=dsp.build_url("admin/Internet/passwall/set_node")%>?protocol=' + protocol + '&number=' + number + '&section=' + section;
 		}
 	}
 	
@@ -117,7 +117,7 @@ table td, .table .td {
 			var port = document.getElementById("cbid.passwall." + cbi_id + ".port").value;
 		<% end %>
 		if ((address != null && address != "") && (port != null && port != "")) {
-			XHR.get('<%=dsp.build_url("admin/vpn/passwall/ping_node")%>', {
+			XHR.get('<%=dsp.build_url("admin/Internet/passwall/ping_node")%>', {
 					address: address,
 					port: port
 				},
@@ -166,7 +166,7 @@ table td, .table .td {
 			//判断是否含有汉字
 			var reg = new RegExp("[\\u4E00-\\u9FFF]+","g");
 			if ((address != null && address != "") && (port != null && port != "") && reg.test(address) == false && (address.indexOf(".") != -1 && address.charAt(address.address - 1) != ".")) {
-				ajax.post('<%=dsp.build_url("admin/vpn/passwall/ping_node")%>', {
+				ajax.post('<%=dsp.build_url("admin/Internet/passwall/ping_node")%>', {
 						index: index,
 						address: address,
 						port: port

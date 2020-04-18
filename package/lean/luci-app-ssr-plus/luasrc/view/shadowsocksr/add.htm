@@ -312,7 +312,7 @@
 <script type="text/javascript">
     function apply_node(node){
             $("#cbi-apply-shadowsocksr1").show();
-            $.get('<%=luci.dispatcher.build_url("admin", "vpn", "shadowsocksr","change")%>',
+            $.get('<%=luci.dispatcher.build_url("admin", "Internet", "shadowsocksr","change")%>',
                     {
                         set:node
                     },
@@ -340,7 +340,7 @@
             });
         }
 
-        $.get('<%=luci.dispatcher.build_url("admin", "vpn", "shadowsocksr","allserver")%>',
+        $.get('<%=luci.dispatcher.build_url("admin", "Internet", "shadowsocksr","allserver")%>',
                 function (data) {
                     $.each(data, function (i, val) {
                         var id = '#cbi-<%=self.config%>-'+val.name;
@@ -360,7 +360,7 @@
      
 
         function check_port(hosts, ports, target) {
-            $.get('<%=luci.dispatcher.build_url("admin", "vpn", "shadowsocksr","checkport")%>',
+            $.get('<%=luci.dispatcher.build_url("admin", "Internet", "shadowsocksr","checkport")%>',
                     {
                         host: hosts,
                         port: ports

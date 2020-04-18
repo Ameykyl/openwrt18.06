@@ -7,28 +7,28 @@ function index()
 	if not nixio.fs.access("/etc/config/shadowsocksr") then
 		return
 	end
-	entry({"admin", "vpn", "shadowsocksr"}, alias("admin", "vpn", "shadowsocksr", "client"),_("ShadowSocksR Plus+"), 10).dependent = true
-	entry({"admin", "vpn", "shadowsocksr", "client"}, cbi("shadowsocksr/client"),_("SSR Client"), 10).leaf = true
-	entry({"admin", "vpn", "shadowsocksr", "servers"}, cbi("shadowsocksr/servers"), _("Node List"), 11).leaf = true
-                 entry({"admin", "vpn", "shadowsocksr", "servers"},arcombine(cbi("shadowsocksr/servers"), cbi("shadowsocksr/client-config")),_("Node List"), 11).leaf = true
-                 entry({"admin", "vpn", "shadowsocksr", "subscription"},cbi("shadowsocksr/subscription"),_("Subscription"),30).leaf=true
-	entry({"admin", "vpn", "shadowsocksr", "control"},cbi("shadowsocksr/control"), _("Access Control"), 40).leaf = true
-                 entry({"admin", "vpn", "shadowsocksr", "servers-list"},arcombine(cbi("shadowsocksr/servers-list"), cbi("shadowsocksr/client-config")),_("Severs Nodes"), 45).leaf = true
-	entry({"admin", "vpn", "shadowsocksr", "advanced"},cbi("shadowsocksr/advanced"),_("Advanced Settings"), 50).leaf = true
-	entry({"admin", "vpn", "shadowsocksr", "server"},arcombine(cbi("shadowsocksr/server"), cbi("shadowsocksr/server-config")),_("SSR Server"), 60).leaf = true
-	entry({"admin", "vpn", "shadowsocksr", "status"},form("shadowsocksr/status"),_("Status"), 70).leaf = true
-	entry({"admin", "vpn", "shadowsocksr", "check"}, call("check_status"))
-	entry({"admin", "vpn", "shadowsocksr", "refresh"}, call("refresh_data"))
-	entry({"admin", "vpn", "shadowsocksr", "subscribe"}, call("subscribe"))
-	entry({"admin", "vpn", "shadowsocksr", "checkport"}, call("check_port"))
-                 entry({"admin", "vpn", "shadowsocksr", "checkports"}, call("check_ports"))
-	entry({"admin", "vpn", "shadowsocksr", "logview"}, cbi("shadowsocksr/logview", {hideapplybtn=true, hidesavebtn=true, hideresetbtn=true}), _("Log") ,80).leaf=true
-                 entry({"admin", "vpn", "shadowsocksr", "fileread"}, call("act_read"), nil).leaf=true
-	entry({"admin", "vpn", "shadowsocksr","run"},call("act_status")).leaf=true
-                 entry({"admin", "vpn", "shadowsocksr", "change"}, call("change_node"))
-                 entry({"admin", "vpn", "shadowsocksr", "allserver"}, call("get_servers"))
-                 entry({"admin", "vpn", "shadowsocksr", "subscribe"}, call("get_subscribe"))
-	entry({"admin", "vpn", "shadowsocksr", "ping"}, call("act_ping")).leaf=true
+	entry({"admin", "Internet", "shadowsocksr"}, alias("admin", "Internet", "shadowsocksr", "client"),_("ShadowSocksR Plus+"), 10).dependent = true
+	entry({"admin", "Internet", "shadowsocksr", "client"}, cbi("shadowsocksr/client"),_("SSR Client"), 10).leaf = true
+	entry({"admin", "Internet", "shadowsocksr", "servers"}, cbi("shadowsocksr/servers"), _("Node List"), 11).leaf = true
+                 entry({"admin", "Internet", "shadowsocksr", "servers"},arcombine(cbi("shadowsocksr/servers"), cbi("shadowsocksr/client-config")),_("Node List"), 11).leaf = true
+                 entry({"admin", "Internet", "shadowsocksr", "subscription"},cbi("shadowsocksr/subscription"),_("Subscription"),30).leaf=true
+	entry({"admin", "Internet", "shadowsocksr", "control"},cbi("shadowsocksr/control"), _("Access Control"), 40).leaf = true
+                 entry({"admin", "Internet", "shadowsocksr", "servers-list"},arcombine(cbi("shadowsocksr/servers-list"), cbi("shadowsocksr/client-config")),_("Severs Nodes"), 45).leaf = true
+	entry({"admin", "Internet", "shadowsocksr", "advanced"},cbi("shadowsocksr/advanced"),_("Advanced Settings"), 50).leaf = true
+	entry({"admin", "Internet", "shadowsocksr", "server"},arcombine(cbi("shadowsocksr/server"), cbi("shadowsocksr/server-config")),_("SSR Server"), 60).leaf = true
+	entry({"admin", "Internet", "shadowsocksr", "status"},form("shadowsocksr/status"),_("Status"), 70).leaf = true
+	entry({"admin", "Internet", "shadowsocksr", "check"}, call("check_status"))
+	entry({"admin", "Internet", "shadowsocksr", "refresh"}, call("refresh_data"))
+	entry({"admin", "Internet", "shadowsocksr", "subscribe"}, call("subscribe"))
+	entry({"admin", "Internet", "shadowsocksr", "checkport"}, call("check_port"))
+                 entry({"admin", "Internet", "shadowsocksr", "checkports"}, call("check_ports"))
+	entry({"admin", "Internet", "shadowsocksr", "logview"}, cbi("shadowsocksr/logview", {hideapplybtn=true, hidesavebtn=true, hideresetbtn=true}), _("Log") ,80).leaf=true
+                 entry({"admin", "Internet", "shadowsocksr", "fileread"}, call("act_read"), nil).leaf=true
+	entry({"admin", "Internet", "shadowsocksr","run"},call("act_status")).leaf=true
+                 entry({"admin", "Internet", "shadowsocksr", "change"}, call("change_node"))
+                 entry({"admin", "Internet", "shadowsocksr", "allserver"}, call("get_servers"))
+                 entry({"admin", "Internet", "shadowsocksr", "subscribe"}, call("get_subscribe"))
+	entry({"admin", "Internet", "shadowsocksr", "ping"}, call("act_ping")).leaf=true
 end
 
 function get_subscribe()

@@ -18,7 +18,7 @@
         padding: 6px 10px 7px 8px;
         border: 1px solid rgba(0,0,0,.05);
         border-radius: .375rem;
-        background-color: #f4;
+        background-color: #fff;
         box-shadow: 0 0 2rem 0 rgba(136,152,170,.15);
 	
     }
@@ -186,14 +186,14 @@
         const $$ = document;
 
         function get_state(){
-            $.get('<%=url([[admin]], [[vpn]], [[shadowsocksr]], [[run]])%>',
+            $.get('<%=url([[admin]], [[Internet]], [[shadowsocksr]], [[run]])%>',
             function (data) {
                 console.log(data);
             }, "json");
         }
         //get_state();
         //<![CDATA[
-        XHR.poll(5, '<%=url([[admin]], [[vpn]], [[shadowsocksr]], [[run]])%>', null,
+        XHR.poll(5, '<%=url([[admin]], [[Internet]], [[shadowsocksr]], [[run]])%>', null,
             function (x, data) {
                 var tb = document.getElementById('shadowsocksr_status');
                 var tb1 = document.getElementById('google_status');

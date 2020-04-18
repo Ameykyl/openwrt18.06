@@ -604,6 +604,11 @@ header > .container > a[class="brand"]:after {
    color: #fb6340!important;
 }
 
+.main > .main-left > .nav > .slide > a[data-title="Internet"]:before {
+    content: "\e004";
+   color: #ff0097!important;
+}
+
 .main > .main-left > .nav > .slide > a[data-title="Network"]:before {
     content: "\e00e";
    color: #8965e0!important;

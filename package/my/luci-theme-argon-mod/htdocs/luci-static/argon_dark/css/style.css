@@ -799,12 +799,16 @@ header>.container>.brand {
     color: #f3a4b5!important;
 }
 .main > .main-left > .nav > .slide > .menu[data-title= Control ]:before{
-    content: "\e90e";
+    content: "\e907";
     color: #afdd22!important;
 }
 .main > .main-left > .nav > .slide > .menu[data-title= VPN ]:before{
     content: "\e90b";
     color: #6de9ea!important;
+}
+.main > .main-left > .nav > .slide > a[data-title="Internet"]:before {
+    content: "\e90e";
+   color: #ff0097!important;
 }
 .main > .main-left > .nav > .slide > .menu[data-title= QOS ]:before{
     content: "\e905";

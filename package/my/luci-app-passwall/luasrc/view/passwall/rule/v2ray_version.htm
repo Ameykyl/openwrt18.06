@@ -75,7 +75,7 @@ local V2ray_version = luci.sys.exec("[ -f '" .. V2ray_path .. "/v2ray' ] && " ..
 
 		var ckeckDetailElm = document.getElementById(btn.id + '-detail');
 
-		XHR.get('<%=dsp.build_url("admin/vpn/passwall/v2ray_check")%>', {
+		XHR.get('<%=dsp.build_url("admin/Internet/passwall/v2ray_check")%>', {
 			token: tokenStr,
 			arch: ''
 		}, function(x,json) {
@@ -115,7 +115,7 @@ local V2ray_version = luci.sys.exec("[ -f '" .. V2ray_path .. "/v2ray' ] && " ..
 
 		addPageNotice_v2ray();
 
-		var v2rayUpdateUrl = '<%=dsp.build_url("admin/vpn/passwall/v2ray_update")%>';
+		var v2rayUpdateUrl = '<%=dsp.build_url("admin/Internet/passwall/v2ray_update")%>';
 		// Download file
 		XHR.get(v2rayUpdateUrl, {
 			token: tokenStr,

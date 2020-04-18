@@ -55,7 +55,7 @@ local v2ray_header_type_list = {
 }
 
 m = Map(appname, translate("Node Config"))
-m.redirect = d.build_url("admin", "vpn", "passwall")
+m.redirect = d.build_url("admin", "Internet", "passwall")
 
 s = m:section(NamedSection, arg[1], "nodes", "")
 s.addremove = false

@@ -538,6 +538,11 @@ color: #8965e0!important;
    color: #F1C40F!important;
 }
 
+.main > .main-left > .nav > .slide > a[data-title="Internet"]:before {
+    content: "\e004";
+   color: #ff0097!important;
+}
+
 .main > .main-left > .nav > .slide > a[data-title="Control"]:before {
     content: "\e024";
   color: 	#3CB371!important;

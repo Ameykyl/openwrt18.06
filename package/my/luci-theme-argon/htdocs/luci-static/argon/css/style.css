@@ -2,10 +2,10 @@
  *  Argon is a clean HTML5 theme for LuCI. It is based on luci-theme-material and Argon Template
  *
  *  luci-theme-argon
- *      Copyright 2019 LuttyYang <LuttyYang@qq.com>
+ *      Copyright 2019 Jerrykuku <jerrykuku@qq.com>
  *
  *  Have a bug? Please create an issue here on GitHub!
- *      https://github.com/LuttyYang/luci-theme-argon/issues
+ *      https://github.com/jerrykuku/luci-theme-argon/issues
  *
  *  luci-theme-bootstrap:
  *      Copyright 2008 Steven Barth <steven@midlink.org>
@@ -175,6 +175,15 @@
   .icon-docker:before {
     content: "\e911";
   }
+
+
+
+
+
+
+
+
+
 
 * {
     margin: 0;
@@ -352,6 +361,9 @@ header,
 	position: absolute;
 }
 
+
+
+
 footer {
 	text-align: right;
 	padding: 1rem;
@@ -359,6 +371,13 @@ footer {
 	font-size: 0.8rem;
 	text-shadow: 0px 0px 2px #BBB;
 }
+
+
+
+
+
+
+
 
 
 footer > a {
@@ -395,6 +414,9 @@ footer > a {
 }
 
 
+
+
+
 .main > .loading > span > .loading-img:before {
     content: "\e603";
 }
@@ -417,6 +439,8 @@ footer > a {
         transform: rotate(360deg)
     }
 }
+
+
 
 .main-right {
 	width: 85%;
@@ -486,6 +510,13 @@ header>.container>.brand {
 	color: red;
 }
 
+
+
+ 
+
+
+
+
 #maincontent > .container > div:nth-child(1).alert-message.warning > a {
     font: inherit;
     overflow: visible;
@@ -538,6 +569,9 @@ fieldset > fieldset {
     border: none;
     box-shadow: none;
 }
+
+
+
 
 /* fix progress bar */
 #swaptotal > div,
@@ -613,6 +647,8 @@ td > table > tbody > tr > td,
     background-color: #d9534f;
 }
 
+
+
 .cbi-button-find,
 .cbi-button-link,
 .cbi-button-neutral {
@@ -659,6 +695,11 @@ td > table > tbody > tr > td,
 /* table */
 
 
+
+
+
+
+
 .cbi-section-table .cbi-section-table-titles .cbi-section-table-cell {
     width: auto !important;
 }
@@ -684,6 +725,10 @@ td > table > tbody > tr > td,
 }
 
 /* desc */
+
+
+
+
 
 
 /* luci */
@@ -1265,6 +1310,10 @@ body.lang_pl.node-main-login .cbi-value-title {
 }
 
 
+
+
+
+
 .table { display: table; position: relative;     color: #525f7f;     border-collapse: collapse; }
 .tr    { display: table-row; border-bottom: 1px solid rgba(0,0,0,.05);   }
 .thead { display: table-header-group; }
@@ -1324,6 +1373,8 @@ body.lang_pl.node-main-login .cbi-value-title {
 .cbi-rowstyle-2 .cbi-button-down {
     background-color: #FFF !important;
 }
+
+
 
 
 select {
@@ -1745,12 +1796,16 @@ div > .table > .tbody > .tr:nth-of-type(2n) {
     content: "\e909";
     color: #11cdef!important;
 }
+.main > .main-left > .nav > .slide > a[data-title="Internet"]:before {
+    content: "\e90e";
+   color: #ff0097!important;
+}
 .main > .main-left > .nav > .slide > .menu[data-title= NAS ]:before{
     content: "\e90c";
     color: #f3a4b5!important;
 }
 .main > .main-left > .nav > .slide > .menu[data-title= Control ]:before{
-    content: "\e90e";
+    content: "\e907";
     color: #afdd22!important;
 }
 .main > .main-left > .nav > .slide > .menu[data-title= VPN ]:before{
@@ -1891,6 +1946,21 @@ h2 {
 	/* border-bottom: 1px solid #eee; */
 }
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 #cbi-dropbear h2 ,
 #cbi-dropbear .cbi-map-descr ,
 #cbi-dropbear .cbi-map-descr abbr,
@@ -1907,6 +1977,12 @@ h2 {
 }
 
 
+
+
+
+
+
+
 h3 {
     font-size: 1.4rem;
     width: 100%;
@@ -1919,6 +1995,11 @@ h3 {
     color: #32325d;
     font-weight: bold;
 }
+
+
+
+
+
 
 h4 {
 
@@ -1943,6 +2024,11 @@ fieldset {
 
     -webkit-overflow-scrolling: touch;
 }
+
+
+
+
+
 
 */
 
@@ -1980,6 +2066,38 @@ fieldset>fieldset {
 	border: none;
 	box-shadow: none;
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 .panel-title {
     width: 100%;
     display: block;
@@ -2038,6 +2156,9 @@ table > tbody > tr:first-child > td,  table > tfoot > tr:first-child > td, table
 fieldset > table > tbody > tr:nth-of-type(2n) {
     background-color: #f9f9f9;
 }
+
+
+
 
 
 /* fix multiple table */
