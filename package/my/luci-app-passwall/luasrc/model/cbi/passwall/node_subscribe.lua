@@ -38,7 +38,7 @@ o.inputstyle = "apply"
 function o.write(e, e)
     luci.sys.call(
         "lua /usr/share/passwall/subscribe.lua start log > /dev/null 2>&1 &")
-    luci.http.redirect(luci.dispatcher.build_url("admin", "vpn", "passwall",
+    luci.http.redirect(luci.dispatcher.build_url("admin", "Internet", "passwall",
                                                  "log"))
 end
 -- [[ Add the node via the link ]]--
@@ -50,7 +50,7 @@ o.inputstyle = "remove"
 function o.write(e, e)
     luci.sys.call(
         "lua /usr/share/passwall/subscribe.lua truncate log > /dev/null 2>&1 &")
-    luci.http.redirect(luci.dispatcher.build_url("admin", "vpn", "passwall",
+    luci.http.redirect(luci.dispatcher.build_url("admin", "Internet", "passwall",
                                                  "log"))
 end
 

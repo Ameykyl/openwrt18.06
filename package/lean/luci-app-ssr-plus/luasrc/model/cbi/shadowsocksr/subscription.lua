@@ -44,7 +44,7 @@ o = s:option(Button,"update_Sub",translate("Update Subscribe List"))
 o.inputstyle = "reload"
 o.description = translate("Update subscribe url list first")
 o.write = function()
-  luci.http.redirect(luci.dispatcher.build_url("admin", "vpn", "shadowsocksr", "servers"))
+  luci.http.redirect(luci.dispatcher.build_url("admin", "Internet", "shadowsocksr", "servers"))
 end
 
 o = s:option(Flag, "switch", translate("Subscribe Default Auto-Switch"))
@@ -74,7 +74,7 @@ end)
 uci:save("shadowsocksr") 
 uci:commit("shadowsocksr")
 luci.sys.exec("/etc/init.d/shadowsocksr restart")
-luci.http.redirect(luci.dispatcher.build_url("admin", "vpn", "shadowsocksr", "servers"))
+luci.http.redirect(luci.dispatcher.build_url("admin", "Internet", "shadowsocksr", "servers"))
 return
 end
 

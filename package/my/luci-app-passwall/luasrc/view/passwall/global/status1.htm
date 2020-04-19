@@ -202,14 +202,14 @@ math.randomseed(os.time())
 <script>
  
         function get_state(){
-            $.get('<%=url([[admin]], [[vpn]], [[passwall1]], [[status]])%>',
+            $.get('<%=url([[admin]], [[Internet]], [[passwall1]], [[status]])%>',
             function (data) {
                 console.log(data);
             }, "json");
         }
         //get_state();
         //<![CDATA[
-        XHR.poll(5, '<%=url([[admin]], [[vpn]], [[passwall1]], [[status]])%>', null,
+        XHR.poll(5, '<%=url([[admin]], [[Internet]], [[passwall1]], [[status]])%>', null,
             function (x, data) {
                  var tb = document.getElementById('status_tcp_node');
                 var tb1 = document.getElementById('_youtube');
@@ -367,7 +367,7 @@ var HTTP = {
 		   }
 	var ip = document.getElementById('_ip');
 	
-	XHR.poll(1, '<%=luci.dispatcher.build_url("admin", "vpn", "passwall", "status")%>', null, function(x, status) {
+	XHR.poll(1, '<%=luci.dispatcher.build_url("admin", "Internet", "passwall", "status")%>', null, function(x, status) {
 		if ( x && x.status == 200 ) {
 			ip.innerHTML = status.localip ? '<b><font color=green>'+status.localip+'</font> </b>' : '<em><b><font color=red><%:NOT SET%></font></b></em>';	
 			IP.getIpifyIP();
@@ -377,7 +377,7 @@ var HTTP = {
 	});
 
 
-	XHR.poll(3, '<%=luci.dispatcher.build_url("admin", "vpn", "passwall", "status")%>', null, function(x, status) {
+	XHR.poll(3, '<%=luci.dispatcher.build_url("admin", "Internet", "passwall", "status")%>', null, function(x, status) {
 		if ( x && x.status == 200 ) {			
 			HTTP.checker('www.baidu.com', '_baidu');
 			HTTP.checker('www.google.com', '_google');
@@ -398,7 +398,7 @@ var HTTP = {
 	HTTP.checker('github.com', '_github');
 	HTTP.checker('s1.music.126.net/style', '_http-163');
 
-	XHR.get('<%=luci.dispatcher.build_url("admin", "vpn", "passwall", "status")%>', null, function(x, status) {
+	XHR.get('<%=luci.dispatcher.build_url("admin", "Internet", "passwall", "status")%>', null, function(x, status) {
 		if ( x && x.status == 200 ) {
 			version.innerHTML = status.current_version ? '<b><font color=green><%:Current Version%>'+'&nbsp;:&nbsp;v'+status.current_version+'</font> </b>' : '<em><b><font color=red>NOT SET</font></b></em>';
 		
@@ -416,7 +416,7 @@ var HTTP = {
 			document.getElementsByTagName('img')[i].setAttribute("oncontextmenu","return false;");
 			document.getElementsByTagName('img')[i].setAttribute("ondragstart","return false;");
 		}
-        XHR.poll(5, '<%=dsp.build_url("admin/vpn/passwall/status")%>', null,
+        XHR.poll(5, '<%=dsp.build_url("admin/Internet/passwall/status")%>', null,
             function (x, data) {
                 var status_dns = document.getElementById('status_dns');
                 var status_haproxy = document.getElementById('status_haproxy');
@@ -532,7 +532,7 @@ var HTTP = {
 				div.removeAttribute('onclick');
 				s.innerHTML = '<%:Check...%>';
 				var sendDate = (new Date()).getTime();
-				XHR.get('<%=dsp.build_url("admin/vpn/passwall/connect_status")%>', {
+				XHR.get('<%=dsp.build_url("admin/Internet/passwall/connect_status")%>', {
 						type: type
 					},
 					function(x, rv) {
@@ -573,7 +573,7 @@ var HTTP = {
 			if (s) {
 				dom.removeAttribute('onclick');
 				s.innerHTML = '<%:Check...%>';
-				XHR.get('<%=dsp.build_url("admin/vpn/passwall/check_port")%>', null,
+				XHR.get('<%=dsp.build_url("admin/Internet/passwall/check_port")%>', null,
 					function(x, rv) {
 						if (rv.ret) {
 							s.innerHTML = rv.ret;

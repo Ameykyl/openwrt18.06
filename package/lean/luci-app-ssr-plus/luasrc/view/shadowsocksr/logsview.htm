@@ -62,9 +62,9 @@
 		var txt = document.getElementById("<%=cbid%>.txt");	// TextArea
 		if ( !txt ) { return; }	// security check
 	txt.value= "Reading: " +  document.getElementById("<%=cbid%>").value
-		XHR.get('<%=luci.dispatcher.build_url("admin", "vpn", "shadowsocksr", "fileread")%>', {lfile: document.getElementById("<%=cbid%>").value} ,
+		XHR.get('<%=luci.dispatcher.build_url("admin", "Internet", "shadowsocksr", "fileread")%>', {lfile: document.getElementById("<%=cbid%>").value} ,
 			function(x, ifc) {
-				if (! ifc) {txt.value = "XHR.get(<%=luci.dispatcher.build_url("admin", "vpn", "shadowsocksr", "fileread")%>) Failed!"; return;}
+				if (! ifc) {txt.value = "XHR.get(<%=luci.dispatcher.build_url("admin", "Internet", "shadowsocksr", "fileread")%>) Failed!"; return;}
 				txt.value = ifc[0];
 				if (bottom)
 					txt.scrollTop = txt.scrollHeight;

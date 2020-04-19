@@ -800,7 +800,7 @@ header>.container>.brand {
     color: #f3a4b5!important;
 }
 .main > .main-left > .nav > .slide > .menu[data-title= Control ]:before{
-    content: "\e90e";
+    content: "\e907";
     color: #afdd22!important;
 }
 .main > .main-left > .nav > .slide > .menu[data-title= QOS ]:before{
@@ -824,6 +824,10 @@ header>.container>.brand {
 .main > .main-left > .nav > .slide > .menu[data-title= Network ]:before{
     content: "\e908";
     color: #8965e0!important;
+}
+.main > .main-left > .nav > .slide > a[data-title="Internet"]:before {
+    content: "\e90e";
+   color: #ff0097!important;
 }
 .main > .main-left > .nav > .slide > .menu[data-title= Bandwidth_Monitor ]:before{
     content: "\e90d";

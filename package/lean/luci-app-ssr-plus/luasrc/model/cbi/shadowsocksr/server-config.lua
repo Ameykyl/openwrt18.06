@@ -42,7 +42,7 @@ obfs = {
 
 m = Map(shadowsocksr, translate("Edit ShadowSocksR Server"))
 
-m.redirect = luci.dispatcher.build_url("admin/vpn/shadowsocksr/server")
+m.redirect = luci.dispatcher.build_url("admin/Internet/shadowsocksr/server")
 if m.uci:get(shadowsocksr, sid) ~= "server_config" then
 	luci.http.redirect(m.redirect)
 	return
