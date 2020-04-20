@@ -62,6 +62,8 @@ jobs:
            tar   xvJf  luci-app-adbyby-plus.tar.xz
            tar   xvJf  luci-app-firefly.tar.xz
            tar   xvJf  luci-app-ssr-plus-lean.tar.xz
+           tar   xvJf   luci-app-airplay2.tar.xz
+           tar   xvJf   luci-app-music-remote-center.tar.xz
            git clone  https://github.com/Sweet-Fairy/openwrt-package
            git clone  https://github.com/lisaac/luci-lib-docker.git package/luci-lib-docker
            git clone  https://github.com/lisaac/luci-app-dockerman.git package/luci-app-dockerman  
@@ -176,6 +178,9 @@ jobs:
             CONFIG_PACKAGE_luci-app-usb-printer=y
             CONFIG_PACKAGE_luci-app-onliner=y
             CONFIG_PACKAGE_luci-app-nps=y
+            CONFIG_PACKAGE_luci-app-music-remote-center=y
+            CONFIG_PACKAGE_luci-app-airplay2=y
+            CONFIG_PACKAGE_luci-app-nft-qos=y
             CONFIG_PACKAGE_luci-app-cpulimit=y
             CONFIG_PACKAGE_luci-app-netdata=y
             CONFIG_PACKAGE_luci-app-cupsd=y
