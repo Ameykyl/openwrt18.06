@@ -7,7 +7,7 @@
 # <https://github.com/KFERMercer/OpenWrt-CI>
 #
 
-name: OpenWrt18.06-IPV6-CI
+name: OpenWrt18.06-CI
 on:
    push:
     branches: 
@@ -54,20 +54,11 @@ jobs:
            rm    -rfv  package/lean/autocore
            rm    -rfv  package/lean/luci-app-adbyby-plus
            cd package/diy
-           tar   xvJf  luci-app-docker.tar.xz
-           tar   xvJf  luci-app-koolddns.tar.xz
-           tar   xvJf  luci-app-rclone.tar.xz
-           tar   xvJf  autocore.tar.xz
-           tar   xvJf  luci-app-nps.tar.xz
-           tar   xvJf  luci-app-adbyby-plus.tar.xz
-           tar   xvJf  luci-app-firefly.tar.xz
-           tar   xvJf  luci-app-ssr-plus-lean.tar.xz
-           tar   xvJf   luci-app-airplay2.tar.xz
-           tar   xvJf   luci-app-music-remote-center.tar.xz
-           git clone  https://github.com/Sweet-Fairy/openwrt-package
+           
+           git clone  https://github.com/Sweet-Fairy/openwrt-package  
            git clone  https://github.com/lisaac/luci-lib-docker.git package/luci-lib-docker
            git clone  https://github.com/lisaac/luci-app-dockerman.git package/luci-app-dockerman  
-    
+           
            # ==========以上是示范如何加入tar.xz解包和拉github源码编译==========
                  
              
@@ -107,6 +98,20 @@ jobs:
           # 
           # 无论你想要对固件进行怎样的定制, 都需要且只需要修改 EOF 回环内的内容.
           # 
+      - name: Custom plugin
+        run: |
+          cd feeds/luci//diy 
+           tar   xvJf  luci-app-docker.tar.xz
+           tar   xvJf  luci-app-koolddns.tar.xz
+           tar   xvJf  luci-app-rclone.tar.xz
+           tar   xvJf  autocore.tar.xz
+           tar   xvJf  luci-app-nps.tar.xz
+           tar   xvJf  luci-app-adbyby-plus.tar.xz
+           tar   xvJf  luci-app-firefly.tar.xz
+           tar   xvJf  luci-app-ssr-plus-lean.tar.xz
+           tar   xvJf   luci-app-airplay2.tar.xz
+           tar   xvJf   luci-app-music-remote-center.tar.xz
+           
           # 编译x64固件:
            cat >> .config <<EOF
            CONFIG_TARGET_x86=y
