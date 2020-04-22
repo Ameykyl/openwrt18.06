@@ -105,18 +105,11 @@ fake_block() {
 
 yml_check()
 {
-   #替换tab
+   #格式替换
    sed -i 's/\t/ /g' "$3" 2>/dev/null
-   
-   #检查关键字避免后续操作出错
-   #proxies
-   [ -z "$(grep "^Proxy:" "$3")" ] && {
-      sed -i "/^ \{1,\}Proxy:/c\Proxy:" "$3" 2>/dev/null
-   }
-   [ -z "$(grep "^Proxy:" "$3")" ] && {
-      sed -i "s/^proxies:/Proxy:/" "$3" 2>/dev/null
-   }
+   sed -i "s/- \{2,\}/- /g" "$3" 2>/dev/null
 
+   #检查关键字避免后续操作出错
 	 #proxy-providers
 	 [ -z "$(grep "^proxy-provider:" "$3")" ] && {
       sed -i "/^ \{1,\}proxy-provider:/c\proxy-provider:" "$3" 2>/dev/null
@@ -132,6 +125,21 @@ yml_check()
    }
    [ -z "$(grep "^Proxy Group:" "$3")" ] && {
       sed -i "/^ \{0,\}proxy-groups:/c\Proxy Group:" "$3" 2>/dev/null
+   }
+   
+   #proxies
+   [ -z "$(grep "^Proxy:" "$3")" ] && {
+      sed -i "/^ \{1,\}Proxy:/c\Proxy:" "$3" 2>/dev/null
+   }
+   [ -z "$(grep "^Proxy:" "$3")" ] && {
+      sed -i "/^proxies:/c\Proxy:" "$3" 2>/dev/null
+   }
+   [ -z "$(grep "^Proxy:" "$3")" ] && {
+   	  group_len=$(sed -n '/^Proxy Group:/=' "$3" 2>/dev/null)
+   	  proxies_len=$(sed -n '/proxies:/=' "$3" 2>/dev/null |sed -n 1p)
+      if [ "$proxies_len" -lt "$group_len" ]; then
+         sed -i "${proxies_len}c\Proxy:" "$3" 2>/dev/null
+      fi 2>/dev/null
    }
    
    #rules
@@ -157,9 +165,8 @@ yml_check()
 
    #位置检查
    proxy_len=$(sed -n '/^Proxy:/=' "$3" 2>/dev/null)
-   group_len=$(sed -n '/^ \{0,\}Proxy Group:/=' "$3" 2>/dev/null)
    provider_len=$(sed -n '/^proxy-provider:/=' "$3" 2>/dev/null)
-   dns_len=$(sed -n '/^ \{0,\}dns:/=' "$3" 2>/dev/null)
+   dns_len=$(sed -n '/^dns:/=' "$3" 2>/dev/null)
    rule_len=$(sed -n '/^Rule:/=' "$3" 2>/dev/null)
    
    if [ "$dns_len" -ge "$proxy_len" ] || [ "$dns_len" -ge "$rule_len" ] || [ "$dns_len" -ge "$group_len" ]; then
@@ -291,42 +298,60 @@ yml_dns_check()
 
 }
 
+#修改代理集路径
+yml_provider_path()
+{
+   sed -i "s/\'//g" "$1" 2>/dev/null
+   sed -i 's/\"//g' "$1" 2>/dev/null
+   proxy_provider_path_line=$(sed -n '/^ \{0,\}path:/=' "$1" 2>/dev/null)
+   if [ ! -z "$proxy_provider_path_line" ]; then
+	    for n in $proxy_provider_path_line
+      do
+         provider_path=$(sed -n "${n}p" "$1" |awk -F 'path:' '{print $2}' 2>/dev/null |sed 's/,.*//' 2>/dev/null |sed 's/^ \{0,\}//g' 2>/dev/null |sed 's/ \{0,\}$//g' 2>/dev/null |sed 's/ \{0,\}\}\{0,\}$//g' 2>/dev/null)
+         if [ -z "$(echo "$provider_path" |grep "proxy_provider")" ]; then
+            provider_name=$(echo "$provider_path" |awk -F '/' '{print $NF}')
+            sed -i "s#${provider_path}#./proxy_provider/${provider_name}#" "$1" 2>/dev/null
+         fi
+      done
+   fi
+}
+
 #检查代理集文件防止启动失败
 yml_proxy_provider_check()
 {
-
-while ( [ ! -z "$(pidof clash)" ] && [ "$proxy_provider_path_exist" != 1 ] )
-do
-   if [ "$proxy_provider_mode" = 1 ]; then
-      proxy_provider_path_line=$(sed -n '/^ \{0,\}path:/=' "$1" 2>/dev/null)
-      proxy_provider_path_exist=1
-      for n in $proxy_provider_path_line
-      do
-         provider_path=$(sed -n "${n}p" $1 |awk -F 'path:' '{print $2}' 2>/dev/null |sed 's/,.*//' 2>/dev/null |sed 's/^ \{0,\}//g' 2>/dev/null |sed 's/ \{0,\}$//g' 2>/dev/null |sed 's/ \{0,\}\}\{0,\}$//g' 2>/dev/null)
-         if [ "$(echo ${provider_path:0:1})" = "." ]; then
-            provider_path_check="/etc/openclash/$(echo ${provider_path:2})"
-            if [ -f "$provider_path_check" ]; then
-               if [ -z "$(grep "'proxies:':" "$provider_path_check")" ] && [ -z "$(grep '"proxies:":' "$provider_path_check")" ] && [ -z "$(grep 'proxies:' "$provider_path_check")" ]; then
+if [ ! -z "$proxy_provider_path_line" ]; then
+   while ( [ ! -z "$(pidof clash)" ] && [ "$proxy_provider_path_exist" != 1 ] )
+   do
+      if [ "$proxy_provider_mode" = 1 ]; then
+         proxy_provider_path_exist=1
+         for n in $proxy_provider_path_line
+         do
+            provider_path=$(sed -n "${n}p" "$1" |awk -F 'path:' '{print $2}' 2>/dev/null |sed 's/,.*//' 2>/dev/null |sed 's/^ \{0,\}//g' 2>/dev/null |sed 's/ \{0,\}$//g' 2>/dev/null |sed 's/ \{0,\}\}\{0,\}$//g' 2>/dev/null)
+            if [ "$(echo ${provider_path:0:1})" = "." ]; then
+               provider_path_check="/etc/openclash/$(echo ${provider_path:2})"
+               if [ -f "$provider_path_check" ]; then
+                  if [ -z "$(grep "'proxies:':" "$provider_path_check")" ] && [ -z "$(grep '"proxies:":' "$provider_path_check")" ] && [ -z "$(grep 'proxies:' "$provider_path_check")" ]; then
+                     proxy_provider_path_exist=0
+                  fi
+               else
                   proxy_provider_path_exist=0
                fi
             else
-               proxy_provider_path_exist=0
-            fi
-         else
-            provider_path_check="$provider_path"
-            if [ -f "$provider_path_check" ]; then
-               if [ -z "$(grep "'proxies:':" "$provider_path_check")" ] && [ -z "$(grep '"proxies:":' "$provider_path_check")" ] && [ -z "$(grep 'proxies:' "$provider_path_check")" ]; then
+               provider_path_check="$provider_path"
+               if [ -f "$provider_path_check" ]; then
+                  if [ -z "$(grep "'proxies:':" "$provider_path_check")" ] && [ -z "$(grep '"proxies:":' "$provider_path_check")" ] && [ -z "$(grep 'proxies:' "$provider_path_check")" ]; then
+                     proxy_provider_path_exist=0
+                  fi
+               else
                   proxy_provider_path_exist=0
                fi
-            else
-               proxy_provider_path_exist=0
             fi
-         fi
-      done
-   else
-      proxy_provider_path_exist=1
-   fi
-done
+         done
+      else
+         proxy_provider_path_exist=1
+      fi
+   done
+fi
 
 if [ -z "$(pidof clash)" ] && [ "$proxy_provider_mode" = 1 ]; then
    echo "错误: OpenClash 启动失败，请到日志页面查看详细错误信息！" >$START_LOG
@@ -775,6 +800,7 @@ if [ "$enable" -eq 1 ] && [ -f "$CONFIG_FILE" ]; then
           yml_auth_custom "$CONFIG_FILE"
           yml_cut "$CHANGE_FILE" "$RULE_FILE" "$DNS_FILE" "$CONFIG_FILE" "$PROXY_FILE" "$PROXY_PROVIDER_FILE" "$GROUP_FILE"
           yml_dns_custom "$enable_custom_dns" "$DNS_FILE"
+          yml_provider_path "$PROXY_PROVIDER_FILE"
           sh /usr/share/openclash/yml_change.sh >/dev/null 2>&1 "$LOGTIME" "$en_mode" "$enable_custom_dns" "$da_password" "$cn_port" "$proxy_port" "$CHANGE_FILE" "$ipv6_enable" "$http_port" "$socks_port" "$lan_ip" "$log_level" "$proxy_mode" "$intranet_allowed" "$en_mode_tun" &
           sh /usr/share/openclash/yml_rules_change.sh >/dev/null 2>&1 "$LOGTIME" "$rule_source" "$enable_custom_clash_rules" "$RULE_FILE" "$set_rule_file" "$en_mode" "$enable_rule_proxy" "$BACKUP_FILE" &
           wait
@@ -798,9 +824,9 @@ if [ "$enable" -eq 1 ] && [ -f "$CONFIG_FILE" ]; then
              ln -s /usr/share/openclash/yacd /www/luci-static/openclash 2>/dev/null
        
              echo "第八步: 设置防火墙规则..." >$START_LOG
-             if [ "$(iptables -t nat -nL PREROUTING --line-number |grep "udp dpt:53" |wc -l)" -gt 1 ] && [ "$enable_redirect_dns" -eq "1" ]; then
+             if [ "$(iptables -t nat -nL PREROUTING --line-number |grep "udp dpt:53" |grep "0.0.0.0/0 \{0,\}0.0.0.0/0" |wc -l)" -gt 1 ] && [ "$enable_redirect_dns" -eq "1" ]; then
                 echo "发现53端口被劫持，清理防火墙规则..." >$START_LOG
-                pre_lines=$(iptables -nvL PREROUTING -t nat |sed 1,2d |sed -n '/udp dpt:53/=' 2>/dev/null |sort -rn)
+                pre_lines=$(iptables -nvL PREROUTING -t nat |sed 1,2d |sed -n '/0.0.0.0\/0 \{0,\}0.0.0.0\/0 \{0,\}udp dpt:53/=' 2>/dev/null |sort -rn)
                 for pre_line in $pre_lines; do
                    iptables -t nat -D PREROUTING "$pre_line" >/dev/null 2>&1
                 done
