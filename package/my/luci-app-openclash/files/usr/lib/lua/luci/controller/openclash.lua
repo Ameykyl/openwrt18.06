@@ -5,8 +5,9 @@ function index()
 		return
 	end
 
-
-	entry({"admin", "services", "openclash"},alias("admin", "services", "openclash", "client"), _("OpenClash"), 50).dependent = true
+	local page = entry({"admin", "services", "openclash"}, alias("admin", "services", "openclash", "client"), _("OpenClash"), 50)
+	page.dependent = true
+	page.acl_depends = { "luci-app-openclash" }
 	entry({"admin", "services", "openclash", "client"},form("openclash/client"),_("Overviews"), 20).leaf = true
 	entry({"admin", "services", "openclash", "status"},call("action_status")).leaf=true
 	entry({"admin", "services", "openclash", "state"},call("action_state")).leaf=true
@@ -21,6 +22,7 @@ function index()
 	entry({"admin", "services", "openclash", "coregameupdate"},call("action_core_game_update"))
 	entry({"admin", "services", "openclash", "ping"}, call("act_ping"))
 	entry({"admin", "services", "openclash", "download_game_rule"}, call("action_download_rule"))
+	entry({"admin", "services", "openclash", "restore"}, call("action_restore_config"))
 	entry({"admin", "services", "openclash", "settings"},cbi("openclash/settings"),_("Global Settings"), 30).leaf = true
 	entry({"admin", "services", "openclash", "servers"},cbi("openclash/servers"),_("Severs and Groups"), 40).leaf = true
 	entry({"admin", "services", "openclash", "game-settings"},cbi("openclash/game-settings"),_("Game Rules and Groups"), 50).leaf = true
@@ -194,6 +196,15 @@ function download_rule()
   return state
 end
 
+function action_restore_config()
+	luci.sys.call("/etc/init.d/openclash stop >/dev/null 2>&1")
+	luci.sys.call("cp '/usr/share/openclash/backup/openclash' '/etc/config/openclash' >/dev/null 2>&1 &")
+	luci.sys.call("cp '/usr/share/openclash/backup/openclash_custom_rules.list' '/etc/openclash/custom/openclash_custom_rules.list' >/dev/null 2>&1 &")
+	luci.sys.call("cp '/usr/share/openclash/backup/openclash_custom_rules_2.list' '/etc/openclash/custom/openclash_custom_rules_2.list' >/dev/null 2>&1 &")
+	luci.sys.call("cp '/usr/share/openclash/backup/openclash_custom_fake_black.conf' '/etc/openclash/custom/openclash_custom_fake_black.conf' >/dev/null 2>&1 &")
+	luci.sys.call("cp '/usr/share/openclash/backup/openclash_custom_hosts.list' '/etc/openclash/custom/openclash_custom_hosts.list' >/dev/null 2>&1 &")
+end
+
 function action_status()
 	luci.http.prepare_content("application/json")
 	luci.http.write_json({
@@ -206,6 +217,7 @@ function action_status()
 		mode = mode();
 	})
 end
+
 function action_state()
 	luci.http.prepare_content("application/json")
 	luci.http.write_json({
