@@ -144,6 +144,16 @@ jobs:
            CONFIG_PACKAGE_kmod-usb2-pci=y
            CONFIG_PACKAGE_kmod-usb3=y
           EOF
+          # 有线网卡支持支持:
+           cat >> .config <<EOF        
+          CONFIG_PACKAGE_kmod-alx=y
+          CONFIG_PACKAGE_kmod-atl1=y
+          CONFIG_PACKAGE_kmod-atl1c=y
+          CONFIG_PACKAGE_kmod-atl1e=y
+          CONFIG_PACKAGE_kmod-atl2=y
+          CONFIG_PACKAGE_kmod-atm=y
+          EOF          
+          
           # 常用LuCI插件选择:
            cat >> .config <<EOF
             CONFIG_PACKAGE_luci-app-adbyby-plus=y
@@ -295,6 +305,3 @@ jobs:
         with:
           name: OpenWrt18.06 x86 IPK
           path: ./bin/packages/
-          
-     
-
